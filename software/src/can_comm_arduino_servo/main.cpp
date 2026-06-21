@@ -277,8 +277,8 @@ You are decoding Servo status frames as if they were MIT-style packed unsigned v
  */
 //
 // CubeMars AK Servo Mode CAN control
-// Cleaned up feedback decoding + basic command helpers
 //
+
 
 #include <Arduino.h>
 #include <Arduino_CAN.h>
@@ -534,7 +534,7 @@ void setup() {
 
   Serial.println("Initializing CAN communication...");
 
-  if (!CAN.begin(CanBitRate::BR_1000k)) {
+  if (!CAN.begin(CanBitRate::BR_500k)) {
     Serial.println("CAN.begin(...) failed.");
     while (true) {}
   }
@@ -542,7 +542,7 @@ void setup() {
   Serial.println("CAN ready.");
 }
 
-constexpr uint8_t MOTOR_ID = 2;
+constexpr uint8_t MOTOR_ID = 0x68;
 
 // RPM sweep settings
 constexpr int32_t RPM_MIN = 10000;
@@ -550,7 +550,7 @@ constexpr int32_t RPM_MAX = 20000;
 constexpr int32_t RPM_STEP = 1;
 
 // Send a new RPM command every 100 ms, like your delay(100)
-constexpr unsigned long RPM_UPDATE_PERIOD_MS = 1;
+constexpr unsigned long RPM_UPDATE_PERIOD_MS = 500;
 
 // Optional: print feedback slower than the CAN update rate
 constexpr unsigned long PRINT_PERIOD_MS = 200;
@@ -562,7 +562,10 @@ unsigned long last_rpm_update_ms = 0;
 unsigned long last_print_ms = 0;
 
 void loop() {
+//Serial.println("Hello");
   // 1) Always drain CAN frames first
+
+
   while (CAN.available()) {
     CanMsg const rxMsg = CAN.read();
 
@@ -597,26 +600,33 @@ void loop() {
   }
 
   // 2) Non-blocking RPM sweep
+
+  //can_set_rpm(0x68, 4296.0);
+
   unsigned long now = millis();
 
   if (now - last_rpm_update_ms >= RPM_UPDATE_PERIOD_MS) {
+
     last_rpm_update_ms = now;
+    //bool ok = can_set_rpm(MOTOR_ID, commanded_rpm);
 
-    bool ok = can_set_rpm(MOTOR_ID, commanded_rpm);
+    //Serial.print("Commanding RPM=");
+    //Serial.print(commanded_rpm);
+    //Serial.print(" ok=");
+    //Serial.println(ok);
 
-    Serial.print("Commanding RPM=");
-    Serial.print(commanded_rpm);
-    Serial.print(" ok=");
-    Serial.println(ok);
+    //commanded_rpm += rpm_direction * RPM_STEP;
 
-    commanded_rpm += rpm_direction * RPM_STEP;
-
-    if (commanded_rpm >= RPM_MAX) {
+    /*if (commanded_rpm >= RPM_MAX) {
       commanded_rpm = RPM_MAX;
       rpm_direction = -1;
     } else if (commanded_rpm <= RPM_MIN) {
       commanded_rpm = RPM_MIN;
       rpm_direction = +1;
     }
+
+  //Serial.println(".");
+*/
   }
+ can_set_position(MOTOR_ID, 300.0f);
 }

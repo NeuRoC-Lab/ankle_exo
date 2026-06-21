@@ -1,0 +1,34 @@
+site_name: AnkleExo documentation webpage
+site_url: https://www.oscartesniere.com/
+
+nav:
+  - Home: index.md
+  - Electrical:
+      - Overview: electrical/index.md
+      - PCB: electrical/pcb.md
+      - Wiring: electrical/wiring.md
+      - Power: electrical/power.md
+  - Software:
+      - Overview: software/index.md
+      - Setup: software/setup.md
+      - API: software/api.md
+      - Encoder testing: software/encoder.md
+  - Mechanical:
+      - Overview: mechanical/index.md
+      - Parts: mechanical/parts.md
+      - Assembly: mechanical/assembly.md
+
+theme:
+  name: readthedocs
+#logo: assets/logo.png
+# add a logo here !
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+        generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+# to upload to the server : `rsync -avz ankledocs root@192.168.0.88:/root/ankledocs/ankledocs/`

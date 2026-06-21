@@ -41,7 +41,7 @@ static constexpr uint8_t neutralMITCommand[8] = {
     0x00, 0x00, 0x07, 0xFF
 };
 
-static constexpr uint8_t MOTOR_ID = 0x02;
+static constexpr uint8_t MOTOR_ID = 0x01;
 // send this command to CANTX to turn the motor into active motor mode first!
 //
 typedef struct {

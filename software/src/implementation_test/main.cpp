@@ -637,7 +637,9 @@ void loop() {
    //read_and_print_can_frames();
   }
   // Then make sure to flush :
+  if(loadcells || encoders || motors) {
   Serial.println();
+   }
   lastUpdate = millis();
  }
 
