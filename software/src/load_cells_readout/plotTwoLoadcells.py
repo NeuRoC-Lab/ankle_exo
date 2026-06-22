@@ -5,7 +5,7 @@ The analog count value is converted to voltage on a 5V basis.
 The left and right load cells need to be carefully defined to avoid confusion.
 
 Type in CLion terminal:
-python software\src\load_cells_readout\plotTwoLoadcellsPolished.py
+python software\src\load_cells_readout\plotTwoLoadcells.py
 """
 
 import serial

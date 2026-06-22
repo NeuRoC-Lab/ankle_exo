@@ -2,7 +2,7 @@
 This code is used to plot the relative angle of one encoder in degrees
 relative to the original position the ankle is at when the test just starts
 
-python src/single_encoder_matlab/plotEncoder.py
+python src/single_encoder/plotEncoder.py
 
 Arduino Pin Connection:
 SPI Clock (SCK): Pin 13

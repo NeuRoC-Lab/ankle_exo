@@ -120,6 +120,6 @@ try:
     while (running["in_progress"] == True) and (plt.fignum_exists(fig.number) == True):
         # y-axis data
         raw = ser.readline().decode().strip()
-        arr = re.split(r"[ :.]", raw)
+        arr = re.split(r"[ :,]", raw)
 
         for
