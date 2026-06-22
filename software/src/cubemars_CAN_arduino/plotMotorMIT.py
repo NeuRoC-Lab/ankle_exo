@@ -117,9 +117,61 @@ ser.flush()
 print("MIT mode motor test starts now")
 
 try:
+
     while (running["in_progress"] == True) and (plt.fignum_exists(fig.number) == True):
+
         # y-axis data
         raw = ser.readline().decode().strip()
         arr = re.split(r"[ :,]", raw)
 
-        for
+        pos_index = (arr.index("pos") + 2)
+        vel_index = (arr.index("vel") + 2)
+        trq_index = (arr.index("trq") + 2)
+        temp_index = (arr.index("temp") + 2)
+
+        position_data.append(float(arr[pos_index]))
+        velocity_data.append(float(arr[vel_index]))
+        torque_data.append(float(arr[trq_index]))
+        temperature_data.append(float(arr[temp_index]))
+
+        # x-axis data
+        current_time = time.perf_counter() - start_time
+        time_data.append(current_time)
+
+        # keep plot centered around only within time window
+        while time_data and (current_time - time_data[0]) > time_window:
+            time_data.pop(0)
+            position_data.pop(0)
+            velocity_data.pop(0)
+            torque_data.pop(0)
+            temperature_data.pop(0)
+
+        # update plots
+        posline.set_data(time_data, position_data)
+        velline.set_data(time_data, velocity_data)
+        torqline.set_data(time_data, torque_data)
+        templine.set_data(time_data, temperature_data)
+
+        ax1.set_xlim(max(0, current_time - time_window), current_time)
+        ax1.relim()
+        ax1.autoscale_view(scalex=False, scaley=True)
+        ax2.set_xlim(max(0, current_time - time_window), current_time)
+        ax2.relim()
+        ax2.autoscale_view(scalex=False, scaley=True)
+        ax3.set_xlim(max(0, current_time - time_window), current_time)
+        ax3.relim()
+        ax3.autoscale_view(scalex=False, scaley=True)
+        ax4.set_xlim(max(0, current_time - time_window), current_time)
+        ax4.relim()
+        ax4.autoscale_view(scalex=False, scaley=True)
+
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
+except KeyboardInterrupt:
+    print("Ctrl+C pressed, closing figure")
+    ser.close()
+
+finally:
+    stop_motor()
+    plt.close("all")
