@@ -13,6 +13,7 @@ nav:
       - Setup: software/setup.md
       - API: software/api.md
       - Encoder testing: software/encoder.md
+      - Sensors Plotting: software/plotting.md
   - Mechanical:
       - Overview: mechanical/index.md
       - Parts: mechanical/parts.md
@@ -25,7 +26,7 @@ theme:
 
 markdown_extensions:
   - pymdownx.arithmatex:
-        generic: true
+      generic: true
 
 extra_javascript:
   - javascripts/mathjax.js
