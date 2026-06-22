@@ -108,13 +108,13 @@ void read_and_print_can_frames()
             Serial.print("  motor id: ");
             Serial.print(reply.can_id);
 
-            Serial.print(" pos (rad?): ");
+            Serial.print(" pos (rad): ");
             Serial.print(reply.position, 4);
 
-            Serial.print(" vel(rad/s?): ");
+            Serial.print(" vel (rad/s): ");
             Serial.print(reply.velocity, 4);
 
-            Serial.print(" trq(N*m): ");
+            Serial.print(" trq (N*m): ");
             Serial.print(reply.torque, 4);
 
             Serial.print(" temp (C): ");
