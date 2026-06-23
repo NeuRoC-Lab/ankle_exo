@@ -63,30 +63,109 @@ The desired gain is calculated as \(\text{Target gain} = \frac{3.3 V}{\text{full
 
 The two parameters that we can modify to increase the full scale signal range are 1) the gain and 2) the bridge excitation voltage
 
+## Force conversion formula
+
+We assume that the load cells are linear. Therefore, the following equality holds:
+
+\[
+\frac{V_{diff}(F)}{V_{diff,FS}}
+=
+\frac{F}{F_{FS}}
+\]
+
+where \(FS\) means **full scale**.
+
+For example, the rated full-scale force of the load cell model is typically:
+
+\[
+F_{FS} = 1000\,\text{N}
+\]
+
+The full-scale differential voltage is given by:
+
+\[
+V_{diff,FS}
+=
+\text{sensitivity}
+\times
+V_{exc}
+\]
+
+Therefore, for an applied force \(F_{applied}\), the output voltage is:
+
+\[
+V_o(F_{applied})
+=
+V_{IAREF}
+-
+\text{Gain}
+\times
+\text{sensitivity}
+\times
+V_{exc}
+\times
+\frac{F_{applied}}{F_{FS}}
+\]
+
+Rearranging the equation:
+
+\[
+V_{IAREF} - V_o(F_{applied})
+=
+\text{Gain}
+\times
+\text{sensitivity}
+\times
+V_{exc}
+\times
+\frac{F_{applied}}{F_{FS}}
+\]
+
+Solving for the applied force:
+
+\[
+F_{applied}
+=
+\frac{
+\left(
+V_{IAREF}
+-
+V_o(F_{applied})
+\right)
+F_{FS}
+}{
+\text{Gain}
+\times
+\text{sensitivity}
+\times
+V_{exc}
+}
+\]
+
+Thus, the applied force can be computed from the measured output voltage as:
+
+\[
+\boxed{
+F_{applied}
+=
+\frac{
+\left(
+V_{IAREF}
+-
+V_o
+\right)
+F_{FS}
+}{
+\text{Gain}
+\times
+\text{sensitivity}
+\times
+V_{exc}
+}
+}
+\]
+
 ## Pinout of the PCB 
 
-V
-+
-​
-
-≥V
-REF
-​
-
-+1.25V
-
-So for the 2.5 V reference:
-
-V
-+
-​
-
-≥2.5V+1.25V=3.75V
-
-If you power the INA125U from 3.3 V, then:
-
-3.3V−2.5V=0.8V
-
-So you only have 0.8 V headroom, but the datasheet wants about 1.25 V dropout/headroom.
 
 ![Pinout ](../images/pcb-pinout.png)
