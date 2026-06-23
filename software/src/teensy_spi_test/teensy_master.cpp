@@ -16,23 +16,23 @@ SPISettings spiSettings(
 uint8_t counter = 0;
 
 uint8_t spi_transfer_byte(uint8_t value) {
-    SPI1.beginTransaction(spiSettings);
+    SPI.beginTransaction(spiSettings);
 
     digitalWrite(CS_PIN, LOW);
     delayMicroseconds(5);
 
     // First byte sends command.
-    SPI1.transfer(value);
+    SPI.transfer(value);
 
     delayMicroseconds(5);
 
     // Second byte clocks back the Arduino's prepared response.
-    uint8_t response = SPI1.transfer(0x00);
+    uint8_t response = SPI.transfer(0x00);
 
     delayMicroseconds(5);
     digitalWrite(CS_PIN, HIGH);
 
-    SPI1.endTransaction();
+    SPI.endTransaction();
 
     return response;
 }
@@ -44,7 +44,7 @@ void setup() {
     pinMode(CS_PIN, OUTPUT);
     digitalWrite(CS_PIN, HIGH);
 
-    SPI1.begin();
+    SPI.begin();
 
     Serial.println("Teensy SPI master started");
 }

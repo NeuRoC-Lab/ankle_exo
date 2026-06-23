@@ -290,6 +290,18 @@ void handle_serial_line(String line) {
     line.trim();
     line.toLowerCase();
 
+    if (line.startsWith("enter")){
+        CanMsg const enter_cmd(CanStandardId(MOTOR_ID), 8, enterMotorMode);
+        CAN.write(enter_cmd);
+        return;
+    }
+    else if(line.startsWith("exit")){
+        CanMsg const exit_cmd(CanStandardId(MOTOR_ID), 8, exitMotorMode);
+        CAN.write(exit_cmd);
+        return;
+    }
+
+
     if (!line.startsWith("set ")) return;
 
     String tok[12];
@@ -399,19 +411,23 @@ void loop() {
             Serial.print("CAN.write(...) failed with error code ");
             Serial.println(rc);
             // optional: exit motor mode
-            CanMsg const exit_cmd(CanStandardId(MOTOR_ID), 8, exitMotorMode);
-            CAN.write(exit_cmd);
-            delay(200);
-
+            Serial.print("Leaving motor mode, reseting values, then re-entering motor mode");
+            delay(1000);
             // send neutral MIT command
             CanMsg const neutral_cmd(CanStandardId(MOTOR_ID), 8, neutralMITCommand);
             CAN.write(neutral_cmd);
-            delay(200);
+            delay(500);
+            CanMsg const exit_cmd(CanStandardId(MOTOR_ID), 8, exitMotorMode);
+            CAN.write(exit_cmd);
+            delay(500);
+
+            CAN.write(neutral_cmd);
+            delay(500);
 
             // enter motor mode
             CanMsg const enter_cmd(CanStandardId(MOTOR_ID), 8, enterMotorMode);
             CAN.write(enter_cmd);
-            delay(200);
+            delay(500);
 
             // send neutral MIT command again
             CAN.write(neutral_cmd);

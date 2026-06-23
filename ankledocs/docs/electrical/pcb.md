@@ -62,3 +62,31 @@ The desired gain is calculated as \(\text{Target gain} = \frac{3.3 V}{\text{full
 
 
 The two parameters that we can modify to increase the full scale signal range are 1) the gain and 2) the bridge excitation voltage
+
+## Pinout of the PCB 
+
+V
++
+​
+
+≥V
+REF
+​
+
++1.25V
+
+So for the 2.5 V reference:
+
+V
++
+​
+
+≥2.5V+1.25V=3.75V
+
+If you power the INA125U from 3.3 V, then:
+
+3.3V−2.5V=0.8V
+
+So you only have 0.8 V headroom, but the datasheet wants about 1.25 V dropout/headroom.
+
+![Pinout ](../images/pcb-pinout.png)

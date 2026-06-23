@@ -8,6 +8,7 @@ nav:
       - PCB: electrical/pcb.md
       - Wiring: electrical/wiring.md
       - Power: electrical/power.md
+      - Encoder debug : electrical/encoder_debug.md
   - Software:
       - Overview: software/index.md
       - Setup: software/setup.md
