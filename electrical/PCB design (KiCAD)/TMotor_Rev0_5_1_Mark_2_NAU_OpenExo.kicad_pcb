@@ -80,7 +80,7 @@
 	(net 0 "")
 	(net 1 "GND")
 	(net 2 "Net-(PS1-GND{slash}-VOUT)")
-	(net 3 "/CAN and peripherals/L7_VIN")
+	(net 3 "/CAN and peripherals./L7_VIN")
 	(net 4 "SDA")
 	(net 5 "SCL")
 	(net 6 "SYNC_DEFAULT")
@@ -171,7 +171,7 @@
 	(net 91 "/Load cells/Right LC Amplifier 1/Vbridge-")
 	(net 92 "/Load cells/Right LC  Amplifier 2/Vbridge+")
 	(net 93 "/Load cells/Right LC Amplifier 1/Vbridge+")
-	(net 94 "/CAN and peripherals/CAN_P")
+	(net 94 "/CAN and peripherals./CAN_P")
 	(net 95 "Net-(U6-RG_2)")
 	(net 96 "Net-(U6-RG)")
 	(net 97 "Net-(U7-RG_2)")
@@ -181,7 +181,7 @@
 	(net 101 "unconnected-(U6-VREF5-Pad15)")
 	(net 102 "Net-(JP5-A)")
 	(net 103 "unconnected-(U7-VREF5-Pad15)")
-	(net 104 "/CAN and peripherals/CAN_N")
+	(net 104 "/CAN and peripherals./CAN_N")
 	(net 105 "Net-(JP8-A)")
 	(net 106 "unconnected-(U7-VREF10-Pad16)")
 	(net 107 "/Load cells/Left LC Amplifier 2/Vexcitation+")
@@ -219,7 +219,7 @@
 	(net 139 "Net-(JP9-B)")
 	(net 140 "Net-(JP10-B)")
 	(net 141 "Net-(JP10-A)")
-	(net 142 "/CAN and peripherals/VBATT")
+	(net 142 "/CAN and peripherals./VBATT")
 	(footprint "Capacitor_THT:C_Disc_D10.5mm_W5.0mm_P5.00mm"
 		(layer "F.Cu")
 		(uuid "00564e60-24a3-4f51-8824-f7be804dc1f8")
@@ -2178,7 +2178,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/f97fb500-251f-49ed-808e-af408e42fab8")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_poly
 			(pts
@@ -2442,7 +2442,7 @@
 			(at -0.5 -2.55)
 			(size 0.6 1.5)
 			(layers "F.Cu" "F.Paste")
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "1")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -2454,7 +2454,7 @@
 			(at 0.5 -2.55)
 			(size 0.6 1.5)
 			(layers "F.Cu" "F.Paste")
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "2")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -2545,94 +2545,6 @@
 			)
 		)
 	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "17ba7b61-f411-4e2f-8655-593764cbb2b9")
-		(at 106.87 99.67)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "64061513-b458-430e-9b36-1a1aa819cfcd")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "GND {{pwr}}"
-			(at 20.55 1.72 0)
-			(layer "User.1")
-			(uuid "d6a786ed-b7d4-4b4b-8e25-a267583ed5c0")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "bc1728b6-6c7b-4a2a-ae42-9b6d880db477")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "dd677834-3a00-4fd7-8698-762dd8dce9c4")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "e685acc5-85de-4f04-a022-f2d7cd4b7261")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "497afefe-15b3-4b34-8c6d-7d14a1ba1101")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "afb53a5e-915d-437b-ac6c-95857fc70a45")
-		)
-		(embedded_fonts no)
-	)
 	(footprint "Diode_THT:D_DO-201AD_P15.24mm_Horizontal"
 		(layer "F.Cu")
 		(uuid "1b6514e2-9c63-4387-ab01-cdb368fef90f")
@@ -2715,7 +2627,7 @@
 		)
 		(property ki_fp_filters "D*DO?201AD*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/ab53bc09-54c7-4909-b804-a998e13888f1")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -2977,7 +2889,7 @@
 			(drill 1.6)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pinfunction "K")
 			(pintype "passive")
 			(uuid "a3f897e2-79f5-4561-95dd-6d7ba7a33546")
@@ -3506,7 +3418,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/39e5c93b-10e3-49d2-96fe-43f36ca27487")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -3686,7 +3598,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "1")
 			(pintype "passive")
 			(uuid "5b51893f-b60b-467d-baf6-73935ed267d0")
@@ -3697,7 +3609,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "2")
 			(pintype "passive")
 			(uuid "d7abd866-e36c-467e-80d7-7963b343b54b")
@@ -5024,7 +4936,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/14c00ae5-ae51-4e41-b1a2-c3d807fb309a")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 7.6 -2.6)
@@ -5112,7 +5024,7 @@
 			(drill 2.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "+")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -5144,94 +5056,6 @@
 				(xyz -0 -0 90)
 			)
 		)
-	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "2fa6b7c8-f7a2-471c-b526-3e50626f5dde")
-		(at 106.84 85.57)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "b37ade4a-cd3d-4cd3-b958-b90331b3f8a4")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "RST {{nano}}"
-			(at 19.49 1.72 0)
-			(layer "User.1")
-			(uuid "9d45590a-8d1a-4656-b1a5-cf14ad7412ec")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "9c587640-570b-4868-9e27-e86af1e1f9e9")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "561ec1b9-f28f-4155-8bf0-dadb3d2c1c6b")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "0724c308-be7f-4633-ba2d-a50fc26fd13f")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "d62db5d3-2304-4909-a25c-49b2dcf10cdb")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "4306ddf5-939a-425a-847c-56c3e174260d")
-		)
-		(embedded_fonts no)
 	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical"
 		(layer "F.Cu")
@@ -6080,7 +5904,7 @@
 		)
 		(property ki_fp_filters "CP_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/10e10785-fe78-4db1-bf98-bd1d1a0965ab")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -8073,7 +7897,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pintype "passive")
 			(uuid "9dce582a-e4d8-4d46-8ef8-276322858532")
 		)
@@ -8155,7 +7979,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/efa61574-d95d-44e4-bf1b-4713bbb82200")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -8346,7 +8170,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pinfunction "2")
 			(pintype "passive")
 			(uuid "e64be631-6da0-4a02-9b76-4b8dfd14adaf")
@@ -8363,94 +8187,6 @@
 				(xyz 0 0 0)
 			)
 		)
-	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "42bff1b5-47a5-4bb5-8bc8-50226e6e5b0c")
-		(at 106.84 88.15)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "9300168a-4bfb-406e-8540-3d3622436cfb")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "GND {{pwr}}"
-			(at 19.65 0.63 0)
-			(layer "User.1")
-			(uuid "5599a994-c2f5-400c-9437-5e11d914f81c")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "c68a7e10-902a-42d3-81b1-1c84bb7711c3")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "d6d411b5-4d39-4369-97d2-6c782a550664")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "2f50cc49-7961-46bd-8619-fe0f4939ce57")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "a7a39834-8826-4b5d-90f6-ef54fbbf0f57")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "a9e50678-caad-4774-94c1-61cb2ab1cbc9")
-		)
-		(embedded_fonts no)
 	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical"
 		(layer "F.Cu")
@@ -9288,7 +9024,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/d459c4d2-20b4-4ce6-b1a7-73a3fbcfa03d")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -9468,7 +9204,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "1")
 			(pintype "passive")
 			(uuid "726c413f-1808-4bef-b19c-9c8a1ebaa545")
@@ -9479,7 +9215,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "2")
 			(pintype "passive")
 			(uuid "bffd35a4-80be-4cea-9e4c-6ff3f092ae91")
@@ -9774,7 +9510,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/beee1fc0-9534-4f63-99c9-b82062de02f8")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_poly
 			(pts
@@ -10038,7 +9774,7 @@
 			(at -0.5 -2.55 180)
 			(size 0.6 1.5)
 			(layers "F.Cu" "F.Paste")
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "1")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -10050,7 +9786,7 @@
 			(at 0.5 -2.55 180)
 			(size 0.6 1.5)
 			(layers "F.Cu" "F.Paste")
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "2")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -10195,7 +9931,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/9b9103a7-6177-4c52-98ed-064c8aa40fa1")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -10447,7 +10183,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/8745a08a-707e-4243-837e-9db2eb83f583")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -10669,7 +10405,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/77a31f4b-cf29-4c6d-9674-62a327703256")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -10820,7 +10556,7 @@
 			(drill 0.5)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pinfunction "2")
 			(pintype "passive")
 			(uuid "2c146430-df76-4ecd-be18-04c6d5229808")
@@ -10892,7 +10628,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/016c6c6e-4611-44d7-895b-915673a0f2d3")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -11855,83 +11591,6 @@
 		)
 		(embedded_fonts no)
 	)
-	(footprint "Pinout tentative layout:Origin"
-		(layer "F.Cu")
-		(uuid "70a349aa-4636-40f2-bc95-f6a1b432163c")
-		(at 103.62 65.28)
-		(descr "Set origin coordinates for pinout")
-		(property "Reference" "pinout_origin"
-			(at 1.5 1.5 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "fbb76334-dcae-4b8f-aa88-30730af6d800")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Pinout Origin: Place at image top left."
-			(at -12.53 -2.6 0)
-			(layer "User.1")
-			(uuid "266df997-9f7d-4c76-97df-822acd90216e")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "e5065f18-aaaa-43b6-950d-d78aaf4ab543")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "aa84621d-0b64-4a21-950e-19e9cdc6b795")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0.1 0.1)
-			(end 0.1 4)
-			(stroke
-				(width 0.2)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "819e6e62-dd11-43bb-810a-8753211996cf")
-		)
-		(fp_line
-			(start 0.1 0.1)
-			(end 4 0.1)
-			(stroke
-				(width 0.2)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "2c3ba692-ab7b-44c2-99dd-70f0a97b4acf")
-		)
-		(embedded_fonts no)
-	)
 	(footprint "Capacitor_THT:C_Disc_D10.5mm_W5.0mm_P5.00mm"
 		(layer "F.Cu")
 		(uuid "78d04a43-d778-4613-a2a0-77c51cc8e2c5")
@@ -12208,7 +11867,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/33045fc0-2b44-4b1f-8cdd-9b77d48853af")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 1.3208 -1.8288)
@@ -12354,7 +12013,7 @@
 			(at -2.5654 0 90)
 			(size 1.8796 3.429)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pinfunction "1")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -12366,7 +12025,7 @@
 			(at 2.5654 0 90)
 			(size 1.8796 3.429)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "2")
 			(pintype "passive")
 			(solder_mask_margin 0.0635)
@@ -12574,7 +12233,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/5b2ee249-d4a5-4891-b3a7-a32ebc0de152")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start -5.8 4.84)
@@ -12724,7 +12383,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 3 "/CAN and peripherals/L7_VIN")
+			(net 3 "/CAN and peripherals./L7_VIN")
 			(pinfunction "+VIN")
 			(pintype "input")
 			(solder_mask_margin 0.0635)
@@ -13161,7 +12820,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/b0446349-ce15-4430-bcb5-cbfefac8c56f")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -13383,7 +13042,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/ad1d8eba-daa0-4306-a05a-e17f1565e327")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -13606,7 +13265,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/51a478b0-59fa-47d6-986d-2cc49fb05c06")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -13859,7 +13518,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/68d6b9bc-790f-493a-87ec-6574965f9dec")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -14504,94 +14163,6 @@
 			)
 		)
 	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "9a933567-159c-445e-9c36-43ba632c04c0")
-		(at 106.64 77.26)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "d3b2b0b6-2f37-4249-a9e0-e25c7d23f148")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "GND {{pwr}}"
-			(at 0 20 0)
-			(layer "User.1")
-			(uuid "ff8ed9db-0976-40d9-9564-413579c71028")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "7617a6b2-982b-4e06-8d64-e66183b14d8d")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "52b6e5c4-d879-4e1c-b741-84c6b2b76aaf")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "83ed981f-b00c-45f3-b7af-4c9bf40a3f07")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "b86d5f69-036c-4e98-8ba9-1a5fcc644ad0")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "9270fd47-466c-4af7-9f2d-c6cc0de532b1")
-		)
-		(embedded_fonts no)
-	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
 		(layer "F.Cu")
 		(uuid "a7edd787-81e1-4218-b913-074db933c456")
@@ -14646,7 +14217,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/7b0a4de9-a3ee-4c38-8867-012a8fde1103")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -14827,7 +14398,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "Pin_2")
 			(pintype "passive")
 			(uuid "def93d5b-6dbd-47bc-9451-2f93c3d5ec41")
@@ -14838,7 +14409,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "Pin_3")
 			(pintype "passive")
 			(uuid "26be8b74-bd5f-40e6-b6ad-ae1299f087e6")
@@ -14907,7 +14478,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/24520d61-6d01-49fb-a821-045efb92494e")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 7.6 -2.6)
@@ -14995,7 +14566,7 @@
 			(drill 2.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "+")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -15079,7 +14650,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/e8ee2dca-c179-4f10-9b54-ce403f48d5f3")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 7.6 -2.6)
@@ -15167,7 +14738,7 @@
 			(drill 2.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "+")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -15515,7 +15086,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/99389ffd-6501-4385-b3a7-6d713f45a7e3")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 7.6 -2.6)
@@ -15603,7 +15174,7 @@
 			(drill 2.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "+")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -15689,7 +15260,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/de2e515f-7daf-4ddc-a061-53fa9491a008")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -16136,7 +15707,7 @@
 		)
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/20041f5e-39e5-42cf-b9cc-3a7d0c3b4a7d")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -16335,94 +15906,6 @@
 			)
 		)
 	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "c27445f4-0669-41ee-bc13-69b5739f0dd0")
-		(at 106.69 79.86)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "692f422b-d324-4c65-98a8-6f345bb08ae3")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "GND {{teensy}} {{gpio}}"
-			(at -0.01 -0.03 0)
-			(layer "User.1")
-			(uuid "d11fb458-65ad-413b-b8ab-2f8230e36005")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "1c925259-3f53-4bbb-9957-1e5de1114547")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "ba940640-9236-4088-9e81-5e764a646979")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "eef92eb9-6aaa-4c72-8552-0cc09b5b1cdf")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "ef23106b-6703-46e3-ba39-c52068fccdb5")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "02b64c7b-455a-4d5a-b398-b3c5979fdb68")
-		)
-		(embedded_fonts no)
-	)
 	(footprint "Capacitor_THT:C_Disc_D10.5mm_W5.0mm_P5.00mm"
 		(layer "F.Cu")
 		(uuid "c616a623-80b4-4e54-b90b-ec701cc4212d")
@@ -16476,7 +15959,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/f14c4f5d-231e-4d7b-a093-a0764b5bb735")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -17218,7 +16701,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/be5bf817-7684-405c-b138-aa6542eb5260")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start 7.6 -2.6)
@@ -17306,7 +16789,7 @@
 			(drill 2.1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "+")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -17694,7 +17177,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/5aa5a693-4d60-42ec-9529-5f0d2a22c7be")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start -1.18 1.59)
@@ -17819,94 +17302,6 @@
 			(solder_paste_margin 0)
 			(thermal_bridge_angle 0)
 			(uuid "893cf9d2-67e3-489f-9ed6-1f2a9e3ae2d5")
-		)
-		(embedded_fonts no)
-	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "d47ac3e8-be9d-4117-bc23-f0694611ffb4")
-		(at 106.89 94.63)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "6ca0ce32-94fe-496a-b56e-eac5f6dcd113")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "SCL {{i2c}} {{teensy}} {{nano}}"
-			(at 20.06 -3.62 0)
-			(layer "User.1")
-			(uuid "471501c7-c5d1-4499-8d0a-cbdcb3f704fc")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "e228fa54-f721-42af-9cf5-3accff86333a")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "695f2734-062d-417f-b2be-ace829b4e215")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "ca9319f6-d03e-4963-8a73-0b00bc801eec")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "25f728de-a4b2-41df-8456-ee21fcbf1624")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "879fb153-bfab-4c78-b6c8-632e69b1b2b2")
 		)
 		(embedded_fonts no)
 	)
@@ -18187,7 +17582,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/9ca16656-0181-4f1b-8598-8eefafe4b773")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(attr through_hole)
 		(fp_line
@@ -18378,7 +17773,7 @@
 			(drill 0.8)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net 142 "/CAN and peripherals/VBATT")
+			(net 142 "/CAN and peripherals./VBATT")
 			(pinfunction "2")
 			(pintype "passive")
 			(uuid "981e6cb6-a6a9-4185-9cc8-f0b7b5785692")
@@ -19632,94 +19027,6 @@
 				(xyz 0 0 0)
 			)
 		)
-	)
-	(footprint "Pinout tentative layout:PinLabel"
-		(layer "F.Cu")
-		(uuid "f860ef8b-795e-4343-ad11-b0b14fbd8fdd")
-		(at 106.92 97.15)
-		(descr "Add one or more labels in a row to a single location.")
-		(property "Reference" "pinout_pinlabel"
-			(at 9.525 7.62 0)
-			(layer "User.1")
-			(hide yes)
-			(uuid "d8cb3c4e-7a29-4429-b709-6fff86696557")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "SDA {{i2c}} {{teensy}} {{nano}}"
-			(at 20.26 2.15 0)
-			(layer "User.1")
-			(uuid "42a21328-75f1-4a1d-9378-b05f0e3eaa6f")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "3a66dce4-a3d4-490f-9367-042c923f9f86")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 0 0 0)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "acedbbda-a10b-4c13-8c8e-43d107ea2ee5")
-			(effects
-				(font
-					(size 1.27 1.27)
-					(thickness 0.15)
-				)
-			)
-		)
-		(attr exclude_from_pos_files exclude_from_bom)
-		(fp_line
-			(start 0 -1)
-			(end 0 1)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "7c80f78b-7e02-4448-9028-c8e77525e87a")
-		)
-		(fp_line
-			(start 1 0)
-			(end -1 0)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "User.1")
-			(uuid "9f693ccd-aeb6-4879-a726-6a8d50bf2ff8")
-		)
-		(fp_circle
-			(center 0 0)
-			(end 0 -0.5)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(fill no)
-			(layer "User.1")
-			(uuid "262c7cb9-9dca-4630-8dbc-4c9ac418e8b9")
-		)
-		(embedded_fonts no)
 	)
 	(footprint "Capacitor_THT:C_Disc_D10.5mm_W5.0mm_P5.00mm"
 		(layer "F.Cu")
@@ -24587,7 +23894,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/4bd2f315-4eaa-4c82-8a19-413087075d01")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start -1.95 -2.525)
@@ -24781,7 +24088,7 @@
 			(size 1.97 0.6)
 			(layers "B.Cu" "B.Mask" "B.Paste")
 			(roundrect_rratio 0.125)
-			(net 104 "/CAN and peripherals/CAN_N")
+			(net 104 "/CAN and peripherals./CAN_N")
 			(pinfunction "CANL")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -24794,7 +24101,7 @@
 			(size 1.97 0.6)
 			(layers "B.Cu" "B.Mask" "B.Paste")
 			(roundrect_rratio 0.125)
-			(net 94 "/CAN and peripherals/CAN_P")
+			(net 94 "/CAN and peripherals./CAN_P")
 			(pinfunction "CANH")
 			(pintype "output")
 			(solder_mask_margin 0.0635)
@@ -29128,7 +28435,7 @@
 			)
 		)
 		(path "/ec3a94af-cbf2-4645-8611-15dc332be977/456129f7-6365-4fbe-9a41-71e3ffcbf0a2")
-		(sheetname "/CAN and peripherals/")
+		(sheetname "/CAN and peripherals./")
 		(sheetfile "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch")
 		(fp_line
 			(start -2.1336 -2.6416)
@@ -39358,7 +38665,7 @@
 	)
 	(zone
 		(net 142)
-		(net_name "/CAN and peripherals/VBATT")
+		(net_name "/CAN and peripherals./VBATT")
 		(layer "F.Cu")
 		(uuid "62b64807-3372-47ca-868f-cd0c465808d6")
 		(hatch edge 0.5)
