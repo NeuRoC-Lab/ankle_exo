@@ -13,14 +13,21 @@ enum class BoardSupply {
 };
 
 struct BoardConfig {
+    // LOAD CELL DEFINITIONS :
+
     INA125Ref ina125ExcitationRef;
     INA125Ref ina125IARef;
     BoardSupply ina125Supply;
-
+    // load cell Analog Read pins
     int LC_L_1_pin;
     int LC_L_2_pin;
     int LC_R_1_pin;
     int LC_R_2_pin;
+
+    // ENCODER DEFINITIONS
+
+    int ENCODER_LEFT_CS;
+    int ENCODER_RIGHT_CS;
 };
 
 // CHANGE THESE DEPENDING ON YOUR SETUP
@@ -36,7 +43,11 @@ constexpr BoardConfig boardConfig {
     .LC_L_1_pin = A6,    // physical/digital pin 20
     .LC_L_2_pin = A7,    // physical/digital pin 21
     .LC_R_1_pin = A11,   // physical/digital pin 25
-    .LC_R_2_pin = A10    // physical/digital pin 24
+    .LC_R_2_pin = A10,    // physical/digital pin 24
+
+    .ENCODER_LEFT_CS = 1, // Pin no 1 on Teensy
+    .ENCODER_RIGHT_CS = 7 // Pin no 7 on Teensy
+
 };
 
 #elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR)
@@ -49,7 +60,10 @@ constexpr BoardConfig boardConfig {
     .LC_L_1_pin = A0,
     .LC_L_2_pin = A1,
     .LC_R_1_pin = A2,
-    .LC_R_2_pin = A3
+    .LC_R_2_pin = A3,
+
+    .ENCODER_LEFT_CS = 10, // digital Pin 10 on Arduino Uno
+    .ENCODER_RIGHT_CS = 9
 };
 
 #else

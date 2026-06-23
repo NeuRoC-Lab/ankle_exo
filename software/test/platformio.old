@@ -1,0 +1,210 @@
+[env:uno]
+platform = atmelavr
+board = uno
+framework = arduino
+monitor_speed = 115200
+
+[env:pcb]
+; an environment for the PCB, which runs on the Teensy 4.1 (excluding the Arduino Nano for now)
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+
+
+
+[env:uart]
+; build environment for UART setup on Arduino UNO R4 WiFi
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+
+; compile/upload the code responsible for UART communication
+; UNO R4 WiFi keeps 5V I/O compatibility, but it is not the classic AVR UNO
+targets = upload, monitor
+monitor_speed = 921600
+
+build_src_filter =
+    -<*>
+    +<cubemars_uart/**>
+
+;dd
+[env:can]
+;build environment for CAN setup
+extends = env:pcb
+build_src_filter =
+    -<*>
+    +<cubemars_can_teensy/**>
+targets = upload, monitor
+
+[env:test_teensy]
+;build environment for CAN setup
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<test_teensy/**>
+targets = upload, monitor
+
+[env:can_module_arduino_receiver]
+;build environment for CAN receiver using the CAN module board
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<can_bus_test_arduinos/**>
+    -<can_bus_test_arduinos/sender.cpp>
+targets = upload, monitor
+
+[env:can_module_arduino_sender]
+;build environment for CAN receiver using the CAN module board
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<can_bus_test_arduinos/**>
+    -<can_bus_test_arduinos/receiver.cpp>
+targets = upload, monitor
+
+[env:can_module_teensy_sender]
+;build environment for CAN receiver using the CAN module board
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<can_bus_test_teensy/**>
+    -<can_bus_test_teensy/receiver.cpp>
+targets = upload, monitor
+
+[env:can_module_teensy_receiver]
+;build environment for CAN receiver using the CAN module board
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<can_bus_test_teensy/**>
+    -<can_bus_test_teensy/sender.cpp>
+targets = upload, monitor
+
+[env:encoder_test]
+;build environment for CAN receiver using the CAN module board
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<dual_encoder_test/**>
+targets = upload, monitor
+
+[env:single_encoder_test]
+;build environment for CAN receiver using the CAN module board
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<single_encoder_matlab/**>
+targets = upload, monitor
+
+[env:arduino_can_cubemars_mit]
+;build environment for CAN receiver using the CAN module board
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<cubemars_CAN_arduino/**>
+targets = upload, monitor
+
+[env:arduino_can_cubemars_servo]
+;build environment for CAN receiver using the CAN module board
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<can_comm_arduino_servo/**>
+    -<can_comm_arduino_servo/test.cpp>
+targets = upload, monitor
+
+[env:arduino_encoder_matlab]
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<single_encoder_matlab/**>
+targets = upload, monitor
+
+
+[env:arduino_loadcells]
+;build environment forload cell reading script. Works only on the Arduino R4
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<load_cells_readout/**>
+targets = upload, monitor
+
+[env:teensy_spi_test_nano]
+;build environment forload cell reading script. Works only on the Arduino R4
+platform = nordicnrf52
+board = nano33ble
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<teensy_spi_test/**>
+    -<teensy_spi_test/arduino_slave.cpp>
+targets = upload, monitor
+
+[env:teensy_spi_test_uno]
+;build environment forload cell reading script. Works only on the Arduino R4
+platform = atmelavr
+board = uno
+framework=arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<teensy_spi_test/**>
+    -<teensy_spi_test/teensy_master.cpp>
+targets = upload, monitor
+
+[env:teensy_integration_test]
+;build environment for running encoder, loadcells, and motors altogether. To be tested
+platform = teensy
+board = teensy41
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<implementation_test/**>
+targets = upload, monitor
+
+[env:quadrature_test]
+;build environment for testing quadrature outputs from the encoder.
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+monitor_speed = 115200
+build_src_filter =
+    -<*>
+    +<encoder_quadrature/**>
+targets = upload, monitor
