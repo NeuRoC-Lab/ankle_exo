@@ -628,5 +628,5 @@ void loop() {
   //Serial.println(".");
 */
   }
- can_set_position(MOTOR_ID, 300.0f);
+ can_set_rpm(MOTOR_ID, 0.0f);
 }

@@ -41,6 +41,6 @@ void loop() {
     Serial.print("Right Load cell 1 force (N) : ");
     Serial.print(LC_R_1.voltageToN());
     Serial.print("Right Load cell 2 force (N) : ");
-    Serial.print(LC_R_2.voltageToN());
+    Serial.println(LC_R_2.voltageToN());
     delay(100);
 }
