@@ -1,13 +1,20 @@
 #pragma once
 
 #include <Arduino.h>
+#include "CANMotor.h"
 
+#if defined(PLATFORM_TEENSY41)
+using CANController = CANMotor_Teensy;
+#elif defined(PLATFORM_RENESAS_RA)
+using CANController = CANMotor_Renesas;
+#endif
 
 class SerialMotorControl {
 public:
-    SerialMotorControl(Stream& serial, MotorCmd& cmd)
+    SerialMotorControl(Stream& serial, MotorCmd& cmd,CANController& motor)
         : m_serial(serial),
-          m_cmd(cmd)
+          m_cmd(cmd),
+          m_controller(motor)
     {}
 
     void update();
@@ -16,6 +23,7 @@ private:
     Stream& m_serial;
     MotorCmd& m_cmd;
     String m_line;
+    CANController& m_controller;
 
     void handleLine(String line);
     void applyParam(const String& name, float value);
@@ -42,6 +50,17 @@ void SerialMotorControl::update() {
 void SerialMotorControl::handleLine(String line) {
     line.trim();
     line.toLowerCase();
+
+    if (line.startsWith("stop")) {
+        m_controller.sendMessage(m_cmd.can_id, exitMotorMode);
+        Serial.println("Stopping MIT mode");
+        return;
+     }
+    if (line.startsWith("start")) {
+        Serial.println("Starting MIT mode");
+        m_controller.sendMessage(m_cmd.can_id, enterMotorMode);
+        return;
+    }
 
     if (!line.startsWith("set ")) {
         return;
@@ -80,7 +99,6 @@ void SerialMotorControl::handleLine(String line) {
             tok[value_start + i].toFloat()
         );
     }
-
     printCurrentCommand();
 }
 
