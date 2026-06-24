@@ -73,7 +73,7 @@ public:
     }
 };
 
-#elif defined(PLATFORM_ATMELAVR) // using the Arduino Uno R3 (AVR based) => to connect directly to the external amplifier
+#elif defined(PLATFORM_ATMEL_AVR) // using the Arduino Uno R3 (AVR based) => to connect directly to the external amplifier
 constexpr uint16_t adc_resolution_bits = 10;
 constexpr uint32_t adc_max_value = (1UL << adc_resolution_bits) - 1;
 constexpr float voltage_scale = 5.0f;

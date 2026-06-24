@@ -72,25 +72,15 @@ constexpr BoardConfig boardConfig {
 // =================================
 
 constexpr float refVoltage(INA125Ref ref) {
-    switch (ref) {
-        case INA125Ref::Bandgap_1V24:
-            return 1.24f;
-        case INA125Ref::Ref_2V5:
-            return 2.5f;
-    }
-
-    return 0.0f;
+    return ref == INA125Ref::Bandgap_1V24 ? 1.24f :
+           ref == INA125Ref::Ref_2V5      ? 2.5f  :
+                                            0.0f;
 }
 
 constexpr float ina125SupplyVoltage(BoardSupply supply) {
-    switch (supply) {
-        case BoardSupply::V3V3:
-            return 3.3f;
-        case BoardSupply::V5V:
-            return 5.0f;
-    }
-
-    return 0.0f;
+    return supply == BoardSupply::V3V3 ? 3.3f :
+           supply == BoardSupply::V5V  ? 5.0f :
+                                         0.0f;
 }
 
 constexpr bool uses2V5Reference =
@@ -102,7 +92,7 @@ struct INA125UParams {
     static constexpr float ampGain = 4.0f + 60000.0f / gainR;
 
     static constexpr float IAref = refVoltage(boardConfig.ina125IARef);
-    static constexpr float Vexc  = refVoltage(boardConfig.ina125ExcitationRef);
+    static constexpr float Vexc  = 3.3f;//refVoltage(boardConfig.ina125ExcitationRef); //we're using 3.3V temporarily
 };
 
 static_assert(
