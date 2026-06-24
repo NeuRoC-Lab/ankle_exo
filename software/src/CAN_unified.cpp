@@ -68,7 +68,7 @@ void loop() {
 
     MotorReply reply;
     while (motor.readMessages(reply)) {
-        //motor.print_can_msg(reply);
+        motor.print_can_msg(reply);
     }
     delay(10);
 

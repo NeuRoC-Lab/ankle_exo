@@ -15,17 +15,15 @@ SPI Chip Select: Pin 10
 import serial
 import time
 import matplotlib.pyplot as plt
+import Plotting
 
 # Arduino Connection
 port = "COM7"
 baud = 115200
 time_window = 15 # For plot x-axis; plot will move horizontally after 15 seconds
 
-ser = serial.Serial(port, baud, timeout=1)
-time.sleep(2)
-# Clear old data
-ser.reset_input_buffer()
-ser.reset_output_buffer()
+encoder = SerialConnect(port, baud)
+encoder.connect()
 
 running = {"in_progress": True} # Define dictionary to determine when the encoder is running
 
@@ -57,18 +55,11 @@ angle_data = []
 start_time = time.perf_counter()
 
 # Create plot and define chart elements
-plt.ion()
-print("Figure created")
 
-fig, ax = plt.subplots()
+encoder_plot = ConfigPlot("Time (s)", "Encoder Position (deg)", "AMT20 Encoder Relative Angle vs Time")
+encoder_plot.createplot()
+
 line, = ax.plot(time_data, angle_data, linewidth=1.5)
-
-ax.set_title("AMT20 Encoder Relative Angle vs Time")
-ax.set_xlabel("Time (s)")
-ax.set_ylabel("Encoder Position (Deg)")
-ax.grid(True)
-
-fig.canvas.mpl_connect("close_event", close_plot)
 
 # Start encoder test
 ser.write(b"y")

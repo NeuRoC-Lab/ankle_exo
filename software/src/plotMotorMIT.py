@@ -3,8 +3,10 @@ This code plots all CubeMars motors data from the following format:
 
     motor id: 2 pos (rad): 0.1234 vel(rad/s?): 0.5678 trq(N*m): 1.2345 temp (C): 32 err: 0
 
+Check for port: python -m serial.tools.list_ports
+
 Type in CLion terminal:
-python software\src\cubemars_CAN_arduino\plotMotorMIT.py
+python software\src\plotMotorMIT.py
 """
 
 import serial
@@ -12,7 +14,7 @@ import time
 import matplotlib.pyplot as plt
 
 # Arduino Connection
-port = "COM5"  # Change port as necessary
+port = "COM4"  # Change port as necessary
 baud = 115200
 time_window = 10  # Plot x-axis window in seconds
 
@@ -124,6 +126,7 @@ try:
     while running["in_progress"] == True and plt.fignum_exists(fig.number) == True:
 
         raw = ser.readline().decode(errors="ignore").strip()
+        print(raw)
 
         # Skip empty lines
         if raw == "":
@@ -131,24 +134,25 @@ try:
 
         # Skip Arduino startup / command / error messages
         if raw.startswith("motor id:") == False:
-            print(raw)
+            print("!" + raw)
             continue
 
         arr = raw.split()
+        print(arr)
 
         try:
-            pos_index = arr.index("pos") + 2
-            vel_index = arr.index("vel") + 2
-            trq_index = arr.index("trq") + 2
-            temp_index = arr.index("temp") + 2
+            pos_index = arr.index("pos(rad):") + 1
+            vel_index = arr.index("vel(rad/s):") + 1
+            trq_index = arr.index("trq(N*m):") + 1
+            temp_index = arr.index("temp(C):") + 1
 
             position_data.append(float(arr[pos_index]))
             velocity_data.append(float(arr[vel_index]))
             torque_data.append(float(arr[trq_index]))
             temperature_data.append(float(arr[temp_index]))
 
-        except:
-            print("Could not read line:")
+        except Exception as e:
+            print("Could not read line:",e)
             print(raw)
             continue
 

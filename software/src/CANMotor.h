@@ -48,7 +48,7 @@ typedef struct {
 } AK60Params;
 
 static constexpr AK60Params motorParams = {
-    -12.5f,  12.5f,   // position
+    -12.5f,  12.5f,   // position (rad)
     -45.0f,  45.0f,   // velocity
       0.0f, 500.0f,   // kp
       0.0f,   5.0f,   // kd
