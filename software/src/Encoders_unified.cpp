@@ -15,6 +15,8 @@ delay(1000);
 }
 
 void loop() {
+delay(100);
+//TODO : add a setter for the encoder update frequency (the Serial.print rate) must be below 20khz, the frequency at which the encoder register updates
 EncoderPositions positions = left_encoder.getPositions();
 Serial.print("Left encoder position : " );
 Serial.print(positions.left_position);

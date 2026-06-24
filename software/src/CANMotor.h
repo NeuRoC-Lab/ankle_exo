@@ -22,6 +22,11 @@ static constexpr uint8_t setZeroPosition[8] = {
     0xFF, 0xFF, 0xFF, 0xFE
 };
 
+static constexpr uint8_t neutralMITCommand[8] = {
+    0x7F, 0xFF, 0x7F, 0xF0,
+    0x00, 0x00, 0x07, 0xFF
+};
+
 typedef struct
 {
     uint8_t can_id;
@@ -78,11 +83,14 @@ public :
 
 bool resetMotor(uint32_t id){
     Serial.println("Exiting MIT motor mode...");
-    delay(200);
+    if(!sendMessage(id, neutralMITCommand)){
+        return false;
+    }
+    delay(1000);
     if(!sendMessage(id, exitMotorMode)){
         return false;
     }
-    delay(200);
+    delay(1000);
     if(!sendMessage(id, enterMotorMode)){
         return false;
     }
@@ -324,14 +332,12 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
 #elif defined(PLATFORM_RENESAS_RA)
     #include <Arduino_CAN.h>
 
-    // constants for predefined messages
-    CanMsg const msg_leave(CanStandardId(MOTOR_ID), sizeof(exitMotorMode), exitMotorMode);
-
     class CANMotor_Renesas : public CANMotor {
     //using PlatformCanBus = CanBus_RenesasRA;
-    public(byte canId,const AK60Params* motorSettings){
-        : CANMotor {canId,motorSettings}
-        }
+    public:
+        CANMotor_Renesas(byte canId,const AK60Params* motorSettings)
+        : CANMotor(canId,motorSettings)
+        {}
 
             virtual void begin(){
             // initializes the CAN controller on the Teensy 41
@@ -343,7 +349,7 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
             }
         }
     virtual bool sendMessage(uint32_t id,const uint8_t data[8]){
-        CanMsg const out_msg(CanStandardId(id), sizeof(data)/sizeof(data[0]), data);
+        CanMsg const out_msg(CanStandardId(id), 8, data); //sizeof(data)/sizeof(data[0]) why does that not evaluate to 8 properly ??? Because in CPP, data[8] is transformed into a pointer so sizeof(data) = size of the pointer, not the array
         return CAN.write(out_msg) > 0;
     }
 
@@ -355,7 +361,7 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
         {
         continue;
         }
-        reply = unpack_reply(rxMsg.buf);
+        reply = unpack_reply(rxMsg.data);
         return true;   // popped one valid message
         }
         return false;      // no valid message available right now

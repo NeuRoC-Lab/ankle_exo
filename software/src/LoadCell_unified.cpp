@@ -2,9 +2,6 @@
 // Created by Oscar Tesniere on 23/06/2026.
 //
 
-//
-// Created by Oscar Tesniere on 23/06/2026.
-//
 #include "LoadCell.h"
 #include "Arduino.h"
 
