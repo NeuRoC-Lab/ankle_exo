@@ -542,7 +542,8 @@ void setup() {
   Serial.println("CAN ready.");
 }
 
-constexpr uint8_t MOTOR_ID = 0x68;
+constexpr uint8_t MOTOR_ID = 0x68; //NOTE THAT THIS IS NOTE DECIMAL 68 BUT 104!!!
+
 
 // RPM sweep settings
 constexpr int32_t RPM_MIN = 10000;
@@ -587,7 +588,6 @@ void loop() {
     // Optional but recommended: ignore other motors
     if (reply.motor_eid != MOTOR_ID) {
       Serial.println("Skipping invalid motor");
-      continue;
     }
 
      //Do not print every frame; Serial printing can block/slow the loop

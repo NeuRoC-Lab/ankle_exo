@@ -92,7 +92,8 @@ struct INA125UParams {
     static constexpr float ampGain = 4.0f + 60000.0f / gainR;
 
     static constexpr float IAref = refVoltage(boardConfig.ina125IARef);
-    static constexpr float Vexc  = 3.3f;//refVoltage(boardConfig.ina125ExcitationRef); //we're using 3.3V temporarily
+    static constexpr float Vexc  = refVoltage(boardConfig.ina125ExcitationRef);
+    // change Vexc to equal 5.0f or 3.3f if using an external excitation voltage (coming for example from the regulated 5V/3.3V on the PCB)
 };
 
 static_assert(

@@ -29,13 +29,13 @@ static constexpr uint8_t neutralMITCommand[8] = {
 
 typedef struct
 {
-    uint8_t can_id;
     float position;
     float velocity;
     float torque;
     float kp;
     float kd;
 } MotorCmd;
+//TODO determine if MotorCmd should be motor-agnostic or not i.e should it include the target motor's CAN ID?
 
 // AK60 Motor parameter definitions
 typedef struct {
@@ -67,50 +67,60 @@ typedef struct
 
 
 
-class CANMotor {
+class CANMotorMIT {
 /*
 Generic methods shared between the two CAN implementations (i.e Teensy 4.1 and Arduino UNO R4)
-
-void pack_cmd() -> in place modification of tx_buf
-
-MotorReply unpack_reply(const uint8_t rx_buf[8]) -> unpacks a command from RX buf
+One CANMotorMIT instance per CubeMars motor
 */
 public :
-     CANMotor(byte canId,const AK60Params* motorSettings){
+     CANMotorMIT(byte canId,const AK60Params* motorSettings,uint32_t kPrintEvery=20){
         m_canId = canId;
         m_motorSettings = motorSettings;
+        m_kPrintEvery = kPrintEvery;
     }
+uint8_t m_canId;
+MotorCmd m_cmd;
+MotorReply m_reply;
+const AK60Params* m_motorSettings;
 
-bool resetMotor(uint32_t id){
+bool resetMotor(){
     Serial.println("Exiting MIT motor mode...");
-    if(!sendMessage(id, neutralMITCommand)){
+    if(!sendMessage(neutralMITCommand)){
         return false;
     }
-    delay(1000);
-    if(!sendMessage(id, exitMotorMode)){
+    delay(500);
+    if(!sendMessage(exitMotorMode)){
         return false;
     }
-    delay(1000);
-    if(!sendMessage(id, enterMotorMode)){
+    delay(500);
+    if(!sendMessage(enterMotorMode)){
         return false;
     }
     return true;
     }
 
-void update(MotorCmd cmd){
+void update(){
         uint8_t tx_buf[8];
         pack_cmd(
             tx_buf,
-            cmd.position,
-            cmd.velocity,
-            cmd.torque,
-            cmd.kp,
-            cmd.kd
+            m_cmd.position,
+            m_cmd.velocity,
+            m_cmd.torque,
+            m_cmd.kp,
+            m_cmd.kd
         );
-        if (!sendMessage(cmd.can_id, tx_buf)) {
+        if (!sendMessage(tx_buf)) {
             Serial.println("MIT command send failed");
         }
-}
+
+
+        while (readMessages(m_reply)) {
+            if (++m_printCounter >= m_kPrintEvery) {
+                print_can_msg(m_reply);
+                m_printCounter = 0;
+            }
+        }
+    }
 
 void print_can_msg(MotorReply reply){
         Serial.print("  motor id: ");
@@ -134,9 +144,8 @@ void print_can_msg(MotorReply reply){
 
 // to prevent one from calling these functions directly from the SuperClass
 protected:
-    // internal variables
-    uint8_t m_canId;
-    const AK60Params* m_motorSettings;
+    uint32_t m_printCounter;
+    uint32_t m_kPrintEvery;
 
     void pack_cmd(
         uint8_t tx_buf[8],
@@ -270,9 +279,9 @@ float constrain_float(float x, float x_min, float x_max)
     return x;
     }
 
-virtual ~CANMotor() = default;
+virtual ~CANMotorMIT() = default;
 virtual void begin(); // this function will call platform specific initialization
-virtual bool sendMessage(uint32_t id,const uint8_t data[8]);
+virtual bool sendMessage(const uint8_t data[8]);
 virtual bool readMessages(MotorReply& reply); // will pop the element in the FIFO mailbox
 };
 
@@ -285,11 +294,11 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
     // Teensy 4.1 CAN1:
     // RX = pin 23
     // TX = pin 22
-    class CANMotor_Teensy : public CANMotor {
+    class CANMotorMIT_Teensy : public CANMotorMIT {
 
     public:
-        CANMotor_Teensy(byte canId,const AK60Params* motorSettings)
-        : CANMotor(canId, motorSettings)
+        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings)
+        : CANMotorMIT(canId, motorSettings)
         {}
 
             virtual void begin(){
@@ -303,9 +312,9 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
                 //TeensyCAN.enableFIFOInterrupt();
         }
 
-            virtual bool sendMessage(uint32_t id,const uint8_t data[8]) override {
+            virtual bool sendMessage(const uint8_t data[8]) override {
             CAN_message_t msg;
-            msg.id = id;
+            msg.id = m_canId;
             msg.len = 8;
             msg.flags.extended = 0; // MIT mode uses standard CAN ID
             memcpy(msg.buf, data, 8);
@@ -332,11 +341,11 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
 #elif defined(PLATFORM_RENESAS_RA)
     #include <Arduino_CAN.h>
 
-    class CANMotor_Renesas : public CANMotor {
+    class CANMotorMIT_Renesas : public CANMotorMIT {
     //using PlatformCanBus = CanBus_RenesasRA;
     public:
-        CANMotor_Renesas(byte canId,const AK60Params* motorSettings)
-        : CANMotor(canId,motorSettings)
+        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings)
+        : CANMotorMIT(canId,motorSettings)
         {}
 
             virtual void begin(){
@@ -347,9 +356,18 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
                 Serial.println("CAN.begin(...) failed.");
                     for (;;) {}
             }
+            Serial.println("Successfully started CAN Communication. Entering motor mode");
+            delay(1000);
+            if(!resetMotor()){
+                Serial.println("Failed to start motor. Please check the Motor power supply is ON and the Motor is connected to the CAN bus");
+            }
+            else {
+                Serial.println("Successfully started motor");
+            }
+
         }
-    virtual bool sendMessage(uint32_t id,const uint8_t data[8]){
-        CanMsg const out_msg(CanStandardId(id), 8, data); //sizeof(data)/sizeof(data[0]) why does that not evaluate to 8 properly ??? Because in CPP, data[8] is transformed into a pointer so sizeof(data) = size of the pointer, not the array
+    virtual bool sendMessage(const uint8_t data[8]){
+        CanMsg const out_msg(CanStandardId(m_canId), 8, data); //sizeof(data)/sizeof(data[0]) why does that not evaluate to 8 properly ??? Because in CPP, data[8] is transformed into a pointer so sizeof(data) = size of the pointer, not the array
         return CAN.write(out_msg) > 0;
     }
 

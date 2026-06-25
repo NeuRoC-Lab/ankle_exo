@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#define CS 10
 
 volatile uint8_t lastReceived = 0;
 volatile bool receivedFlag = false;
@@ -25,7 +26,7 @@ void setup() {
     pinMode(MISO, OUTPUT);   // Arduino sends data back on MISO
     pinMode(MOSI, INPUT);
     pinMode(SCK, INPUT);
-    pinMode(SS, INPUT);
+    pinMode(CS, INPUT);
 
     // Enable SPI in slave mode
     SPCR |= _BV(SPE);
