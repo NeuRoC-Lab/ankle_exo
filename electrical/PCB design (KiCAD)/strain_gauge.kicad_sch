@@ -2245,7 +2245,17 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 53.34) (xy 160.02 54.61)
+			(xy 165.1 92.71) (xy 165.1 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "58380b71-a386-4917-abd4-b26f5acbfa32")
+	)
+	(wire
+		(pts
+			(xy 160.02 53.34) (xy 160.02 55.88)
 		)
 		(stroke
 			(width 0)
@@ -2275,7 +2285,7 @@
 	)
 	(wire
 		(pts
-			(xy 170.18 53.34) (xy 170.18 54.61)
+			(xy 170.18 53.34) (xy 170.18 55.88)
 		)
 		(stroke
 			(width 0)
@@ -2292,6 +2302,16 @@
 			(type solid)
 		)
 		(uuid "85f8f105-b369-4ba6-aa3b-7e64df9d17ba")
+	)
+	(wire
+		(pts
+			(xy 165.1 96.52) (xy 168.91 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8990972e-6f75-4bbb-ad48-71766d021721")
 	)
 	(wire
 		(pts
@@ -2312,6 +2332,16 @@
 			(type default)
 		)
 		(uuid "8dcfc963-037a-41cb-b7a0-b0211a744ac5")
+	)
+	(wire
+		(pts
+			(xy 165.1 73.66) (xy 165.1 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "94e98de3-8259-488a-8d52-836ce2204e4b")
 	)
 	(wire
 		(pts
@@ -2355,13 +2385,23 @@
 	)
 	(wire
 		(pts
-			(xy 160.02 73.66) (xy 161.29 73.66)
+			(xy 160.02 73.66) (xy 165.1 73.66)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "a44b16ad-a3f4-4d5d-80f5-ecd28eb15260")
+	)
+	(wire
+		(pts
+			(xy 168.91 87.63) (xy 172.72 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a80eb8c0-3f04-4b98-bbc4-3f9996bb659e")
 	)
 	(wire
 		(pts
@@ -2435,16 +2475,6 @@
 	)
 	(wire
 		(pts
-			(xy 165.1 58.42) (xy 165.1 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d0e4ab06-34ac-45ba-b76d-9b25113d2d18")
-	)
-	(wire
-		(pts
 			(xy 156.21 80.01) (xy 176.53 80.01)
 		)
 		(stroke
@@ -2515,14 +2545,14 @@
 	)
 	(hierarchical_label "Vexcitation+"
 		(shape output)
-		(at 161.29 73.66 0)
+		(at 172.72 87.63 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid "19cd404f-893b-4660-8398-2ad352eea070")
+		(uuid "4ce70e44-3746-450e-8797-fd4a68aa5666")
 	)
 	(hierarchical_label "Vbridge-"
 		(shape input)
@@ -2556,6 +2586,84 @@
 			(justify left)
 		)
 		(uuid "9c51fbc7-bfab-4404-ab75-18046b71fc74")
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 168.91 96.52 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "058da0ab-be5c-49f1-bc5d-a4f58b9362e4")
+		(property "Reference" "#PWR085"
+			(at 168.91 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 168.91 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 168.91 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 168.91 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 168.91 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c8fa47cd-a4ad-4a19-afe1-499c55db879d")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "#PWR088")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "#PWR086")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "#PWR087")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "#PWR085")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "Device:C")
@@ -2920,6 +3028,88 @@
 		)
 	)
 	(symbol
+		(lib_id "Jumper:SolderJumper_3_Open")
+		(at 165.1 87.63 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "55442e52-2dbb-405e-ab67-017fa0154c9d")
+		(property "Reference" "INA_EXC_JP6"
+			(at 162.052 87.376 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SolderJumper_3_Open"
+			(at 159.766 94.996 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm_NumberLabels"
+			(at 165.1 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 165.1 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Solder Jumper, 3-pole, open"
+			(at 165.1 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b8ddbc2a-0766-4ddd-b169-6afcbc40233a")
+		)
+		(pin "2"
+			(uuid "31f76270-3706-4b72-8981-8a3154c3c6b0")
+		)
+		(pin "3"
+			(uuid "894cc941-3c8a-45b8-994e-652680ca5569")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "INA_EXC_JP7")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "INA_EXC_JP3")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "INA_EXC_JP4")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "INA_EXC_JP6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Diode:BAT54S")
 		(at 48.26 81.28 90)
 		(unit 1)
@@ -3005,15 +3195,15 @@
 	)
 	(symbol
 		(lib_id "Jumper:SolderJumper_3_Open")
-		(at 165.1 54.61 0)
+		(at 165.1 55.88 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "55ab50b2-243b-4127-be7f-8ce412ef6224")
-		(property "Reference" "JP1"
-			(at 165.354 51.562 0)
+		(property "Reference" "INA_PWR_JP6"
+			(at 177.8 54.356 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3021,7 +3211,7 @@
 			)
 		)
 		(property "Value" "SolderJumper_3_Open"
-			(at 182.626 51.562 0)
+			(at 178.816 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3029,7 +3219,7 @@
 			)
 		)
 		(property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm_NumberLabels"
-			(at 165.1 54.61 0)
+			(at 165.1 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3038,7 +3228,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 165.1 54.61 0)
+			(at 165.1 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3047,7 +3237,7 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 3-pole, open"
-			(at 165.1 54.61 0)
+			(at 165.1 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3067,19 +3257,19 @@
 		(instances
 			(project ""
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
-					(reference "JP4")
+					(reference "INA_PWR_JP7")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
-					(reference "JP2")
+					(reference "INA_PWR_JP3")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
-					(reference "JP3")
+					(reference "INA_PWR_JP4")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
-					(reference "JP1")
+					(reference "INA_PWR_JP6")
 					(unit 1)
 				)
 			)
@@ -3971,8 +4161,8 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "eb9664e3-5f3c-430a-950e-6443c40b9e5b")
-		(property "Reference" "JP5"
-			(at 81.026 71.882 0)
+		(property "Reference" "INA_VREF_JP6"
+			(at 68.834 68.072 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4026,19 +4216,19 @@
 		(instances
 			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
-					(reference "JP10")
+					(reference "INA_VREF_JP7")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
-					(reference "JP8")
+					(reference "INA_VREF_JP3")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
-					(reference "JP9")
+					(reference "INA_VREF_JP4")
 					(unit 1)
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
-					(reference "JP5")
+					(reference "INA_VREF_JP6")
 					(unit 1)
 				)
 			)

@@ -12,13 +12,81 @@ Note that because only the Teensy 4.1 and Arduino UNO R4 boards have an integrat
 
 For the wiring, please refer to `board.h` and the `electrical` section of this documentation. It differs from board to board.
 
-A representative OOP diagram of the `CANMotor` class and it's two subclasses `CANMotor_Teensy41`, `CANMotor_Renesas` is shown below 
+A representative OOP diagram of the `CANMotor` class and it's two subclasses `CANMotor_Teensy41`, `CANMotor_Renesas` is shown below
 
 ![OOP Diagram](../images/CANMotor_OOP.png)
 
-To run the unified CAN controller example code (`CAN_unified.cpp`) you will need to run the pio environment `LC_teensy41` or `LC_uno_r4` depending on which board you are using. 
+To run the unified CAN controller example code (`CAN_unified.cpp`) you will need to run the pio environment `CAN_teensy41` or `CAN_uno_r4` depending on which board you are using. 
 As a reminder, the general format to run an environment in platformio is `pio run -e yourenvname` where `yourenvname` is the target environment. 
 
+#### Design update (25/06)
+
+After the Servo mode was successfully tested on June 24th we are now implementing a separate class for the MIT and Servo mode. Those supercless are `CANMotorMIT` (MIT mode) and `ServoCANMotor` (Servo mode). Note that these two classes need to been validated again 
+
+
+| Class                   | Mode | Board          | Platformio Environment        |
+|-------------------------|-----:|:---------------|-------------------------------|
+| `CANMotorMIT_Teensy`    |  MIT | Teensy 4.1     | `pio run -e MIT_CAN_teensy41` |
+| `CANMotorMIT_Renesas`   |  MIT | Arduino Uno R4 | `pio run -e MIT_CAN_uno_r4`   |
+| `ServoCANMotor_Renesas` | Servo | Arduino Uno R4 | `pio run -e Servo_CAN_uno_r4` |
+| `ServoCANMotor_Teensy`  | Servo | Teensy 4.1     | NOT IMPLEMENTED YET           |
+
+The following commands can be run (rightmost command) to execute the MIT/Servo demo code on the Teensy/Arduino Uno R4. 
+Note the following : 
+
+* You must wire the CANTX/CANRX wires accordingly to the Teensy or Arduino UNO R4.
+
+* For the Arduino 
+
+  | OpenExo PCB                     | Arduino |
+  |---------------------------------|--------:|
+  | CANTX _through voltage divider_ |     D10 |
+  | CANRX                           |     D13 | 
+  | GND                             |     GND | 
+  | 3.3V                            |   3.3V  | 
+
+* For the Teensy
+
+
+| OpenExo PCB                     | Arduino |
+|---------------------------------|--------:|
+| CANTX  |     D22 |
+| CANRX                           |     D23 | 
+| GND                             |     GND | 
+| 3.3V                            |    3.3V | 
+
+
+#### Serial communication 
+
+The serial communication to control the motor works as follow : 
+
+##### MIT mode
+* `start id xx` : start the motor (it will otherwise remain deaf to commands)
+* `stop id xx` : stop the motor and put it in idle mode
+* `zero id xx` : set the motor's zero
+
+`set` | `id xx`: 
+
+  - `pos x.x` : position (in radians from -12.0 to +12.0)
+  - `vel x.x` : velocity (in radians/s from -45.0 to +45.0)
+  - `kp x.x` : proportional gain (for position)
+  - `kd x.x` : derivative gain (for velocity)
+  - `trq x.x`  : feedforward torque (be careful with it when using the motor with no load attached to the shaft as it will spin freely while accelerating)
+
+_Note that the order the parameters are given does not matter. One / more parameter can be updated at once_
+##### Servo Mode
+
+`set` | `id xx`  :
+
+  - `duty x.x` : set duty cycle mode
+  - `current x.x` : set current mode (proportional to torque T = kI)
+  - `brake x.x` : set brake current mode
+  - `rpm x.x` : set rpm mode
+  - `pos x.x` : set position mode
+  - `pos x.x rpm x.x acc x.x` : set position velocity acceleration loop mode
+  -  `origin 0` : set encoder origin
+
+  - _Note that only ONE mode can be active at a time_
 ### LoadCell class
 
 The `LoadCell` class is the main class used to interface the motor. 
@@ -34,3 +102,4 @@ Specific boards may be used for specific needs :
 
 
 ![OOP Diagram](../images/LoadCells_OOP.png)
+

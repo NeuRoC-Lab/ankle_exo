@@ -169,3 +169,11 @@ V_{exc}
 
 
 ![Pinout ](../images/pcb-pinout.png)
+
+## PCB changelog 
+
+#### 26/06
+
+* Refactored labels for INA solder jumpers by aligning the labels on a "45degrees" plane so that we can distinguish those labels from other things on the board (clearer for reading)
+* Added a solder jumper for INA excitation voltage to choose between the INA voltage reference (2.5v/BG) or 5V from PCB regulator
+* Added a solder jumper to choose whether to connect the Teensy's VIN to the board (so that we can use USB)
