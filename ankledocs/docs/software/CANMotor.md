@@ -61,9 +61,27 @@ Note the following :
 The serial communication to control the motor works as follow : 
 
 ##### MIT mode
-* `start id xx` : start the motor (it will otherwise remain deaf to commands)
-* `stop id xx` : stop the motor and put it in idle mode
-* `zero id xx` : set the motor's zero
+
+![MIT control law from SITODRIVE](../images/MIT mode control law.jpeg)
+
+\(c_{ff}\) value is usually the sum of the current required to offset the friction of the actuator and the current value calculated by the robot dynamics
+
+When the kp and kd values are both 0, the rotational stiffness and damping are both 0, which is equivalent to the current mode, and the phase current can be directly controlled:
+
+Increasing the feedforward torque \(c_{ff}\) will offset the necessary torque to overcome the static friction. As a consequence the motor is set into motion easier. 
+
+References from [sito drive for the MIT actuator control mode](https://docs.sitodrive.com/Joint_Actuator_User_Documentation/Detailed_explanation_of_control_mode/MIT_mode)
+
+Note : setting kd to wero will make the motor oscillate about the target position which is not recommended
+
+
+* `start id xx` : start the motor 
+- To enable the control loop, after a "crash" wherein the motor disables itself after a fault was detected
+
+* `stop id xx` : disable the control loop (the motor is in idle mode, and keeps sending telemetry data but there is no actuation. note you can still set MIT parameters)
+- To exit idle mode, enter the `start` command. 
+
+* `zero id xx` : resets the motor's encoder position to 0 at the current position. 
 
 `set` | `id xx`: 
 

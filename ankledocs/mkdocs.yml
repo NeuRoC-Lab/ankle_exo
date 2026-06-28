@@ -10,7 +10,7 @@ nav:
       - Power: electrical/power.md
       - Encoder debug : electrical/encoder_debug.md
   - Software:
-      - Interfaces: software/interfaces.md
+      - CAN Motor Interfaces: software/CANMotor.md
       - Setup: software/setup.md
       - API: software/api.md
       - Encoder testing: software/encoder.md
