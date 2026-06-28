@@ -17,6 +17,7 @@ enum CAN_PACKET_ID : uint32_t {
     CAN_PACKET_SET_MIT           = 8
 };
 
+
 struct MotorCmd {
     CAN_PACKET_ID packetID = CAN_PACKET_SET_DUTY;
     uint8_t data[8] = {0};
@@ -44,6 +45,8 @@ static constexpr AK60Params motorParams = {
     0.0f, 60.0f             // brake current, A
 };
 
+
+
 constexpr uint32_t SERVO_JUMP_START_STATE   = 0x09;
 constexpr uint32_t SERVO_ENTER_MODE_FRAME   = 0x2C;
 constexpr uint32_t SERVO_REALTIME_FEEDBACK  = 0x29;
@@ -63,16 +66,17 @@ struct ServoMotorReply {
 
 class ServoCANMotor {
 public:
-    ServoCANMotor(byte canId, const AK60Params* motorSettings, uint32_t kPrintEvery = 20)
+    ServoCANMotor(byte canId, const AK60Params* motorSettings,MotorCmd& cmd, uint32_t kPrintEvery = 20)
         : m_canId(canId),
           m_motorSettings(motorSettings),
+          m_cmd(cmd),
           m_kPrintEvery(kPrintEvery)
     {}
 
     virtual ~ServoCANMotor() = default;
 
     uint8_t m_canId;
-    MotorCmd m_cmd;
+    MotorCmd& m_cmd;
 
     virtual void begin() = 0;
     virtual bool sendMessage(CAN_PACKET_ID packetId, const uint8_t* data, uint8_t len) = 0;
@@ -257,8 +261,8 @@ protected:
 
 class ServoCANMotor_Renesas : public ServoCANMotor {
 public:
-    ServoCANMotor_Renesas(byte canId, const AK60Params* motorSettings)
-        : ServoCANMotor(canId, motorSettings)
+    ServoCANMotor_Renesas(byte canId, const AK60Params* motorSettings,MotorCmd& cmd, uint32_t kPrintEvery = 20)
+        : ServoCANMotor(canId, motorSettings,cmd,kPrintEvery)
     {}
 
     void begin() override {

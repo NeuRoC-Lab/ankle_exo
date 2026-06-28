@@ -59,6 +59,8 @@ void SerialMotorControl::handleLine(String line) {
 
 #if defined(MIT_MODE)
     if (line.startsWith("stop")) {
+        motor.m_enabled = false;
+        delay(100);
         m_controller.sendMessage(exitMotorMode);
         m_serial.println("Stopping MIT mode");
         return;
@@ -66,11 +68,14 @@ void SerialMotorControl::handleLine(String line) {
 
     if (line.startsWith("start")) {
         m_serial.println("Starting MIT mode");
+        motor.m_enabled = true;
+        delay(100);
         m_controller.sendMessage(enterMotorMode);
         return;
     }
 
     if (line.startsWith("zero")) {
+        delay(100);
         m_serial.println("Setting MIT zero position");
         m_controller.sendMessage(setZeroPosition);
         return;

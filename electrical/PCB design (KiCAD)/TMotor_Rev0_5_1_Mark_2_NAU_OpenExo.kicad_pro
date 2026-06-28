@@ -65,7 +65,7 @@
       ],
       "drc_exclusions": [
         [
-          "courtyards_overlap|113725000|118584982|26b850e7-7f7a-4e53-b1da-b94dcbd44275|525ac54d-7728-4e2c-97e2-630e4e256951",
+          "courtyards_overlap|113725000|118584999|26b850e7-7f7a-4e53-b1da-b94dcbd44275|525ac54d-7728-4e2c-97e2-630e4e256951",
           "under the teensy"
         ],
         [
@@ -567,7 +567,7 @@
       "plot": ".",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo.step",
       "svg": "",
       "vrml": ""
     },

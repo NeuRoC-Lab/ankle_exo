@@ -7,6 +7,35 @@ float kp_target = 0.5f;
 float kd_target = 0.5f;
 float trq_target = 0.0f;
 
+typedef struct {
+    float p_min,p_max;
+    float v_min,v_max;
+    float kp_min,kp_max;
+    float kd_min,kd_max;
+    float trq_min,trq_max;
+
+} AK60Params;
+
+constexpr AK60Params motorParams = {
+    // these are values for the SOFT STOP CONTROL
+    -12.5f, 12.5f,   // position (rad)
+    -45.0f,  45.0f,   // velocity
+      0.0f, 500.0f,   // kp
+      0.0f,   5.0f,   // kd
+    -15.0f,  15.0f    // torque
+};
+
+
+constexpr AK60Params motorConstraints = {
+    // these are values for the SOFT STOP CONTROL
+    -2.8f, 2.8f,   // position (rad)
+    -30.0f,  30.0f,   // velocity
+      0.0f, 5.0f,   // kp
+      0.0f,   5.0f,   // kd
+    -5.0f,  5.0f    // torque
+};
+
+
 static constexpr uint8_t exitMotorMode[8] = {
     0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFD
@@ -37,23 +66,8 @@ typedef struct
 } MotorCmd;
 //TODO determine if MotorCmd should be motor-agnostic or not i.e should it include the target motor's CAN ID?
 
-// AK60 Motor parameter definitions
-typedef struct {
-    float p_min,p_max;
-    float v_min,v_max;
-    float kp_min,kp_max;
-    float kd_min,kd_max;
-    float trq_min,trq_max;
 
-} AK60Params;
 
-static constexpr AK60Params motorParams = {
-    -12.5f,  12.5f,   // position (rad)
-    -45.0f,  45.0f,   // velocity
-      0.0f, 500.0f,   // kp
-      0.0f,   5.0f,   // kd
-    -15.0f,  15.0f    // torque
-};
 
 typedef struct
 {
@@ -72,16 +86,23 @@ class CANMotorMIT {
 Generic methods shared between the two CAN implementations (i.e Teensy 4.1 and Arduino UNO R4)
 One CANMotorMIT instance per CubeMars motor
 */
-public :
-     CANMotorMIT(byte canId,const AK60Params* motorSettings,uint32_t kPrintEvery=20){
-        m_canId = canId;
-        m_motorSettings = motorSettings;
-        m_kPrintEvery = kPrintEvery;
-    }
-uint8_t m_canId;
-MotorCmd m_cmd;
-MotorReply m_reply;
-const AK60Params* m_motorSettings;
+public:
+    CANMotorMIT(byte canId, const AK60Params* motorSettings,const AK60Params* motorConstraints , MotorCmd& cmd, uint32_t kPrintEvery = 20)
+        : m_canId(canId),
+          m_cmd(cmd),
+          m_motorConstraints(motorConstraints),
+          m_motorSettings(motorSettings),
+          m_kPrintEvery(kPrintEvery),
+          m_printCounter(0)
+    {}
+
+    uint8_t m_canId;
+    MotorCmd& m_cmd;   // reference, not copy
+    MotorReply m_reply;
+    bool m_enabled;
+    const AK60Params* m_motorSettings;
+    const AK60Params* m_motorConstraints;
+
 
 bool resetMotor(){
     Serial.println("Exiting MIT motor mode...");
@@ -100,27 +121,44 @@ bool resetMotor(){
     }
 
 void update(){
+
+        if(m_enabled){
         uint8_t tx_buf[8];
         pack_cmd(
             tx_buf,
             m_cmd.position,
             m_cmd.velocity,
-            m_cmd.torque,
             m_cmd.kp,
-            m_cmd.kd
+            m_cmd.kd,
+            m_cmd.torque
         );
         if (!sendMessage(tx_buf)) {
             Serial.println("MIT command send failed");
         }
-
+        }
 
         while (readMessages(m_reply)) {
+            checkHardStop();
             if (++m_printCounter >= m_kPrintEvery) {
                 print_can_msg(m_reply);
                 m_printCounter = 0;
             }
         }
     }
+void checkHardStop(){
+if((m_reply.position > m_motorConstraints->p_max || m_reply.position < m_motorConstraints->p_min) && m_enabled){
+
+// DO NOT USE THAT BECAUSE THE VALUES ROLL OVER THE MAX / MIN !! SO YOU'LL NEVER SEE IF YOPU OVERSHOOT
+//if(m_reply.position > m_motorSettings->p_max || m_reply.position < m_motorSettings->p_min){
+Serial.println("Detected overshoot ! Please decrease the Kp. Stopping the motor");
+Serial.print("Position (rad/s) at the moment the hard stop was triggered: ");
+Serial.print(m_reply.position);
+m_enabled = false;
+sendMessage(exitMotorMode);
+// leaving motor mode seems to disable logging of messages
+delay(1000);
+}
+}
 
 void print_can_msg(MotorReply reply){
         Serial.print("  motor id: ");
@@ -158,36 +196,36 @@ protected:
     {
     uint16_t position = float_to_uint(
         p_in,
-        motorParams.p_min,
-        motorParams.p_max,
+        m_motorConstraints->p_min,
+        m_motorConstraints->p_max,
         16
     );
 
     uint16_t velocity = float_to_uint(
         v_in,
-        motorParams.v_min,
-        motorParams.v_max,
+        m_motorConstraints->v_min,
+        m_motorConstraints->v_max,
         12
     );
 
     uint16_t kp = float_to_uint(
         kp_in,
-        motorParams.kp_min,
-        motorParams.kp_max,
+        m_motorConstraints->kp_min,
+        m_motorConstraints->kp_max,
         12
     );
 
     uint16_t kd = float_to_uint(
         kd_in,
-        motorParams.kd_min,
-        motorParams.kd_max,
+        m_motorConstraints->kd_min,
+        m_motorConstraints->kd_max,
         12
     );
 
     uint16_t trq = float_to_uint(
         trq_in,
-        motorParams.trq_min,
-        motorParams.trq_max,
+        m_motorConstraints->trq_min,
+        m_motorConstraints->trq_max,
         12
     );
 
@@ -260,6 +298,7 @@ float uint_to_float(uint16_t code, float x_min, float x_max, int bits)
 
 uint16_t float_to_uint(float x, float x_min, float x_max, int bits)
     {
+    x = constrain_float(x,x_min,x_max);
     float span = x_max - x_min;
     float max_int = (float)(((unsigned long)1 << bits) -1);
     return (uint16_t)((x-x_min)* max_int / span);
@@ -268,11 +307,19 @@ float constrain_float(float x, float x_min, float x_max)
     {
     if (x < x_min)
     {
+        Serial.print("Note : capping value ");
+        Serial.print(x);
+        Serial.print(" to ");
+        Serial.println(x_min);
         return x_min;
     }
 
     if (x > x_max)
     {
+        Serial.print("Note : capping value ");
+        Serial.print(x);
+        Serial.print(" to ");
+        Serial.println(x_max);
         return x_max;
     }
 
@@ -297,8 +344,8 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
     class CANMotorMIT_Teensy : public CANMotorMIT {
 
     public:
-        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings)
-        : CANMotorMIT(canId, motorSettings)
+        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings,const AK60Params* motorConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        : CANMotorMIT(canId, motorSettings,motorConstraints,cmd,kPrintEvery)
         {}
 
             virtual void begin(){
@@ -344,8 +391,8 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
     class CANMotorMIT_Renesas : public CANMotorMIT {
     //using PlatformCanBus = CanBus_RenesasRA;
     public:
-        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings)
-        : CANMotorMIT(canId,motorSettings)
+        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings,const AK60Params* motorConstraints,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        : CANMotorMIT(canId,motorSettings,motorConstraints,cmd,kPrintEvery)
         {}
 
             virtual void begin(){

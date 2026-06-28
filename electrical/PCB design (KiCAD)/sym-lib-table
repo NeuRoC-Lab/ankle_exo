@@ -4,4 +4,5 @@
   (lib (name "P78E05-1000")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/P78E05-1000.kicad_sym")(options "")(descr ""))
   (lib (name "TXU0104")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/TXU0104PWR.kicad_sym")(options "")(descr ""))
   (lib (name "TXU0304-Q1")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/2026-06-17_15-25-16.kicad_sym")(options "")(descr ""))
+  (lib (name "XT30PW-F")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/XT30PW-F.kicad_sym")(options "")(descr ""))
 )

@@ -3,13 +3,16 @@
 //
 #include <Arduino.h>
 
+// AK60 Motor parameter definitions
+
+
+unsigned long debug_update = millis();
+
 #if defined(MIT_MODE)
 #include "CANMotorMIT.h"
 #elif defined(SERVO_MODE)
 #include "ServoCANMotor.h"
 #endif
-
-
 
 #if defined(PLATFORM_TEENSY41)
 #if defined(SERVO_MODE)
@@ -35,23 +38,25 @@ using CANController = CANMotorMIT_Renesas;
 
 // this is for motor1. CAN id is set here :
 
-constexpr byte MOTOR_ID = 0x01;
-CANController motor(MOTOR_ID, &motorParams);
-
-#include "SerialMotorControl.h" // only include that library ONCE we defined the CANController object
-
+constexpr int NO_MOTOR_UPDATE = -1;
 
 #if defined(MIT_MODE)
+
+constexpr byte MOTOR_ID = 0x02; // 0x02 for the one mounted ; 0x01 for the one that is free
 
 MotorCmd motor1Cmd {
     .position = 0.0f,
     .velocity = 0.0f,
     .torque = 0.0f,
-    .kp = 0.5f,
-    .kd = 0.5f
+    .kp = 0.0f,
+    .kd = 0.0f
 };
 
+CANController motor(MOTOR_ID, &motorParams,&motorConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+
 #elif defined(SERVO_MODE)
+
+constexpr byte MOTOR_ID = 0x68; //decimal 104
 
 MotorCmd motor1Cmd {
     .packetID = CAN_PACKET_SET_DUTY,
@@ -59,7 +64,14 @@ MotorCmd motor1Cmd {
     .len = 4
 };
 
+CANController motor(MOTOR_ID, &motorParams,motor1Cmd,5);//NO_MOTOR_UPDATE);
+
 #endif
+
+
+#include "SerialMotorControl.h" // only include that library ONCE we defined the CANController object
+
+
 
 SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
@@ -85,9 +97,26 @@ void loop() {
     motor1Cmd.kp = 0.5f;
     motor1Cmd.kd = 0.5f;
     */
-
-    motor.update();
-    serialControl.update();
+    for(int i = 0 ; i < 1000;i=i+10){
+        motor.can_set_rpm(i);
+        motor.update();
+delay(100);
+    }
+    for(int i = 1000;i>0;i=i-10){
+        motor.can_set_rpm(i);
+        motor.update();
+        delay(100);
+    }
+    /*
+    if(millis() - debug_update > 1000){
+    Serial.print("Velocity");
+    Serial.println(motor.m_cmd.velocity);
+    Serial.print("Kd");
+    Serial.println(motor.m_cmd.kd);
+    debug_update = millis();
+    }
+    */
+    //serialControl.update();
     delay(10);
 
 }
