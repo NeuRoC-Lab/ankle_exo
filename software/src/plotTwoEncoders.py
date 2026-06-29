@@ -148,5 +148,5 @@ except KeyboardInterrupt:
     print("Ctrl+C pressed, closing figure")
 
 finally:
-    stop_motor()
+    stop_encoders()
     plt.close("all")
