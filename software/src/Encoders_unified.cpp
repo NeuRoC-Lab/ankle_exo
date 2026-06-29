@@ -45,15 +45,21 @@ void loop()
     float right_delta = current_right_position - previous_right_position;
 
     float raw_left_velocity = left_delta / dt;
+    float raw_right_velocity = right_delta / dt;
+
+    Serial.print("Left raw velocity : ");
+    Serial.print(raw_left_velocity);
+    Serial.print("Right raw velocity : ");
+    Serial.print(raw_right_velocity);
 
     // Apply EWMA filter
     filtered_left_velocity += alpha * (raw_left_velocity - filtered_left_velocity);
     filtered_right_velocity += alpha * (raw_right_velocity - filtered_right_velocity);
 
-    Serial.print("Left velocity : ");
+    Serial.print("Left filtered velocity : ");
     Serial.print(filtered_left_velocity);
-    Serial.print(" Right velocity : ");
-    Serial.println(filtered_right_velocity);
+    Serial.print(" Right filtered velocity : ");
+    Serial.print(filtered_right_velocity);
 
     // Update previous position
     previous_left_position = current_left_position;
