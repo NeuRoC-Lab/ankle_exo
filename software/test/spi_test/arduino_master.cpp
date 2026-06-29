@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-constexpr uint8_t CS_PIN = 0;
+constexpr uint8_t CS_PIN = 10;
 
 SPISettings spiSettings(
     1000000,   // 1Mhz

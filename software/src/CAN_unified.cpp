@@ -1,30 +1,80 @@
 //
 // Created by Oscar Tesniere on 23/06/2026.
 //
-#include "CANMotor.h"
-#include "SerialMotorControl.h"
+#include <Arduino.h>
 
-MotorCmd cmd {
-    .can_id = 1,
-    .position = 0.0f,
-    .velocity = 10.0f,
-    .torque = 0.0f,
-    .kp = 0.5f,
-    .kd = 0.5f
-};
+// AK60 Motor parameter definitions
 
-constexpr byte MOTOR_ID = 0x01;
+
+unsigned long debug_update = millis();
+
+#if defined(MIT_MODE)
+#include "CANMotorMIT.h"
+#elif defined(SERVO_MODE)
+#include "ServoCANMotor.h"
+#endif
 
 #if defined(PLATFORM_TEENSY41)
-using CANController = CANMotor_Teensy;
-#elif defined(PLATFORM_RENESAS_RA)
-using CANController = CANMotor_Renesas;
+#if defined(SERVO_MODE)
+using CANController = ServoCANMotor_Teensy;
+#elif defined(MIT_MODE)
+using CANController = CANMotorMIT_Teensy;
+#else
+#error "You need to select either MIT or Servo mode for operating the motor"
 #endif
-CANController motor(MOTOR_ID, &motorParams);
 
-SerialMotorControl serialControl(Serial, cmd, motor);
+#elif defined(PLATFORM_RENESAS_RA)
 
-unsigned long update = millis();
+#if defined(SERVO_MODE)
+using CANController = ServoCANMotor_Renesas;
+#elif defined(MIT_MODE)
+using CANController = CANMotorMIT_Renesas;
+#else
+#error "You need to select either MIT or Servo mode for operating the motor"
+#endif
+#else
+#error "You need to select either PLATFORM_TEENSY41 or PLATFORM_RENESAS_RA"
+#endif
+
+// this is for motor1. CAN id is set here :
+
+constexpr int NO_MOTOR_UPDATE = -1;
+
+#if defined(MIT_MODE)
+
+constexpr byte MOTOR_ID = 0x02; // 0x02 for the one mounted ; 0x01 for the one that is free
+
+MotorCmd motor1Cmd {
+    .position = 0.0f,
+    .velocity = 0.0f,
+    .torque = 0.0f,
+    .kp = 0.0f,
+    .kd = 0.0f
+};
+
+CANController motor(MOTOR_ID, &motorParams,&motorConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+
+#elif defined(SERVO_MODE)
+
+constexpr byte MOTOR_ID = 0x68; //decimal 104
+
+MotorCmd motor1Cmd {
+    .packetID = CAN_PACKET_SET_DUTY,
+    .data = {0},
+    .len = 4
+};
+
+CANController motor(MOTOR_ID, &motorParams,motor1Cmd,5);//NO_MOTOR_UPDATE);
+
+#endif
+
+
+#include "SerialMotorControl.h" // only include that library ONCE we defined the CANController object
+
+
+
+SerialMotorControl serialControl(Serial, motor1Cmd, motor);
+
 
 void setup() {
     Serial.begin(115200);
@@ -32,7 +82,7 @@ void setup() {
     delay(1000);
 
     motor.begin();
-    if(!motor.resetMotor(MOTOR_ID)){
+    if(!motor.resetMotor()){
     Serial.println("Failed to start motor");
     }
     else {
@@ -42,34 +92,31 @@ void setup() {
 
 void loop() {
     /*
-    MotorCmd cmd;
-
-    cmd.can_id = 1;
-    cmd.position = 0.0f;
-    cmd.velocity = 10.0f;
-    cmd.kp = 0.5f;
-    cmd.kd = 0.5f;
+    motor1Cmd.position = 0.0f;
+    motor1Cmd.velocity = 10.0f;
+    motor1Cmd.kp = 0.5f;
+    motor1Cmd.kd = 0.5f;
     */
-
+    for(int i = 0 ; i < 1000;i=i+10){
+        motor.can_set_rpm(i);
+        motor.update();
+delay(100);
+    }
+    for(int i = 1000;i>0;i=i-10){
+        motor.can_set_rpm(i);
+        motor.update();
+        delay(100);
+    }
     /*
-    if(millis() - update > 1000){
-    if(cmd.torque == 0.1f){
-        cmd.torque = 0.0f;
-    }
-    else{
-        cmd.torque = 0.1f;
-    }
-    update = millis();
+    if(millis() - debug_update > 1000){
+    Serial.print("Velocity");
+    Serial.println(motor.m_cmd.velocity);
+    Serial.print("Kd");
+    Serial.println(motor.m_cmd.kd);
+    debug_update = millis();
     }
     */
-    motor.update(cmd);
-    serialControl.update();
-    //Serial.println("Updating command");
-
-    MotorReply reply;
-    while (motor.readMessages(reply)) {
-        motor.print_can_msg(reply);
-    }
+    //serialControl.update();
     delay(10);
 
 }

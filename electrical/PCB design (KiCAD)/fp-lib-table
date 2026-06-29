@@ -5,4 +5,5 @@
   (lib (name "TXU0304")(type "KiCad")(uri "$(KIPRJMOD)/libraries/footprints/ul_TXU0304-Q1/footprints.pretty")(options "")(descr ""))
   (lib (name "TXU0104")(type "KiCad")(uri "$(KIPRJMOD)/libraries/footprints/ul_TXU0104QPWRQ1/footprints.pretty")(options "")(descr ""))
   (lib (name "Pinout tentative layout")(type "KiCad")(uri "/Users/oscartesniere/Downloads/pinouttest/pinout_kicad_example/pinout.pretty")(options "")(descr ""))
+  (lib (name "XT30PW-F")(type "KiCad")(uri "$(KIPRJMOD)/libraries/footprints/TX30PW-F/Connector_AMASS.pretty(1)")(options "")(descr ""))
 )
