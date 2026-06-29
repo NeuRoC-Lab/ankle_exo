@@ -1,3 +1,8 @@
+"""
+Attempt code to make all python plotting scripts modular and less long by defining classes for main plotting actions
+NOT FINISHED NOR IMPLEMENTED
+"""
+
 import serial
 import re
 import time
