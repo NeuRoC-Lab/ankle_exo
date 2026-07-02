@@ -52,8 +52,8 @@ start_time = time.perf_counter()
 # Create plot
 plt.ion()
 print("Figure created")
-width = 8
-height = 6
+width = 12
+height = 8
 
 fig, axes = plt.subplots(2, 2, figsize=(width, height))
 ax1 = axes[0, 0]

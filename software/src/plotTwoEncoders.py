@@ -49,7 +49,7 @@ def close_plot(event):
 
 time.sleep(1)
 
-# Prepare data for both plots
+# Prepare data for six plots
 
 left_angle = []
 right_angle = []
@@ -64,7 +64,16 @@ time_data = []
 
 start_time = time.perf_counter()
 
-# Create plots
+"""
+Create plots in the format of
+    +---------+---------+
+    |   ax1   |   ax2   |
+    +---------+---------+
+    |   ax3   |   ax4   |
+    +---------+---------+
+    |   ax5   |   ax6   |
+    +---------+---------+
+"""
 
 plt.ion()
 print("Figure Creating")
@@ -79,6 +88,7 @@ ax4 = axes[1, 1]
 ax5 = axes[2, 0]
 ax6 = axes[2, 1]
 
+# Main title
 fig.suptitle("Real Time Encoder Position for Left and Right Ankle Exoskeletons", fontsize=14)
 
 line1, = ax1.plot(time_data, left_angle, linewidth=1.5, color="red")
@@ -88,6 +98,7 @@ line4, = ax4.plot(time_data, right_raw_velocity, linewidth=1.5, color="blue")
 line5, = ax5.plot(time_data, left_filtered_velocity, linewidth=1.5, color="yellow")
 line6, = ax6.plot(time_data, right_filtered_velocity, linewidth=1.5, color="purple")
 
+# Figure titles
 ax1.set_title("Left Encoder Position Over Time")
 ax2.set_title("Right Encoder Position Over Time")
 ax3.set_title("Left Encoder Raw Velocity Over Time")
@@ -95,6 +106,7 @@ ax4.set_title("Right Encoder Raw Velocity Over Time")
 ax5.set_title("Left Encoder Filtered Velocity Over Time")
 ax6.set_title("Right Encoder Filtered Velocity Over Time")
 
+# Figure x-axes
 ax1.set_xlabel("Time (s)")
 ax2.set_xlabel("Time(s)")
 ax3.set_xlabel("Time (s)")
@@ -102,6 +114,7 @@ ax4.set_xlabel("Time (s)")
 ax5.set_xlabel("Time (s)")
 ax6.set_xlabel("Time (s)")
 
+# Figure y-axes
 ax1.set_ylabel("Left encoder angle (deg)")
 ax2.set_ylabel("Right encoder angle (deg)")
 ax3.set_ylabel("Left encoder raw velocity (deg/s)")
