@@ -4,7 +4,7 @@
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
-		(at -3.2766 0.635 0)
+		(at -2.03 0.34 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "ed5c498a-6a34-4b40-8521-9172a4b3654e")
@@ -17,7 +17,7 @@
 		)
 	)
 	(property "Value" "D16"
-		(at -1.7272 0.635 0)
+		(at -1.79 2.49 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "62579ce3-94c0-40f4-89ef-d671a18bd047")
@@ -828,14 +828,29 @@
 		(uuid "72f61c88-8af9-402e-bfad-4431499ead03")
 	)
 	(fp_text user "*"
-		(at -3.2004 -4.8768 0)
+		(at -1.28 -3.07 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "eb4b648f-4663-4fe7-b2a1-6472d3a0d812")
+		(effects
+			(font
+				(size 1.1938 1.1938)
+				(thickness 0.29845)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "*"
+		(at -3.29 -4.81 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "f9ab7c2d-77e9-4849-8fff-c1da33176b6c")
 		(effects
 			(font
 				(size 1.1938 1.1938)
-				(thickness 0.0762)
+				(thickness 0.29845)
+				(bold yes)
 			)
 			(justify left bottom)
 		)

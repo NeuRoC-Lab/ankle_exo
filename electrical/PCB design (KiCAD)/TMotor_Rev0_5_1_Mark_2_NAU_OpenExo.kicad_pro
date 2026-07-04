@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.8,
-          "height": 1.27,
-          "width": 2.54
+          "drill": 0.0,
+          "height": 2.0,
+          "width": 2.0
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -65,32 +65,20 @@
       ],
       "drc_exclusions": [
         [
-          "courtyards_overlap|113725000|118584999|26b850e7-7f7a-4e53-b1da-b94dcbd44275|525ac54d-7728-4e2c-97e2-630e4e256951",
-          "under the teensy"
+          "lib_footprint_mismatch|120005000|104424250|26b850e7-7f7a-4e53-b1da-b94dcbd44275|00000000-0000-0000-0000-000000000000",
+          "I modified the footprint on purpose to add the pinsockets"
         ],
         [
-          "courtyards_overlap|117230000|128597500|26b850e7-7f7a-4e53-b1da-b94dcbd44275|961f405c-0c06-43f4-bbce-a6dd76829a5b",
-          "under the teensy"
+          "silk_edge_clearance|131714653|78489814|18f972f8-9ac9-4b49-9bea-5a89bb2e3aa0|e962a685-72c5-496e-830b-defbf508f33c",
+          "its fine"
         ],
         [
-          "courtyards_overlap|119547189|101776149|26b850e7-7f7a-4e53-b1da-b94dcbd44275|65fbf3cc-f1c3-476a-974d-f501d395572c",
-          "under the teensy"
+          "silk_edge_clearance|180189888|79314921|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
+          "its fine"
         ],
         [
-          "courtyards_overlap|120855000|74925000|26b850e7-7f7a-4e53-b1da-b94dcbd44275|2a6e49d1-88d6-4336-9ddd-85137c44b4db",
-          "under the teensy"
-        ],
-        [
-          "courtyards_overlap|122650000|101584982|26b850e7-7f7a-4e53-b1da-b94dcbd44275|6bce1155-f1ed-4db2-aa0f-b5bd3c77fff2",
-          "under tthe teensy"
-        ],
-        [
-          "courtyards_overlap|123970000|135099942|26b850e7-7f7a-4e53-b1da-b94dcbd44275|dd8f819f-0965-459b-bece-37faa782c76a",
-          "This is fine since we're surelevating the teensy through female header connectors. There is no chevauchement"
-        ],
-        [
-          "courtyards_overlap|125271852|121030695|26b850e7-7f7a-4e53-b1da-b94dcbd44275|78d04a43-d778-4613-a2a0-77c51cc8e2c5",
-          "under the teensy"
+          "silk_edge_clearance|189574700|64008571|b483043c-bd55-49e3-ac1e-0b5c7e51eef8|a6eaeffe-316f-4226-bef0-5d2fc39d8f5d",
+          "its fine"
         ]
       ],
       "meta": {
@@ -174,7 +162,7 @@
         "min_track_width": 0.0,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.5,
-        "solder_mask_to_copper_clearance": 0.0,
+        "solder_mask_to_copper_clearance": 0.005,
         "use_height_for_length_calcs": true
       },
       "teardrop_options": [
@@ -564,7 +552,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": ".",
+      "plot": "EXPORT FOR V1.1(new)/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo.step",

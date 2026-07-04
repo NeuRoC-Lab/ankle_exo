@@ -104,7 +104,7 @@ _Note that the order the parameters are given does not matter. One / more parame
   - `pos x.x rpm x.x acc x.x` : set position velocity acceleration loop mode
   -  `origin 0` : set encoder origin
 
-  - _Note that only ONE mode can be active at a time_
+  - _Note that only ONE mode can be active at a time_ (WAIT MAYBE NO ACTUALLY?)
 ### LoadCell class
 
 The `LoadCell` class is the main class used to interface the motor. 

@@ -17,7 +17,7 @@
 #define set_zero_point 0x70
 
 // Chip select pin
-const int CS = 10;
+const int CS_PIN = 10;
 
 // Control flags
 bool running = false;
@@ -28,6 +28,45 @@ uint16_t zeroPosition = 0;
 // Function prototype
 uint8_t SPIWrite(uint8_t sendByte);
 
+uint16_t readEncoder()
+{
+    uint8_t data;
+    uint8_t timeoutCounter = 0;
+    uint16_t currentPosition;
+
+    data = SPIWrite(rd_pos);
+
+    while (data != rd_pos && timeoutCounter++ < timoutLimit)
+    {
+        data = SPIWrite(nop);
+    }
+
+    if (timeoutCounter >= timoutLimit)
+    {
+        Serial.println("Error obtaining position");
+        return 0;
+    }
+
+    currentPosition = (SPIWrite(nop) & 0x0F) << 8;
+    currentPosition |= SPIWrite(nop);
+
+    return currentPosition;
+}
+
+uint8_t SPIWrite(uint8_t sendByte)
+{
+    uint8_t data;
+
+    digitalWrite(CS_PIN, LOW);
+    data = SPI.transfer(sendByte);
+    digitalWrite(CS_PIN, HIGH);
+
+    delayMicroseconds(10);
+
+    return data;
+}
+
+
 void setup()
 {
     Serial.begin(baudRate);
@@ -35,12 +74,12 @@ void setup()
     pinMode(SCK, OUTPUT);
     pinMode(MOSI, OUTPUT);
     pinMode(MISO, INPUT);
-    pinMode(CS, OUTPUT);
+    pinMode(CS_PIN, OUTPUT);
 
     SPI.beginTransaction(
         SPISettings(500000, MSBFIRST, SPI_MODE0));
 
-    digitalWrite(CS, HIGH);
+    digitalWrite(CS_PIN, HIGH);
 
     Serial.println("AMT20 Encoder Test");
     Serial.println("y = start running encoder");
@@ -100,42 +139,4 @@ void loop()
     Serial.println(" deg");
 
     delay(50);
-}
-
-uint16_t readEncoder()
-{
-    uint8_t data;
-    uint8_t timeoutCounter = 0;
-    uint16_t currentPosition;
-
-    data = SPIWrite(rd_pos);
-
-    while (data != rd_pos && timeoutCounter++ < timoutLimit)
-    {
-        data = SPIWrite(nop);
-    }
-
-    if (timeoutCounter >= timoutLimit)
-    {
-        Serial.println("Error obtaining position");
-        return 0;
-    }
-
-    currentPosition = (SPIWrite(nop) & 0x0F) << 8;
-    currentPosition |= SPIWrite(nop);
-
-    return currentPosition;
-}
-
-uint8_t SPIWrite(uint8_t sendByte)
-{
-    uint8_t data;
-
-    digitalWrite(CS, LOW);
-    data = SPI.transfer(sendByte);
-    digitalWrite(CS, HIGH);
-
-    delayMicroseconds(10);
-
-    return data;
 }

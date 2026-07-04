@@ -1,0 +1,140 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "3e3ff72e-d777-45cf-9299-e91389ff12dd")
+	(paper "A4")
+	(lib_symbols)
+	(sheet
+		(at 23.114 49.022)
+		(size 44.45 19.304)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "488ec729-0dfb-4444-ad76-08976c45f4bf")
+		(property "Sheetname" "MCUs"
+			(at 23.114 48.3104 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_1.kicad_sch"
+			(at 23.114 68.9106 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd"
+					(page "1")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 166.878 53.086)
+		(size 41.91 15.494)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "76f1db6b-86f9-4936-9afd-1ff77552b608")
+		(property "Sheetname" "Load cells"
+			(at 166.878 52.3744 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_4.kicad_sch"
+			(at 166.878 69.1646 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 94.488 51.816)
+		(size 42.926 16.256)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "ec3a94af-cbf2-4645-8611-15dc332be977")
+		(property "Sheetname" "CAN and peripherals."
+			(at 94.488 51.1044 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch"
+			(at 94.488 68.6566 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

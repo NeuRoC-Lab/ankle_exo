@@ -21,7 +21,13 @@ LoadCellController LC_L_2(boardConfig.LC_L_2_pin);
 LoadCellController LC_R_2(boardConfig.LC_R_2_pin);
 LoadCellController LC_R_1(boardConfig.LC_R_1_pin);
 
-void setup() {
+void setup()
+    {
+    #if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_LEAST(1, 1, 0)
+    Serial.println("[Startup] checking the INA125U reference voltages...");
+    delay(1000);
+    check_excitation_voltages();
+    #endif
     Serial.begin(115200);
     Serial.println("Starting script to interface load cells over Serial with uniformized script");
     delay(1000);

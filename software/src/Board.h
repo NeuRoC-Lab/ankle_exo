@@ -1,4 +1,35 @@
 #pragma once
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+#ifndef HW_VERSION_MAJOR
+    #define HW_VERSION_MAJOR 1
+#endif
+
+#ifndef HW_VERSION_MINOR
+    #define HW_VERSION_MINOR 0
+#endif
+
+#ifndef HW_VERSION_PATCH
+    #define HW_VERSION_PATCH 0
+#endif
+
+#pragma message "Using HW version " STR(HW_VERSION_MAJOR) "." STR(HW_VERSION_MINOR) "." STR(HW_VERSION_PATCH)
+
+//#pragma message "HW_VERSION_MAJOR = " STR(HW_VERSION_MAJOR)
+//#pragma message "HW_VERSION_MINOR = " STR(HW_VERSION_MINOR)
+//#pragma message "HW_VERSION_PATCH = " STR(HW_VERSION_PATCH)
+
+// default to first (v1.0.0) version if the compiler is missing the hardware version. That way our code is "safe" and there is no ambiguity
+
+#define HW_VERSION_ENCODE(major, minor, patch) \
+((major) * 10000 + (minor) * 100 + (patch))
+
+#define HARDWARE_VERSION \
+HW_VERSION_ENCODE(HW_VERSION_MAJOR, HW_VERSION_MINOR, HW_VERSION_PATCH)
+
+#define HW_VERSION_AT_LEAST(major, minor, patch) \
+(HARDWARE_VERSION >= HW_VERSION_ENCODE(major, minor, patch))
 
 #include <Arduino.h>
 
@@ -28,6 +59,12 @@ struct BoardConfig {
 
     int ENCODER_LEFT_CS;
     int ENCODER_RIGHT_CS;
+
+    // analog pins to read the excitation voltage (IAREF) of the INA125U in order to validate the settings and proper operation of the board
+    int left_amp_1_exc;
+    int left_amp_2_exc;
+    int right_amp_1_exc;
+    int right_amp_2_exc;
 };
 
 // CHANGE THESE DEPENDING ON YOUR SETUP
@@ -45,9 +82,14 @@ constexpr BoardConfig boardConfig {
     .LC_R_1_pin = A11,   // physical/digital pin 25
     .LC_R_2_pin = A10,    // physical/digital pin 24
 
-    .ENCODER_LEFT_CS = 1, // Pin no 1 on Teensy
-    .ENCODER_RIGHT_CS = 7 // Pin no 7 on Teensy
+    .ENCODER_LEFT_CS = 0, // Pin no 0 on Teensy
+    .ENCODER_RIGHT_CS = 7, // Pin no 7 on Teensy
 
+    // Note : only available past HW version 1.1.0
+    .left_amp_1_exc = 15,
+    .left_amp_2_exc = 14,
+    .right_amp_1_exc = 39,
+    .right_amp_2_exc = 40,
 };
 
 #elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR)
@@ -102,3 +144,34 @@ static_assert(
 );
 static_assert(INA125UParams::gainR > 0.0f, "Gain resistor must be positive");
 static_assert(INA125UParams::ampGain > 0.0f, "Gain value must be positive");
+
+#if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_LEAST(1,1,0)
+
+void check_excitation_voltages() {
+    const int exc_pins[] = {
+        boardConfig.left_amp_1_exc,
+        boardConfig.left_amp_2_exc,
+        boardConfig.right_amp_1_exc,
+        boardConfig.right_amp_2_exc
+    };
+
+    const float expected = refVoltage(boardConfig.ina125IARef);
+
+    for (int exc_pin : exc_pins) {
+        float measured = analogRead(exc_pin) * 3.3f / 4095.0f;
+
+        if (fabs(measured - expected) > 0.2f) {
+            Serial.print("Error: reference voltage for EXC pin ");
+            Serial.print(exc_pin);
+            Serial.print(" is ");
+            Serial.print(measured, 3);
+            Serial.print(" V, expected ");
+            Serial.print(expected, 3);
+            Serial.println(" V. Make sure the solder jumpers are configured properly.");
+
+            while (1); // abort code execution
+        }
+    }
+}
+
+#endif

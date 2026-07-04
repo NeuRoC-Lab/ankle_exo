@@ -311,6 +311,74 @@ public:
     }
 };
 
+#elif defined(PLATFORM_TEENSY41)
+
+#include <FlexCAN_T4.h>
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TeensyCAN;
+// we use the CAN1 on the teensy (CANTX=22,CANRX=23)
+
+class ServoCANMotor_Teensy : public ServoCANMotor {
+public:
+    ServoCANMotor_Teensy(byte canId, const AK60Params* motorSettings,MotorCmd& cmd, uint32_t kPrintEvery = 20)
+        : ServoCANMotor(canId, motorSettings,cmd,kPrintEvery)
+    {}
+
+    void begin() override {
+        Serial.println("Initializing CAN communication [Teensy] for Servo Mode at 500 kbps");
+        TeensyCAN.begin();
+        TeensyCAN.setBaudRate(500000);// initialize baudrate at 500k
+        TeensyCAN.setMaxMB(16);
+        TeensyCAN.enableFIFO();
+        Serial.println("CAN ready.");
+        //TODO Add a condition check to see if the CAN properly started (like we do for the Arduino_CAN library equivalent)
+    }
+
+    bool sendMessage(CAN_PACKET_ID packetId, const uint8_t* data, uint8_t len) override {
+        CAN_message_t msg;
+        msg.id = make_servo_eid(packetId); // added make servo eid to concatenate function id with motor id
+        msg.flags.extended = 1;
+        msg.len = len;
+
+        memset(msg.buf, 0, sizeof(msg.buf));
+        memcpy(msg.buf, data, len);
+
+        int rc = TeensyCAN.write(msg);
+        return rc > 0;
+    }
+
+    bool readMessages(ServoMotorReply& reply) override {
+        CAN_message_t rxMsg;
+            while (TeensyCAN.read(rxMsg)) {
+                if (rxMsg.len != 8) {
+                    Serial.print("Invalid message of length ");
+                    Serial.println(rxMsg.len);
+                    continue;
+                   }
+                if(!rxMsg.flags.extended){
+                    Serial.println("Detected Non Standard CAN ID. Are you in Servo Mode ????");
+                    continue;
+                }
+                 ServoMotorReply parsed = unpack_servo_reply(rxMsg.id,rxMsg.buf,rxMsg.len);
+                // TODO : DO WE NEED TO APPLY A MASK HERE ???
+
+                if (!parsed.valid_feedback) {
+                    continue;
+                }
+
+                if (parsed.motor_eid != m_canId) {
+                    Serial.println("Non matching ID");
+                    continue;
+                }
+
+                reply = parsed;
+                return true;
+            }
+
+        return false;
+    }
+};
+
+
 #else
-    #error "No CAN platform selected for ServoCANMotor. Define PLATFORM_RENESAS_RA or add another platform implementation."
+    #error "No CAN platform selected for ServoCANMotor. Define PLATFORM_RENESAS_RA,or PLATFORM_TEENSY41"
 #endif

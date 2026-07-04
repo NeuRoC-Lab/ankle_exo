@@ -1947,6 +1947,16 @@
 		)
 		(uuid "03f8047f-c8bf-4a1e-82f3-d5a3bdd2e5de")
 	)
+	(text "weak pull down to avoid \nsaturating output amplifier\n"
+		(exclude_from_sim no)
+		(at 211.328 90.932 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1dd51769-0d21-4128-ac2a-a76ebbeefafb")
+	)
 	(junction
 		(at 170.18 59.69)
 		(diameter 0)
@@ -1984,6 +1994,12 @@
 		(uuid "60c9f680-13e5-4923-9cec-f20494cce280")
 	)
 	(junction
+		(at 186.69 77.47)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "906136e0-59cd-4b64-af64-219996a014ef")
+	)
+	(junction
 		(at 189.23 69.85)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1994,6 +2010,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "9d4a57e1-6ffb-4621-a28a-213ad9bb4dab")
+	)
+	(junction
+		(at 193.04 80.01)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a45d7899-b7b0-47e6-8c3e-b80f62bbfd0c")
 	)
 	(junction
 		(at 72.39 81.28)
@@ -2285,6 +2307,16 @@
 	)
 	(wire
 		(pts
+			(xy 193.04 80.01) (xy 196.85 80.01)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "7024a01a-18cd-436f-8f23-f35fe56a18f3")
+	)
+	(wire
+		(pts
 			(xy 170.18 53.34) (xy 170.18 55.88)
 		)
 		(stroke
@@ -2302,6 +2334,16 @@
 			(type solid)
 		)
 		(uuid "85f8f105-b369-4ba6-aa3b-7e64df9d17ba")
+	)
+	(wire
+		(pts
+			(xy 186.69 77.47) (xy 189.23 77.47)
+		)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(uuid "87629aae-29fd-4e61-bdb8-f9958ce9c702")
 	)
 	(wire
 		(pts
@@ -2345,7 +2387,7 @@
 	)
 	(wire
 		(pts
-			(xy 156.21 77.47) (xy 189.23 77.47)
+			(xy 156.21 77.47) (xy 186.69 77.47)
 		)
 		(stroke
 			(width 0.1524)
@@ -2395,7 +2437,7 @@
 	)
 	(wire
 		(pts
-			(xy 168.91 87.63) (xy 172.72 87.63)
+			(xy 168.91 87.63) (xy 170.18 87.63)
 		)
 		(stroke
 			(width 0)
@@ -2505,7 +2547,7 @@
 	)
 	(wire
 		(pts
-			(xy 176.53 80.01) (xy 196.85 80.01)
+			(xy 176.53 80.01) (xy 193.04 80.01)
 		)
 		(stroke
 			(width 0.1524)
@@ -2545,7 +2587,7 @@
 	)
 	(hierarchical_label "Vexcitation+"
 		(shape output)
-		(at 172.72 87.63 0)
+		(at 170.18 87.63 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2748,6 +2790,88 @@
 		)
 	)
 	(symbol
+		(lib_id "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo-eagle-import:R-US_0207/10")
+		(at 193.04 85.09 90)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1671df24-68c2-4885-b6f0-ed558f4f1779")
+		(property "Reference" "R23"
+			(at 191.5414 81.28 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "1M"
+			(at 196.342 81.28 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 193.04 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 193.04 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 193.04 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8fe14b5b-cb90-40c9-8cf8-ee69ca62293d")
+		)
+		(pin "2"
+			(uuid "f84c5041-6cd1-455c-8394-b33a41484e42")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "R26")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "R24")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "R25")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "R23")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 209.55 69.85 0)
 		(unit 1)
@@ -2820,6 +2944,84 @@
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
 					(reference "#PWR010")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 193.04 90.17 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3b0e3fa4-62e3-48ef-a747-0b459a6f0bfb")
+		(property "Reference" "#PWR058"
+			(at 193.04 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 193.04 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 193.04 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 193.04 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 193.04 90.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b5873258-f36d-4f2b-8221-440fcbd4ce5f")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "#PWR063")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "#PWR061")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "#PWR062")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "#PWR058")
 					(unit 1)
 				)
 			)
@@ -3120,19 +3322,21 @@
 		(fields_autoplaced yes)
 		(uuid "555ba76d-f856-433c-9198-f116b3f4596b")
 		(property "Reference" "D1"
-			(at 41.91 81.28 0)
+			(at 45.72 80.0099 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property "Value" "BAT54S"
-			(at 44.45 81.28 0)
+			(at 45.72 82.5499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(justify left)
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
@@ -3453,7 +3657,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Value" "470R"
+		(property "Value" "10R"
 			(at 124.46 96.012 0)
 			(effects
 				(font
@@ -3838,6 +4042,84 @@
 	)
 	(symbol
 		(lib_id "power:GND")
+		(at 186.69 87.63 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8c90b027-c45f-41b4-8aa8-8c9a3d3d688f")
+		(property "Reference" "#PWR089"
+			(at 186.69 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 186.69 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 186.69 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 186.69 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 186.69 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "df7e5c84-1a7b-4518-b81c-bb909d26cbef")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "#PWR092")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "#PWR090")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "#PWR091")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "#PWR089")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
 		(at 170.18 67.31 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -4069,6 +4351,88 @@
 				)
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
 					(reference "C24")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo-eagle-import:R-US_0207/10")
+		(at 186.69 82.55 90)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "de026677-2fcf-4ce7-8c4c-bbedb8355b54")
+		(property "Reference" "R19"
+			(at 185.1914 78.74 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Value" "1M"
+			(at 189.992 78.74 0)
+			(effects
+				(font
+					(size 1.778 1.5113)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 186.69 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 186.69 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 186.69 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9ac00132-6748-4512-9f08-92124860d455")
+		)
+		(pin "2"
+			(uuid "89250dd9-a1fe-44f1-96fe-dce0ac4ef328")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/4c7844ce-912f-4570-97a6-8e3b66425452"
+					(reference "R22")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/944478cc-ad75-4fe3-a0cb-a0388ad7c18d"
+					(reference "R20")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/c0c136a9-715a-4523-84cb-168ac7440c43"
+					(reference "R21")
+					(unit 1)
+				)
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608/ffb5542d-bbdd-4da7-9ada-f3fec1753454"
+					(reference "R19")
 					(unit 1)
 				)
 			)

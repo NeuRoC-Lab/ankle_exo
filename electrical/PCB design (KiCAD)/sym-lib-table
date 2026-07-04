@@ -5,4 +5,5 @@
   (lib (name "TXU0104")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/TXU0104PWR.kicad_sym")(options "")(descr ""))
   (lib (name "TXU0304-Q1")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/2026-06-17_15-25-16.kicad_sym")(options "")(descr ""))
   (lib (name "XT30PW-F")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/XT30PW-F.kicad_sym")(options "")(descr ""))
+  (lib (name "TFM-107-01-L-D-WT")(type "KiCad")(uri "/Users/oscartesniere/Downloads/TFM-107-01-L-D-WT/TFM-107-01-L-D-WT.kicad_sym")(options "")(descr ""))
 )

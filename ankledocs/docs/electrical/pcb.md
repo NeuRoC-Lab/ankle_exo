@@ -170,10 +170,36 @@ V_{exc}
 
 ![Pinout ](../images/pcb-pinout.png)
 
+Pinout for the load cells connectors : 
+
+![Load Cells Pinout](../images/LC_connectors_pinout.png)
 ## PCB changelog 
 
-#### 26/06
+#### 26/06 (version 1.0.0)
 
 * Refactored labels for INA solder jumpers by aligning the labels on a "45degrees" plane so that we can distinguish those labels from other things on the board (clearer for reading)
 * Added a solder jumper for INA excitation voltage to choose between the INA voltage reference (2.5v/BG) or 5V from PCB regulator
 * Added a solder jumper to choose whether to connect the Teensy's VIN to the board (so that we can use USB)
+
+
+#### 03/07 (version v1.0.1)
+
+* Modified the Teensy 4.1 footprint to include two 1x24 PinSocket rows so that we can include the pin socket soldering into PCBA for JLCPCB
+* Added a status LED for the 5V power line
+* Make sure to check for unconnected zones 
+* Modified the pinout order for the SPI header (it is now from left to right `GND`,`SCK`,`COPI`,`CIPO`,`CS1`,`CS2`,`5V`)
+* Make sure to check the option `Subtract soldermask from silkscreen` : this will tell KiCad to _automatically remove silkscreen graphics/text wherever they overlap exposed copper pads_ which might otherwise cause manufacturing issues
+* **MAIN PATCH : **  Re-routed the TXU304 and TXU0104 input  / output pins to resolve mismatch in version v1.0.0. The inputs were misconnected to outputs which made the SPI non functioning on version v1.0.0. _The SPI bus has fixed direction ports (COPI, SCK, CS go from controller to peripheral, while CIPO goes from peripheral to controller) but the order was mismatched in version 1.0.0_
+
+Before the patch `.1`
+![SPI before patch 1.0.1](./images/rev%201.0.1%20SPI%20unpatched%20.png)
+After the patch `.1`
+![SPI after patch 1.0.1](./images/rev%201.0.0%20SPI%20patched%20.png)
+
+#### 04/07 (version v1.1.0)
+* connected excitation voltage outputs of the 4 INA125U to Teensy's Analog inputs so that the Teensy can ensure the INA125Us are properly wotking and that these match the settings in Board.h
+
+PCB assembly list : 
+
+https://jlcpcb.com/help/article/how-to-generate-the-bom-and-centroid-file-from-kicad
+

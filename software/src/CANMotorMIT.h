@@ -29,7 +29,7 @@ constexpr AK60Params motorParams = {
 constexpr AK60Params motorConstraints = {
     // these are values for the SOFT STOP CONTROL
     -2.8f, 2.8f,   // position (rad)
-    -30.0f,  30.0f,   // velocity
+    -30.0f,  100.0f,   // velocity
       0.0f, 5.0f,   // kp
       0.0f,   5.0f,   // kd
     -5.0f,  5.0f    // torque
@@ -138,7 +138,7 @@ void update(){
         }
 
         while (readMessages(m_reply)) {
-            checkHardStop();
+            //checkHardStop();
             if (++m_printCounter >= m_kPrintEvery) {
                 print_can_msg(m_reply);
                 m_printCounter = 0;
