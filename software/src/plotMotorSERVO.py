@@ -1,12 +1,12 @@
 """
 This code plots all CubeMars motors data from the following format:
 
-    motor id: 2 pos (rad): 0.1234 vel(rad/s?): 0.5678 trq(N*m): 1.2345 temp (C): 32 err: 0
+    motor_id= 1 pos_deg= 2 speed_erpm= 3 current_a= 4 temp_c= 5 error= 6
 
 Check for port: python -m serial.tools.list_ports
 
 Type in CLion terminal:
-python software\src\plotMotorMIT.py
+python software\src\plotMotorSERVO.py
 """
 
 import serial
@@ -44,7 +44,7 @@ time.sleep(1)
 time_data = []
 position_data = []
 velocity_data = []
-torque_data = []
+current_data = []
 temperature_data = []
 
 start_time = time.perf_counter()
@@ -52,8 +52,8 @@ start_time = time.perf_counter()
 # Create plot
 plt.ion()
 print("Figure created")
-width = 12
-height = 8
+width = 8
+height = 6
 
 fig, axes = plt.subplots(2, 2, figsize=(width, height))
 ax1 = axes[0, 0]
@@ -78,9 +78,9 @@ velline, = ax2.plot(
     color="#A7C7E7"
 )
 
-torqline, = ax3.plot(
+ampline, = ax3.plot(
     time_data,
-    torque_data,
+    current_data,
     linewidth=1.5,
     color="purple"
 )
@@ -94,7 +94,7 @@ templine, = ax4.plot(
 
 ax1.set_title("CubeMars Motor Position Over Time")
 ax2.set_title("CubeMars Motor Velocity Over Time")
-ax3.set_title("CubeMars Motor Torque Over Time")
+ax3.set_title("CubeMars Motor Current Over Time")
 ax4.set_title("CubeMars Motor Temperature Over Time")
 
 ax1.set_xlabel("Time (s)")
@@ -102,9 +102,9 @@ ax2.set_xlabel("Time (s)")
 ax3.set_xlabel("Time (s)")
 ax4.set_xlabel("Time (s)")
 
-ax1.set_ylabel("Position (rad)")
-ax2.set_ylabel("Velocity (rad/s)")
-ax3.set_ylabel("Torque (Nm)")
+ax1.set_ylabel("Position (deg)")
+ax2.set_ylabel("Velocity (eRPM)")
+ax3.set_ylabel("Current (A)")
 ax4.set_ylabel("Temperature (C)")
 
 ax1.grid(True)
@@ -119,7 +119,7 @@ plt.show(block=False)
 
 # Start Motor Test
 ser.flush()
-print("MIT mode motor test starts now")
+print("Servo mode motor test starts now")
 
 try:
 
@@ -141,14 +141,14 @@ try:
         print(arr)
 
         try:
-            pos_index = arr.index("pos(rad):") + 1
-            vel_index = arr.index("vel(rad/s):") + 1
-            trq_index = arr.index("trq(N*m):") + 1
-            temp_index = arr.index("temp(C):") + 1
+            pos_index = arr.index("pos_deg=") + 1
+            vel_index = arr.index("speed_erpm=") + 1
+            amp_index = arr.index("current_a=") + 1
+            temp_index = arr.index("temp_c=") + 1
 
             position_data.append(float(arr[pos_index]))
             velocity_data.append(float(arr[vel_index]))
-            torque_data.append(float(arr[trq_index]))
+            current_data.append(float(arr[amp_index]))
             temperature_data.append(float(arr[temp_index]))
 
         except Exception as e:
@@ -165,13 +165,13 @@ try:
             time_data.pop(0)
             position_data.pop(0)
             velocity_data.pop(0)
-            torque_data.pop(0)
+            current_data.pop(0)
             temperature_data.pop(0)
 
         # update plots
         posline.set_data(time_data, position_data)
         velline.set_data(time_data, velocity_data)
-        torqline.set_data(time_data, torque_data)
+        ampline.set_data(time_data, current_data)
         templine.set_data(time_data, temperature_data)
 
         ax1.set_xlim(max(0, current_time - time_window), current_time)
