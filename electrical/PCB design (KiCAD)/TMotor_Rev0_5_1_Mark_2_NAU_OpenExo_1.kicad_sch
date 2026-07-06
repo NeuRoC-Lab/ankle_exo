@@ -4473,6 +4473,16 @@
 			(justify right bottom)
 		)
 		(uuid "14900087-1b56-46c0-8c5d-eaffb6b05de2")
+		(property "Netclass" "Digital signals"
+			(at 117.094 53.848 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify right)
+			)
+		)
 	)
 	(label "OE2"
 		(at 46.99 40.64 180)
@@ -4493,6 +4503,16 @@
 			(justify right bottom)
 		)
 		(uuid "25cf080e-f3d2-4ff1-a534-eb628d3ac1fb")
+		(property "Netclass" "Digital signals"
+			(at 117.602 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify right)
+			)
+		)
 	)
 	(label "SCK_5v"
 		(at 113.03 102.87 0)
@@ -4543,6 +4563,16 @@
 			(justify right bottom)
 		)
 		(uuid "6b31a47b-87cc-4191-9371-406725b0a320")
+		(property "Netclass" "Digital signals"
+			(at 117.348 51.562 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify right)
+			)
+		)
 	)
 	(label "NANO_TX"
 		(at 162.56 96.52 0)
@@ -4573,6 +4603,17 @@
 			(justify left bottom)
 		)
 		(uuid "a85bf1e5-59c8-45f4-9974-77a30155d476")
+		(property "Netclass" "Digital signals"
+			(at 106.172 89.408 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
 	)
 	(label "NANO_TX"
 		(at 113.03 162.56 0)
@@ -4845,6 +4886,16 @@
 				(hide yes)
 			)
 		)
+		(property "Netclass" "Digital signals"
+			(at 72.39 97.4097 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
 	)
 	(global_label "CS1"
 		(shape bidirectional)
@@ -4999,6 +5050,16 @@
 				(hide yes)
 			)
 		)
+		(property "Netclass" "Digital signals"
+			(at 72.39 99.9497 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
 	)
 	(global_label "RIGHT_AMP1_EXC"
 		(shape input)
@@ -5101,6 +5162,16 @@
 		(uuid "c0835110-8c68-464c-80bc-c60c083963a0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 63.516 102.87 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+		(property "Netclass" "Digital signals"
+			(at 72.39 105.0297 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5217,6 +5288,67 @@
 				)
 				(justify left)
 				(hide yes)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 100.33 45.72 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1880e660-a5c9-41fe-ab26-2f5ebede2126")
+		(property "Netclass" "Digital signals"
+			(at 101.0285 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at -46.99 -2.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 100.33 48.26 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "87c3cac2-a68e-4f0f-a306-b06af98ef6ff")
+		(property "Netclass" "Digital signals"
+			(at 85.344 50.292 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Component Class" ""
+			(at -46.99 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
 			)
 		)
 	)
