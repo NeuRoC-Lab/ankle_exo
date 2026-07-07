@@ -29,7 +29,7 @@ constexpr AK60Params motorParams = {
 constexpr AK60Params motorConstraints = {
     // these are values for the SOFT STOP CONTROL
     -2.8f, 2.8f,   // position (rad)
-    -30.0f,  100.0f,   // velocity
+    -30.0f,  30.0f,   // velocity
       0.0f, 5.0f,   // kp
       0.0f,   5.0f,   // kd
     -5.0f,  5.0f    // torque
@@ -87,14 +87,22 @@ Generic methods shared between the two CAN implementations (i.e Teensy 4.1 and A
 One CANMotorMIT instance per CubeMars motor
 */
 public:
-    CANMotorMIT(byte canId, const AK60Params* motorSettings,const AK60Params* motorConstraints , MotorCmd& cmd, uint32_t kPrintEvery = 20)
-        : m_canId(canId),
-          m_cmd(cmd),
-          m_motorConstraints(motorConstraints),
-          m_motorSettings(motorSettings),
-          m_kPrintEvery(kPrintEvery),
-          m_printCounter(0)
-    {}
+    CANMotorMIT(
+    byte canId,
+    const AK60Params* motorSettings,
+    const AK60Params* motorConstraints,
+    MotorCmd& cmd,
+    uint32_t kPrintEvery = 20
+)
+    : m_canId(canId),
+      m_cmd(cmd),
+      m_reply{},
+      m_enabled(false),
+      m_motorSettings(motorSettings),
+      m_motorConstraints(motorConstraints),
+      m_printCounter(0),
+      m_kPrintEvery(kPrintEvery)
+{}
 
     uint8_t m_canId;
     MotorCmd& m_cmd;   // reference, not copy
@@ -104,21 +112,35 @@ public:
     const AK60Params* m_motorConstraints;
 
 
-bool resetMotor(){
+bool resetMotor()
+{
+    m_enabled = false;
+
     Serial.println("Exiting MIT motor mode...");
-    if(!sendMessage(neutralMITCommand)){
+
+    if (!sendMessage(exitMotorMode)) {
         return false;
     }
+
     delay(500);
-    if(!sendMessage(exitMotorMode)){
+
+    Serial.println("Entering MIT motor mode...");
+
+    if (!sendMessage(enterMotorMode)) {
         return false;
     }
-    delay(500);
-    if(!sendMessage(enterMotorMode)){
+
+    delay(100);
+
+    // Zero position, velocity, gains, and feedforward torque.
+    if (!sendMessage(neutralMITCommand)) {
         return false;
     }
+
+    m_enabled = true;
+
     return true;
-    }
+}
 
 void update(){
 
