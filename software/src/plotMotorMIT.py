@@ -20,6 +20,8 @@ import serial
 import time
 import matplotlib.pyplot as plt
 import threading
+import csv
+from datetime import datetime
 
 # Arduino Connection
 port = "COM6"  # Change port as necessary
@@ -42,6 +44,8 @@ def stop_motor():
 
     if ser.is_open:
         ser.flush()
+        file.close() #Close csv file
+        print(f"CSV file saved as {filename}")
         ser.close()
         print("Motor Plotting Stopped")
 
@@ -126,6 +130,22 @@ def control_motor():
 
 
 time.sleep(1)
+
+#Create csv file
+filename = f"MITmotorData_{datetime.now().strftime('%Y%m%d_%H%M%S ')}.csv"
+file = open(filename, "w", newline="")
+writer = csv.writer(file)
+
+#Write sheet column titles by writing the first row
+writer.writerow([
+    "Time (s)",
+    "Position (rad)",
+    "Velocity (rad/s)"
+    "Torque (Nm)"
+    "Temperature (C)"
+])
+
+start_time = time.time()
 
 # Prepare 4 plots data
 time_data = []
@@ -247,6 +267,15 @@ try:
             new_velocity = float(arr[vel_index])
             new_torque = float(arr[trq_index])
             new_temperature = float(arr[temp_index])
+
+            #Update csv file
+            writer.writerow([
+                time.time() - start_time,
+                new_position,
+                new_velocity,
+                new_torque,
+                new_temperature
+            ])
 
         except Exception as e:
             print("Could not read line:", e)
