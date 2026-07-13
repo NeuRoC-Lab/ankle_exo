@@ -13,15 +13,18 @@ Command types:
 
 Type in CLion terminal to run code:
 python software\src\plotMotorMIT.py
+python src\plotMotorMIT.py
 """
 
 import serial
 import time
 import matplotlib.pyplot as plt
 import threading
+import csv
+from datetime import datetime
 
 # Arduino Connection
-port = "COM4"  # Change port as necessary
+port = "COM6"  # Change port as necessary
 baud = 115200
 time_window = 10  # Plot x-axis window in seconds
 
@@ -41,6 +44,8 @@ def stop_motor():
 
     if ser.is_open:
         ser.flush()
+        file.close() #Close csv file
+        print(f"CSV file saved as {filename}")
         ser.close()
         print("Motor Plotting Stopped")
 
@@ -59,14 +64,14 @@ def control_motor():
 
         try:
             command = input()
-            command_lower = command.strip().lower()
+            command = command.strip().lower()
 
             # Ignore empty commands
-            if command_lower == "":
+            if command == "":
                 continue
 
             # Stop Python plotting program
-            if command_lower in (
+            if command in (
                 "stop",
                 "stop motor",
                 "stop id 1",
@@ -77,11 +82,12 @@ def control_motor():
                 break
 
             # Pause plotting
-            if command_lower in (
+            if command in (
                 "pause",
                 "pause plotting",
                 "pause motor",
-                "pause motor plotting"
+                "pause motor plotting",
+                "pause id 1"
             ):
                 plotting["paused"] = True
                 print(
@@ -91,7 +97,7 @@ def control_motor():
                 continue
 
             # Resume plotting
-            if command_lower in (
+            if command in (
                 "resume",
                 "resume plotting",
                 "resume motor",
@@ -124,6 +130,22 @@ def control_motor():
 
 
 time.sleep(1)
+
+#Create csv file
+filename = f"MITmotorData_{datetime.now().strftime('%Y%m%d_%H%M%S ')}.csv"
+file = open(filename, "w", newline="")
+writer = csv.writer(file)
+
+#Write sheet column titles by writing the first row
+writer.writerow([
+    "Time (s)",
+    "Position (rad)",
+    "Velocity (rad/s)"
+    "Torque (Nm)"
+    "Temperature (C)"
+])
+
+start_time = time.time()
 
 # Prepare 4 plots data
 time_data = []
@@ -225,7 +247,6 @@ try:
 
         # Skip empty lines
         if raw == "":
-            fig.canvas.flush_events()
             continue
 
         # Skip Arduino startup / command / error messages
@@ -246,6 +267,15 @@ try:
             new_velocity = float(arr[vel_index])
             new_torque = float(arr[trq_index])
             new_temperature = float(arr[temp_index])
+
+            #Update csv file
+            writer.writerow([
+                time.time() - start_time,
+                new_position,
+                new_velocity,
+                new_torque,
+                new_temperature
+            ])
 
         except Exception as e:
             print("Could not read line:", e)
