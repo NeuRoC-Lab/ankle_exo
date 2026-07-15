@@ -17,6 +17,8 @@ The following pin connections are used when testing with the Arduino Uno:
 import serial
 import time
 import matplotlib.pyplot as plt
+import csv
+import os
 
 from software.src.plotMotorMIT import start_time
 
@@ -33,8 +35,6 @@ time.sleep(2)
 ser.reset_input_buffer()
 ser.reset_output_buffer()
 
-
-
 running = {"in_progress": True}
 
 def stop_encoders():
@@ -43,6 +43,8 @@ def stop_encoders():
         ser.flush()
         ser.close()
         print("Encoders plotting stopped")
+        print("CSV file saved here:")
+        print(path)
 
 def close_plot(event):
     stop_encoders()
@@ -63,6 +65,10 @@ right_filtered_velocity = []
 time_data = []
 
 start_time = time.perf_counter()
+
+# CSV file
+filename = "encoderData.csv"
+path = os.path.abspath(filename)
 
 """
 Create plots in the format of
@@ -129,7 +135,7 @@ ax4.grid(True)
 ax5.grid(True)
 ax6.grid(True)
 
-fig.canvas.mp1_connect("close_event", close_plot)
+fig.canvas.mpl_connect("close_event", close_plot)
 
 plt.show(block=False)
 
@@ -137,93 +143,124 @@ plt.show(block=False)
 ser.flush()
 print("Left and right encoder position and velocity plotting starts now")
 
-try:
+with open(path, "w", newline="") as csv_file:
 
-    while running["in_progress"] == True and plt.fignum_exists(fig.number) == True:
+    writer = csv.writer(csv_file)
 
-        raw = ser.readline().decode(errors="ignore").strip()
-        print(raw)
+    # Column titles
+    writer.writerow([
+        "Time (s)",
+        "Left Position (deg)",
+        "Right Position (deg)",
+        "Left Raw Velocity (deg/s)",
+        "Right Raw Velocity (deg/s)",
+        "Left Filtered Velocity (deg/s)",
+        "Right Filtered Velocity (deg/s)"
+    ])
 
-        # Skip empty lines
-        if raw == "":
-            continue
+    try:
 
-        # Skip startup / command / error messages
-        if raw.startswith("Left") == False:
-            print("This is most likely a command or error message")
-            continue
+        while running["in_progress"] == True and plt.fignum_exists(fig.number) == True:
 
-        arr = raw.split
+            raw = ser.readline().decode(errors="ignore").strip()
+            print(raw)
 
-        try:
-            left_pos_index = 3
-            right_pos_index = 7
-            left_raw_index = 11
-            right_raw_index = 15
-            left_filtered_index = 19
-            right_filtered_index = 23
+            # Skip empty lines
+            if raw == "":
+                continue
 
-            # y-axis data
-            left_angle.append(float(arr[left_pos_index]))
-            right_angle.append(float(arr[right_pos_index]))
-            left_raw_velocity.append(float(arr[left_raw_index]))
-            right_raw_velocity.append(float(arr[right_raw_index]))
-            left_filtered_velocity.append(float(arr[left_filtered_index]))
-            right_filtered_velocity.append(float(arr[right_filtered_index]))
+            # Skip startup / command / error messages
+            if raw.startswith("Left") == False:
+                print("This is most likely a command or error message")
+                continue
 
-        except Exception as e:
-            print("Could not read line:", e)
-            continue
+            arr = raw.split()
 
-        # x-axis data
-        current_time = time.perf_counter() - start_time
-        time_data.append(current_time)
+            try:
+                left_pos_index = 3
+                right_pos_index = 7
+                left_raw_index = 11
+                right_raw_index = 15
+                left_filtered_index = 19
+                right_filtered_index = 23
 
-        # keep plot centered around only within the time window
-        while time_data and (current_time - time_data[0]) > time_window:
-            left_angle.pop(0)
-            right_angle.pop(0)
-            left_raw_velocity.pop(0)
-            right_raw_velocity.pop(0)
-            left_filtered_velocity.pop(0)
-            right_filtered_velocity.pop(0)
+                # y-axis data
+                left_angle.append(float(arr[left_pos_index]))
+                right_angle.append(float(arr[right_pos_index]))
+                left_raw_velocity.append(float(arr[left_raw_index]))
+                right_raw_velocity.append(float(arr[right_raw_index]))
+                left_filtered_velocity.append(float(arr[left_filtered_index]))
+                right_filtered_velocity.append(float(arr[right_filtered_index]))
 
-        # update plots in real line
-        line1.set_data(time_data, left_angle)
-        line2.set_data(time_data, right_angle)
-        line3.set_data(time_data, left_raw_velocity)
-        line4.set_data(time_data, right_raw_velocity)
-        line5.set_data(time_data, left_filtered_velocity)
-        line6.set_data(time_data, right_filtered_velocity)
+            except Exception as e:
+                print("Could not read line:", e)
+                continue
 
-        ax1.set_xlim(max(0, current_time - time_window), current_time)
-        ax1.relim()
-        ax1.autoscale_view(scalex=False, scaley=True)
+            # x-axis data
+            current_time = time.perf_counter() - start_time
+            time_data.append(current_time)
 
-        ax2.set_xlim(max(0, current_time - time_window), current_time)
-        ax2.relim()
-        ax2.autoscale_view(scalex=False, scaley=True)
+            # Write data to csv file
+            writer.writerow([
+                current_time,
+                left_angle[-1],
+                right_angle[-1],
+                left_raw_velocity[-1],
+                right_raw_velocity[-1],
+                left_filtered_velocity[-1],
+                right_filtered_velocity[-1]
+            ])
 
-        ax3.set_xlim(max(0, current_time - time_window), current_time)
-        ax3.relim()
-        ax3.autoscale_view(scalex=False, scaley=True)
+            csv_file.flush()
 
-        ax4.set_xlim(max(0, current_time - time_window), current_time)
-        ax4.relim()
-        ax4.autoscale_view(scalex=False, scaley=True)
+            # keep plot centered around only within the time window
+            while time_data and (current_time - time_data[0]) > time_window:
+                left_angle.pop(0)
+                right_angle.pop(0)
+                left_raw_velocity.pop(0)
+                right_raw_velocity.pop(0)
+                left_filtered_velocity.pop(0)
+                right_filtered_velocity.pop(0)
 
-        ax5.set_xlim(max(0, current_time - time_window), current_time)
-        ax5.relim()
-        ax5.autoscale_view(scalex=False, scaley=True)
+            # update plots in real line
+            line1.set_data(time_data, left_angle)
+            line2.set_data(time_data, right_angle)
+            line3.set_data(time_data, left_raw_velocity)
+            line4.set_data(time_data, right_raw_velocity)
+            line5.set_data(time_data, left_filtered_velocity)
+            line6.set_data(time_data, right_filtered_velocity)
 
-        ax6.set_xlim(max(0, current_time - time_window), current_time)
-        ax6.relim()
-        ax6.autoscale_view(scalex=False, scaley=True)
+            ax1.set_xlim(max(0, current_time - time_window), current_time)
+            ax1.relim()
+            ax1.autoscale_view(scalex=False, scaley=True)
+
+            ax2.set_xlim(max(0, current_time - time_window), current_time)
+            ax2.relim()
+            ax2.autoscale_view(scalex=False, scaley=True)
+
+            ax3.set_xlim(max(0, current_time - time_window), current_time)
+            ax3.relim()
+            ax3.autoscale_view(scalex=False, scaley=True)
+
+            ax4.set_xlim(max(0, current_time - time_window), current_time)
+            ax4.relim()
+            ax4.autoscale_view(scalex=False, scaley=True)
+
+            ax5.set_xlim(max(0, current_time - time_window), current_time)
+            ax5.relim()
+            ax5.autoscale_view(scalex=False, scaley=True)
+
+            ax6.set_xlim(max(0, current_time - time_window), current_time)
+            ax6.relim()
+            ax6.autoscale_view(scalex=False, scaley=True)
 
 
-except KeyboardInterrupt:
-    print("Ctrl+C pressed, closing figure")
+    except KeyboardInterrupt:
+        print("Ctrl+C pressed, closing figure")
 
-finally:
-    stop_encoders()
-    plt.close("all")
+    finally:
+        stop_encoders()
+        plt.close("all")
+
+print("CSV saved here:")
+print(path)
