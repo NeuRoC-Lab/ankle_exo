@@ -11,6 +11,8 @@ python software\src\load_cells_readout\plotTwoLoadcells.py
 import serial
 import time
 import matplotlib.pyplot as plt
+import csv
+import os
 
 # Arduino Connection
 port = "COM5"
@@ -50,6 +52,10 @@ right_data = []
 
 start_time = time.perf_counter()
 
+# CSV file
+filename = "loadcellData.csv"
+path = os.path.abspath(filename)
+
 # Create plot
 plt.ion()
 print("Figure created")
@@ -87,84 +93,108 @@ plt.show(block=False)
 ser.flush()
 print("Load cells test starts now")
 
-try:
-    while running["in_progress"] and plt.fignum_exists(fig.number):
+with open(path, "w", newline="") as csv_file:
 
-        # Read serial data
-        raw = ser.readline().decode(errors="ignore").strip()
+    writer = csv.writer(csv_file)
 
-        if not raw:
-            plt.pause(0.001)
-            continue
+    # Column titles
+    writer.writerow([
+        "Time (s)",
+        "Left load cell voltage (V)",
+        "Right load cell voltage (V)"
+    ])
 
-        arr = raw.split()
+    try:
+        while running["in_progress"] and plt.fignum_exists(fig.number):
 
-        try:
-            # Find positions of "left" and "right"
-            left_index = next(
-                i for i, x in enumerate(arr)
-                if x.lower().rstrip(":") == "left"
-            )
+            # Read serial data
+            raw = ser.readline().decode(errors="ignore").strip()
 
-            right_index = next(
-                i for i, x in enumerate(arr)
-                if x.lower().rstrip(":") == "right"
-            )
-
-            # Find first numeric value after LEFT
-            left_value = None
-            for token in arr[left_index + 1:right_index]:
-                try:
-                    left_value = float(token)
-                    break
-                except ValueError:
-                    pass
-
-            # Find first numeric value after RIGHT
-            right_value = None
-            for token in arr[right_index + 1:]:
-                try:
-                    right_value = float(token)
-                    break
-                except ValueError:
-                    pass
-
-            if left_value is None or right_value is None:
+            if not raw:
+                plt.pause(0.001)
                 continue
 
-        except (StopIteration, IndexError):
-            continue
+            arr = raw.split()
 
-        # Store data
-        left_data.append(left_value)
-        right_data.append(right_value)
+            try:
+                # Find positions of "left" and "right"
+                left_index = next(
+                    i for i, x in enumerate(arr)
+                    if x.lower().rstrip(":") == "left"
+                )
 
-        current_time = time.perf_counter() - start_time
-        time_data.append(current_time)
+                right_index = next(
+                    i for i, x in enumerate(arr)
+                    if x.lower().rstrip(":") == "right"
+                )
 
-        # Keep only data within time window
-        while time_data and (current_time - time_data[0]) > time_window:
-            time_data.pop(0)
-            left_data.pop(0)
-            right_data.pop(0)
+                # Find first numeric value after LEFT
+                left_value = None
+                for token in arr[left_index + 1:right_index]:
+                    try:
+                        left_value = float(token)
+                        break
+                    except ValueError:
+                        pass
 
-        # Safety check to avoid shape mismatch
-        min_len = min(len(time_data), len(left_data), len(right_data))
+                # Find first numeric value after RIGHT
+                right_value = None
+                for token in arr[right_index + 1:]:
+                    try:
+                        right_value = float(token)
+                        break
+                    except ValueError:
+                        pass
 
-        line1.set_data(time_data[-min_len:], left_data[-min_len:])
-        line2.set_data(time_data[-min_len:], right_data[-min_len:])
+                if left_value is None or right_value is None:
+                    continue
 
-        ax.set_xlim(max(0, current_time - time_window), current_time)
+            except (StopIteration, IndexError):
+                continue
 
-        ax.relim()
-        ax.autoscale_view(scalex=False, scaley=True)
+            # Store data
+            left_data.append(left_value)
+            right_data.append(right_value)
 
-        fig.canvas.draw_idle()
-        plt.pause(0.001)
+            # x-axis data
+            current_time = time.perf_counter() - start_time
+            time_data.append(current_time)
 
-except KeyboardInterrupt:
-    print("Ctrl+C pressed, closing figure")
+            # Write data to csv file
+            writer.writerow([
+                current_time,
+                left_data[-1],
+                right_data[-1]
+            ])
 
-finally:
-    stop_loadcells()
-    plt.close("all")
+            csv_file.flush()
+
+            # Keep only data within time window
+            while time_data and (current_time - time_data[0]) > time_window:
+                time_data.pop(0)
+                left_data.pop(0)
+                right_data.pop(0)
+
+            # Safety check to avoid shape mismatch
+            min_len = min(len(time_data), len(left_data), len(right_data))
+
+            line1.set_data(time_data[-min_len:], left_data[-min_len:])
+            line2.set_data(time_data[-min_len:], right_data[-min_len:])
+
+            ax.set_xlim(max(0, current_time - time_window), current_time)
+
+            ax.relim()
+            ax.autoscale_view(scalex=False, scaley=True)
+
+            fig.canvas.draw_idle()
+            plt.pause(0.001)
+
+    except KeyboardInterrupt:
+        print("Ctrl+C pressed, closing figure")
+
+    finally:
+        stop_loadcells()
+        plt.close("all")
+
+print("CSV file saved here:")
+print(path)
