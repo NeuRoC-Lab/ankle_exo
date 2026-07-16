@@ -5,16 +5,26 @@ This code plots all CubeMars motors data from the following format:
 
 Check for port: python -m serial.tools.list_ports
 
-Type in CLion terminal:
+Command types:
+- Motor control command: start/stop id 1; set id 1 [param] [value]
+- Pause 
+- Resume
+- Exit
+
+Type in CLion terminal to run code:
 python software\src\plotMotorMIT.py
+python src\plotMotorMIT.py
 """
 
 import serial
 import time
 import matplotlib.pyplot as plt
+import threading
+import csv
+from datetime import datetime
 
 # Arduino Connection
-port = "COM4"  # Change port as necessary
+port = "COM6"  # Change port as necessary
 baud = 115200
 time_window = 10  # Plot x-axis window in seconds
 
@@ -26,19 +36,116 @@ ser.reset_input_buffer()
 ser.reset_output_buffer()
 
 running = {"in_progress": True}
+plotting = {"paused": False}
+
 
 def stop_motor():
     running["in_progress"] = False
 
     if ser.is_open:
         ser.flush()
+        file.close() #Close csv file
+        print(f"CSV file saved as {filename}")
         ser.close()
         print("Motor Plotting Stopped")
+
 
 def close_plot(event):
     stop_motor()
 
+
+def control_motor():
+    """
+    Allows user to control motor parameters by sending commands
+    from the CLion terminal to the Teensy.
+    """
+
+    while running["in_progress"] == True:
+
+        try:
+            command = input()
+            command = command.strip().lower()
+
+            # Ignore empty commands
+            if command == "":
+                continue
+
+            # Stop Python plotting program
+            if command in (
+                "stop",
+                "stop motor",
+                "stop id 1",
+                "exit",
+                "end"
+            ):
+                running["in_progress"] = False
+                break
+
+            # Pause plotting
+            if command in (
+                "pause",
+                "pause plotting",
+                "pause motor",
+                "pause motor plotting",
+                "pause id 1"
+            ):
+                plotting["paused"] = True
+                print(
+                    'Plotting paused. Teensy data is still being read. '
+                    'Enter "resume" to continue.'
+                )
+                continue
+
+            # Resume plotting
+            if command in (
+                "resume",
+                "resume plotting",
+                "resume motor",
+                "resume motor plotting",
+                "continue plotting",
+                "continue"
+            ):
+                plotting["paused"] = False
+                print("Motor plotting resumes now")
+                continue
+
+            # Send all other commands to Teensy
+            if ser.is_open:
+                ser.write((command + "\n").encode("utf-8"))
+                ser.flush()
+                print("Command sent to Teensy:", command)
+
+        except EOFError:
+            running["in_progress"] = False
+            break
+
+        except KeyboardInterrupt:
+            running["in_progress"] = False
+            break
+
+        except serial.SerialException as e:
+            print("Could not send command:", e)
+            running["in_progress"] = False
+            break
+
+
 time.sleep(1)
+
+#Create csv file
+filename = f"MITmotorData_{datetime.now().strftime('%Y%m%d_%H%M%S ')}.csv"
+file = open(filename, "w", newline="")
+writer = csv.writer(file)
+
+#Write sheet column titles by writing the first row
+writer.writerow([
+    "Time (s)",
+    "Position (rad)",
+    "Velocity (rad/s)"
+    "Torque (Nm)"
+    "Temperature (C)"
+])
+
+start_time = time.time()
 
 # Prepare 4 plots data
 time_data = []
@@ -117,13 +224,23 @@ fig.canvas.mpl_connect("close_event", close_plot)
 # Show figure window
 plt.show(block=False)
 
+terminal_thread = threading.Thread(
+    target=control_motor,
+    daemon=True
+)
+terminal_thread.start()
+
 # Start Motor Test
 ser.flush()
 print("MIT mode motor test starts now")
+print("Local commands: pause, resume, exit")
 
 try:
 
-    while running["in_progress"] == True and plt.fignum_exists(fig.number) == True:
+    while (
+        running["in_progress"] == True
+        and plt.fignum_exists(fig.number) == True
+    ):
 
         raw = ser.readline().decode(errors="ignore").strip()
         print(raw)
@@ -135,10 +252,10 @@ try:
         # Skip Arduino startup / command / error messages
         if raw.startswith("motor id:") == False:
             print("!" + raw)
+            fig.canvas.flush_events()
             continue
 
         arr = raw.split()
-        print(arr)
 
         try:
             pos_index = arr.index("pos(rad):") + 1
@@ -146,21 +263,40 @@ try:
             trq_index = arr.index("trq(N*m):") + 1
             temp_index = arr.index("temp(C):") + 1
 
-            position_data.append(float(arr[pos_index]))
-            velocity_data.append(float(arr[vel_index]))
-            torque_data.append(float(arr[trq_index]))
-            temperature_data.append(float(arr[temp_index]))
+            new_position = float(arr[pos_index])
+            new_velocity = float(arr[vel_index])
+            new_torque = float(arr[trq_index])
+            new_temperature = float(arr[temp_index])
+
+            #Update csv file
+            writer.writerow([
+                time.time() - start_time,
+                new_position,
+                new_velocity,
+                new_torque,
+                new_temperature
+            ])
 
         except Exception as e:
-            print("Could not read line:",e)
+            print("Could not read line:", e)
             print(raw)
+            continue
+
+        # When paused, continue reading serial but discard plotting data
+        if plotting["paused"] == True:
+            fig.canvas.flush_events()
             continue
 
         # x-axis data
         current_time = time.perf_counter() - start_time
-        time_data.append(current_time)
 
-        # keep plot centered around only within time window
+        time_data.append(current_time)
+        position_data.append(new_position)
+        velocity_data.append(new_velocity)
+        torque_data.append(new_torque)
+        temperature_data.append(new_temperature)
+
+        # Keep plot centered within time window
         while time_data and (current_time - time_data[0]) > time_window:
             time_data.pop(0)
             position_data.pop(0)
@@ -168,7 +304,7 @@ try:
             torque_data.pop(0)
             temperature_data.pop(0)
 
-        # update plots
+        # Update plots
         posline.set_data(time_data, position_data)
         velline.set_data(time_data, velocity_data)
         torqline.set_data(time_data, torque_data)
