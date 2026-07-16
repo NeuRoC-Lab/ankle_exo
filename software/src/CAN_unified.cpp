@@ -139,10 +139,10 @@ void loop() {
 
     if(millis() - update > 1000){
     // Serial.print("AMP L1 : ");
-    //Serial.print(analogRead(24)*3.3f/4095.0f);
-    //Serial.print(" AMP L2 : ");
-    //Serial.print(analogRead(25)*3.3f/4095.0f);
-    //Serial.println();
+    // Serial.print(analogRead(24)*3.3f/4095.0f);
+    // Serial.print(" AMP L2 : ");
+    // Serial.print(analogRead(25)*3.3f/4095.0f);
+    // Serial.println();
     update = millis();
     }
 

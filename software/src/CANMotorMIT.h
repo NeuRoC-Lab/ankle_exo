@@ -28,7 +28,7 @@ constexpr AK60Params motorParams = {
 
 constexpr AK60Params motorConstraints = {
     // these are values for the SOFT STOP CONTROL
-    -2.8f, 2.8f,   // position (rad)
+    -12.5f, 12.5f,   // position (rad)
     -30.0f,  30.0f,   // velocity
       0.0f, 5.0f,   // kp
       0.0f,   5.0f,   // kd

@@ -40,13 +40,20 @@ void setup()
 }
 
 void loop() {
-    Serial.print("Left Load cell 1 force (N) : ");
-    Serial.print(LC_L_1.voltageToN());
-    Serial.print("Left Load cell 2 force (N) : ");
-    Serial.print(LC_L_2.voltageToN());
-    Serial.print("Right Load cell 1 force (N) : ");
-    Serial.print(LC_R_1.voltageToN());
-    Serial.print("Right Load cell 2 force (N) : ");
-    Serial.println(LC_R_2.voltageToN());
+    Serial.print("L1:");
+    Serial.print(LC_L_1.rawVoltage());
+    Serial.print("\t");
+
+    Serial.print("L2:");
+    Serial.print(LC_L_2.rawVoltage());
+    Serial.print("\t");
+
+    Serial.print("R1:");
+    Serial.print(LC_R_1.rawVoltage());
+    Serial.print("\t");
+
+    Serial.print("R2:");
+    Serial.println(LC_R_2.rawVoltage());
+
     delay(100);
 }

@@ -8,7 +8,7 @@ import re
 import time
 import matplotlib.pyplot as plt
 
-class SerialConnect
+class SerialConnect:
     def __init__(self, port, baud):
         self.port = port
         self.baud = baud

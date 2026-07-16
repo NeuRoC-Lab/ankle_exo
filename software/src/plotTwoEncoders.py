@@ -5,7 +5,7 @@ The code is now updated to also plot raw velocity and filtered velocity using EW
 
 To run this script, type in terminal of CLion:
 
-python software\src\plotTwoEncoders.py
+python src\plotTwoEncoders.py
 
 The following pin connections are used when testing with the Arduino Uno:
     SPI Clock SCK: pin 13
@@ -20,10 +20,10 @@ import matplotlib.pyplot as plt
 import csv
 import os
 
-from software.src.plotMotorMIT import start_time
+
 
 # Establish serial connection
-port = "COM7"
+port = "COM4"
 baud = 115200
 time_window = 15
 
