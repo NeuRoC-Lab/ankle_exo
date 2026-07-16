@@ -27,6 +27,9 @@ class LoadCell {
         return (m_ina_params.IAref - getVo()) * m_lc_params.ratedN
                / (m_ina_params.ampGain * m_lc_params.sensitivity * m_ina_params.Vexc);
     }
+    float rawVoltage() {
+        return getVo();
+    }
 };
 
 #if defined(PLATFORM_TEENSY41) // Using the Teensy 41

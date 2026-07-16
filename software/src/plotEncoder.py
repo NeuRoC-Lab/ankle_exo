@@ -2,7 +2,7 @@
 This code is used to plot the relative angle of one encoder in degrees
 relative to the original position the ankle is at when the test just starts
 
-python src/single_encoder/plotEncoder.py
+python src/plotEncoder.py
 
 Arduino Pin Connection:
 SPI Clock (SCK): Pin 13
@@ -15,17 +15,22 @@ SPI Chip Select: Pin 10
 import serial
 import time
 import matplotlib.pyplot as plt
-import Plotting
+
 
 # Arduino Connection
-port = "COM7"
+port = "COM4"
 baud = 115200
-time_window = 15 # For plot x-axis; plot will move horizontally after 15 seconds
+time_window = 15
 
-encoder = SerialConnect(port, baud)
-encoder.connect()
+ser = serial.Serial(port, baud, timeout=1)
+time.sleep(2)
 
-running = {"in_progress": True} # Define dictionary to determine when the encoder is running
+# Clear old data
+
+ser.reset_input_buffer()
+ser.reset_output_buffer()
+
+running = {"in_progress": True}
 
 # Define function to stop encoder test
 def stop_encoder():
@@ -56,10 +61,24 @@ start_time = time.perf_counter()
 
 # Create plot and define chart elements
 
-encoder_plot = ConfigPlot("Time (s)", "Encoder Position (deg)", "AMT20 Encoder Relative Angle vs Time")
-encoder_plot.createplot()
-
+plt.ion()
+print("Figure Creating")
+width = 16
+height = 12
+fig, ax = plt.subplots()
 line, = ax.plot(time_data, angle_data, linewidth=1.5)
+
+ax.set_title("Encoder angle vs Time")
+ax.set_xlabel("Time (s)")
+ax.set_ylabel("Angle (deg")
+ax.grid(True)
+
+fig.canvas.mpl_connect("close_event", close_plot)
+
+# Show figure window
+plt.show(block=False)
+
+
 
 # Start encoder test
 ser.write(b"y")
@@ -69,11 +88,18 @@ print("Encoder Test Starting Now")
 try:
     while (running["in_progress"] == True) and (plt.fignum_exists(fig.number) == True):
         # y-axis data
-        value = ser.readline().decode().strip()
-        print("Angle: " + value)
+        while ser.in_waiting > 0:
+            raw = ser.readline().decode().strip()
+
+        # take most recent data in serial buffer, at the expense of discarding intermediate data. This ensures lowest latency
+        # for more accurate logging (which will however introduce a delay) remove the while ser.in_waiting > 0 loop
+
+        #print(raw)
+        arr = raw.split()
 
         try:
-            angle = float(value)
+            i = arr.index("Angle:")
+            angle = float(arr[i+1])
             angle_data.append(angle)
 
         except ValueError:
