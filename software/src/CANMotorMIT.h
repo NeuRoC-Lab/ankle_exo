@@ -17,7 +17,8 @@ typedef struct {
 } AK60Params;
 
 constexpr AK60Params motorParams = {
-    // these are values for the SOFT STOP CONTROL
+    // these are the nominal min/max values specified for the AK60 KV140 V1.1 when issuing a user command to the motor
+    // This also acts as a software clip for the motor. The user values will be clipped if out of range.
     -12.5f, 12.5f,   // position (rad)
     -45.0f,  45.0f,   // velocity
       0.0f, 500.0f,   // kp
@@ -26,14 +27,8 @@ constexpr AK60Params motorParams = {
 };
 
 
-constexpr AK60Params motorConstraints = {
-    // these are values for the SOFT STOP CONTROL
-    -12.5f, 12.5f,   // position (rad)
-    -30.0f,  30.0f,   // velocity
-      0.0f, 5.0f,   // kp
-      0.0f,   5.0f,   // kd
-    -5.0f,  5.0f    // torque
-};
+extern const AK60Params motorConstraints;
+// SOFT STOP values. These values are compared against the motor's feedback messages and will enforce a hard stop if one/more of the velocity, position, torque exceeds the range specified here
 
 
 static constexpr uint8_t exitMotorMode[8] = {
@@ -160,7 +155,7 @@ void update(){
         }
 
         while (readMessages(m_reply)) {
-            //checkHardStop();
+            checkHardStop();
             if (++m_printCounter >= m_kPrintEvery) {
                 print_can_msg(m_reply);
                 m_printCounter = 0;
@@ -168,13 +163,24 @@ void update(){
         }
     }
 void checkHardStop(){
-if((m_reply.position > m_motorConstraints->p_max || m_reply.position < m_motorConstraints->p_min) && m_enabled){
+    if (m_enabled &&
+        (m_reply.torque   > m_motorConstraints->trq_max ||
+         m_reply.torque   < m_motorConstraints->trq_min ||
+         m_reply.velocity > m_motorConstraints->v_max   ||
+         m_reply.velocity < m_motorConstraints->v_min   ||
+         m_reply.position > m_motorConstraints->p_max   ||
+         m_reply.position < m_motorConstraints->p_min))
+    {
 
 // DO NOT USE THAT BECAUSE THE VALUES ROLL OVER THE MAX / MIN !! SO YOU'LL NEVER SEE IF YOPU OVERSHOOT
 //if(m_reply.position > m_motorSettings->p_max || m_reply.position < m_motorSettings->p_min){
-Serial.println("Detected overshoot ! Please decrease the Kp. Stopping the motor");
-Serial.print("Position (rad/s) at the moment the hard stop was triggered: ");
+Serial.println("Detected position/velocity/torque overshoot ! Stopping the motor");
+Serial.print("Position at overshoot");
 Serial.print(m_reply.position);
+Serial.print(" Velocity at overshoot");
+Serial.print(m_reply.velocity);
+Serial.print(" Torque at overshoot");
+Serial.println(m_reply.torque);
 m_enabled = false;
 sendMessage(exitMotorMode);
 // leaving motor mode seems to disable logging of messages

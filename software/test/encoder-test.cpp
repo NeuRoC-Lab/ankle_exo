@@ -17,7 +17,7 @@
 #define set_zero_point 0x70
 
 // Chip select pin
-const int CS_PIN = 10;
+const int CS_PIN = 9;
 
 // Control flags
 bool running = false;
@@ -75,11 +75,13 @@ void setup()
     pinMode(MOSI, OUTPUT);
     pinMode(MISO, INPUT);
     pinMode(CS_PIN, OUTPUT);
+    pinMode(10,OUTPUT);
 
     SPI.beginTransaction(
         SPISettings(500000, MSBFIRST, SPI_MODE0));
 
     digitalWrite(CS_PIN, HIGH);
+    digitalWrite(10,HIGH); // idle the other encoder as it will interfere
 
     Serial.println("AMT20 Encoder Test");
     Serial.println("y = start running encoder");

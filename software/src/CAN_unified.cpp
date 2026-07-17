@@ -3,9 +3,6 @@
 //
 #include <Arduino.h>
 
-// AK60 Motor parameter definitions
-
-
 unsigned long debug_update = millis();
 
 #if defined(MIT_MODE)
@@ -51,6 +48,13 @@ MotorCmd motor1Cmd {
     .kp = 0.0f,
     .kd = 0.0f
 };
+// define SOFT stop values here
+constexpr AK60Params motorConstraints = {
+
+    -12.5f, 12.5f,   // position (rad)
+    -30.0f,  30.0f,   // velocity
+    -5.0f,  5.0f    // torque
+};
 
 CANController motor(MOTOR_ID, &motorParams,&motorConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
 
@@ -76,16 +80,10 @@ CANController motor(MOTOR_ID, &motorParams,motor1Cmd,10);//NO_MOTOR_UPDATE);
 SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
 void setup() {
-    //pinMode(29,OUTPUT); // this is temporarily used as a OE pin for TXU0304
 
     Serial.begin(115200);
-      // from https://www.pjrc.com/store/teensy41.html#analog :
-      // 18 pins can be used an analog inputs, for reading sensors or other analog signals. Basic analog input is done with the analogRead function. The default resolution is 10 bits (input range 0 to 1023), but can be adjusted with analogReadResolution. The hardware allows up to 12 bits of resolution, but in practice only up to 10 bits are normally usable due to noise. More advanced use is possible with the ADC library.
-    analogReadResolution(12); // enable 12 bit ADC resolution because the Teensy defaults otherwise to 10 bits
     Serial.println("Starting script to interface motor over CAN in MIT mode");
     delay(1000);
-
-    //digitalWrite(29,HIGH);
 
     motor.begin();
     if(!motor.resetMotor()){
@@ -98,14 +96,19 @@ void setup() {
 
 bool toturnOn;
 unsigned long update = millis();
+
 void loop() {
-  /*
+
+#if defined(MIT_MODE)
+
+    // this will put the motor in a constant velocity spin mode (MIT)
     motor1Cmd.position = 0.0f;
     motor1Cmd.velocity = 10.0f;
     motor1Cmd.kp = 0.5f;
     motor1Cmd.kd = 0.5f;
-    // TESTER CODE FOR THE SERVO
-    /*
+
+#elif defined(SERVO_MODE)
+    // this will spin the motor at an increasing then decreasing RPM
     for(int i = 1000 ; i < 3000;i=i+100){
         motor.can_set_rpm(i);
         motor.update();
@@ -116,14 +119,12 @@ void loop() {
         motor.update();
         delay(100);
     }
-*/
+
     //motor.can_set_rpm(1000);
     //motor.update();
     //serialControl.update();
 
 
-    delay(10); // this delay is NECESSARY OTHERWISE COMMAND UPDATES DONT SHOW UP
-    //TODO understand why that is necessary
     /*
     if(millis() - debug_update > 1000){
     Serial.print("Velocity");
@@ -133,21 +134,11 @@ void loop() {
     debug_update = millis();
     }
     */
+    #endif
     motor.update();
     serialControl.update();
-    delay(10);
-
-    if(millis() - update > 1000){
-    // Serial.print("AMP L1 : ");
-    // Serial.print(analogRead(24)*3.3f/4095.0f);
-    // Serial.print(" AMP L2 : ");
-    // Serial.print(analogRead(25)*3.3f/4095.0f);
-    // Serial.println();
-    update = millis();
-    }
-
-
-
+    delay(10);// this delay is NECESSARY OTHERWISE COMMAND UPDATES DONT SHOW UP
+    //TODO understand why that is necessary
 
 
 }

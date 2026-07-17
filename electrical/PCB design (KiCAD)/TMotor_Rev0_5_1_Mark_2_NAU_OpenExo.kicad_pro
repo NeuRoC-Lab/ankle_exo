@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.0,
-          "height": 2.0,
-          "width": 2.0
+          "drill": 1.016,
+          "height": 1.7272,
+          "width": 1.7272
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -64,6 +64,54 @@
         }
       ],
       "drc_exclusions": [
+        [
+          "courtyards_overlap|136720733|87237543|5db49bad-6020-41ad-a8c4-bb60e0275c65|7e6b3f86-2de4-4df0-908f-ec5603c5550e",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|137727500|111375000|5db49bad-6020-41ad-a8c4-bb60e0275c65|b89e7c9f-d7cf-4b54-b85b-7a4381a486e6",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|137748770|95905460|5db49bad-6020-41ad-a8c4-bb60e0275c65|8c92a1ff-39a1-4cfc-a671-1920bcec34dd",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|138605000|87225000|165fb0ec-26cd-4849-bcd1-0f6481bf97d4|5db49bad-6020-41ad-a8c4-bb60e0275c65",
+          "under the Nano"
+        ],
+        [
+          "courtyards_overlap|138883781|99672500|5db49bad-6020-41ad-a8c4-bb60e0275c65|eec604e7-3550-4b7d-86e4-06b831cef2b9",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|138887500|119365000|5db49bad-6020-41ad-a8c4-bb60e0275c65|961f405c-0c06-43f4-bbce-a6dd76829a5b",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|140830000|128347190|5db49bad-6020-41ad-a8c4-bb60e0275c65|be47168e-91e0-4348-a3fe-c6b9a79c6ff5",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|140856755|119365000|3754ef72-4a03-4765-b58a-fcc7749eb74d|961f405c-0c06-43f4-bbce-a6dd76829a5b",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|141635000|100185000|5db49bad-6020-41ad-a8c4-bb60e0275c65|d1c6d4bc-a11c-477a-8500-fc77820a6f89",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|141725000|87195000|5db49bad-6020-41ad-a8c4-bb60e0275c65|9abc93ef-9151-416a-980d-b7d4366add14",
+          "Under the nano"
+        ],
+        [
+          "courtyards_overlap|142785000|127249424|3754ef72-4a03-4765-b58a-fcc7749eb74d|5db49bad-6020-41ad-a8c4-bb60e0275c65",
+          "Under the Nano"
+        ],
+        [
+          "courtyards_overlap|143530589|115095000|5db49bad-6020-41ad-a8c4-bb60e0275c65|eb0794c5-91e0-4b84-9b37-aa3e3632e506",
+          "Under the nano"
+        ],
         [
           "lib_footprint_mismatch|120005000|104424250|26b850e7-7f7a-4e53-b1da-b94dcbd44275|00000000-0000-0000-0000-000000000000",
           "I modified the footprint on purpose to add the pinsockets"

@@ -66,6 +66,8 @@ public:
 
     virtual void initialize(){
      analogReadResolution(adc_resolution_bits);
+        // from https://www.pjrc.com/store/teensy41.html#analog :
+        // 18 pins can be used an analog inputs, for reading sensors or other analog signals. Basic analog input is done with the analogRead function. The default resolution is 10 bits (input range 0 to 1023), but can be adjusted with analogReadResolution. The hardware allows up to 12 bits of resolution, but in practice only up to 10 bits are normally usable due to noise. More advanced use is possible with the ADC library.
     if(usingInternalRef){
      analogReference(AR_INTERNAL);
     // set the alaog reference to 1.5V

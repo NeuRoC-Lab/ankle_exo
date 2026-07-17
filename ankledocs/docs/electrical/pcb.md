@@ -196,9 +196,20 @@ Before the patch `.1`
 After the patch `.1`
 ![SPI after patch 1.0.1](./images/rev%201.0.0%20SPI%20patched%20.png)
 
-#### 04/07 (version v1.1.0)
+#### 04/07 (version v1.0.1)
 * connected excitation voltage outputs of the 4 INA125U to Teensy's Analog inputs so that the Teensy can ensure the INA125Us are properly wotking and that these match the settings in Board.h
 
+
+#### 17/07 (version v1.1.0)
+
+* Replaced erroneous Arduino Nano (BX00028=Nano Every) symbol+footprint with corresponding model (the BX00071=Nano BLE33 R2). Check that the older versions (<v1.1.0) are not affected, especially UART b/w Teensy and Nano
+* Redesigned the load cell sampling circuit to use the Arduino Nano's builtin SAADC in differential mode. The advantages are :
+  * The Teensy 4.1's analog pins are known to be noisy so the Nano naturally becomes a more stable option 
+  * The differential mode (where IN+=Vexc and IN-=INA125U output) simplifies the `Board.h` configuration. The code no longer needs to know what voltage is each IAREF at, since the differential ADC extracts the differential voltage 
+  * The differential mode also improves signal integrity by rejecting the common-mode noise picked up by the lines on the PCB.
+  * The differential mode eliminates any IAREF voltage drifts / offsets _ACCROSS_ and _WITHIN_ all four INA125Us. The code assumed that the IAREF voltages were exactly 2.5V or 1.24v but in practice soldering quality and trace impedance can affect that by introducing some variability between the IAREF of each respective INA125U
+  * The Arduino Nano's SAADC features a PGA stage which makes this setup more flexible to changing `Rg` gain resistors. We can optimize the dynamic range to improve resolution.
+* Redesigned the `LEFT_LC_CONN` and `RIGHT_LC_CONN` pinout so that 1) they are identical (versions < v1.1.0 had distinct pinouts) 2) they are _SYMETRICAL_ which means the 2x4 connector can safely be flipped, only the load cell will be swapped. 
 PCB assembly list : 
 
 https://jlcpcb.com/help/article/how-to-generate-the-bom-and-centroid-file-from-kicad
