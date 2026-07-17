@@ -7,6 +7,7 @@ unsigned long debug_update = millis();
 
 #if defined(MIT_MODE)
 #include "CANMotorMIT.h"
+#include "MotorConfig.h" // ONLY FOR MIT MODE RN
 #elif defined(SERVO_MODE)
 #include "ServoCANMotor.h"
 #endif
@@ -48,15 +49,9 @@ MotorCmd motor1Cmd {
     .kp = 0.0f,
     .kd = 0.0f
 };
-// define SOFT stop values here
-constexpr AK60Params motorConstraints = {
 
-    -12.5f, 12.5f,   // position (rad)
-    -30.0f,  30.0f,   // velocity
-    -5.0f,  5.0f    // torque
-};
 
-CANController motor(MOTOR_ID, &motorParams,&motorConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+CANController motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
 
 #elif defined(SERVO_MODE)
 

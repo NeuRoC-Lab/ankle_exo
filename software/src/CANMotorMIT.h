@@ -18,7 +18,7 @@ typedef struct {
 
 constexpr AK60Params motorParams = {
     // these are the nominal min/max values specified for the AK60 KV140 V1.1 when issuing a user command to the motor
-    // This also acts as a software clip for the motor. The user values will be clipped if out of range.
+    // These are not meant to clip the user commands ; altering these values will make the motor misbehave
     -12.5f, 12.5f,   // position (rad)
     -45.0f,  45.0f,   // velocity
       0.0f, 500.0f,   // kp
@@ -27,8 +27,10 @@ constexpr AK60Params motorParams = {
 };
 
 
-extern const AK60Params motorConstraints;
-// SOFT STOP values. These values are compared against the motor's feedback messages and will enforce a hard stop if one/more of the velocity, position, torque exceeds the range specified here
+extern const AK60Params motorSoftwareConstraints;
+// These values clip the user's position, velocity and feedforward torque before sending them to the motor
+extern const AK60Params motorRunningConstraints;
+// These values are compared against the motor's feedback messages and will enforce a hard stop if one/more of the velocity, position, torque exceeds the range specified here
 
 
 static constexpr uint8_t exitMotorMode[8] = {
@@ -63,7 +65,6 @@ typedef struct
 
 
 
-
 typedef struct
 {
     uint8_t can_id;
@@ -85,7 +86,8 @@ public:
     CANMotorMIT(
     byte canId,
     const AK60Params* motorSettings,
-    const AK60Params* motorConstraints,
+    const AK60Params* motorSoftwareConstraints,
+    const AK60Params* motorRunningConstraints,
     MotorCmd& cmd,
     uint32_t kPrintEvery = 20
 )
@@ -94,7 +96,8 @@ public:
       m_reply{},
       m_enabled(false),
       m_motorSettings(motorSettings),
-      m_motorConstraints(motorConstraints),
+      m_motorSoftwareConstraints(motorSoftwareConstraints),
+      m_motorRunningConstraints(motorRunningConstraints),
       m_printCounter(0),
       m_kPrintEvery(kPrintEvery)
 {}
@@ -104,7 +107,8 @@ public:
     MotorReply m_reply;
     bool m_enabled;
     const AK60Params* m_motorSettings;
-    const AK60Params* m_motorConstraints;
+    const AK60Params* m_motorSoftwareConstraints;
+    const AK60Params* m_motorRunningConstraints;
 
 
 bool resetMotor()
@@ -164,28 +168,25 @@ void update(){
     }
 void checkHardStop(){
     if (m_enabled &&
-        (m_reply.torque   > m_motorConstraints->trq_max ||
-         m_reply.torque   < m_motorConstraints->trq_min ||
-         m_reply.velocity > m_motorConstraints->v_max   ||
-         m_reply.velocity < m_motorConstraints->v_min   ||
-         m_reply.position > m_motorConstraints->p_max   ||
-         m_reply.position < m_motorConstraints->p_min))
+        (m_reply.torque   > m_motorRunningConstraints->trq_max ||
+         m_reply.torque   < m_motorRunningConstraints->trq_min ||
+         m_reply.velocity > m_motorRunningConstraints->v_max   ||
+         m_reply.velocity < m_motorRunningConstraints->v_min   ||
+         m_reply.position > m_motorRunningConstraints->p_max   ||
+         m_reply.position < m_motorRunningConstraints->p_min))
     {
+    Serial.println("Detected position/velocity/torque overshoot ! Stopping the motor");
+    Serial.print("Position at overshoot");
+    Serial.print(m_reply.position);
+    Serial.print(" Velocity at overshoot");
+    Serial.print(m_reply.velocity);
+    Serial.print(" Torque at overshoot");
+    Serial.println(m_reply.torque);
 
-// DO NOT USE THAT BECAUSE THE VALUES ROLL OVER THE MAX / MIN !! SO YOU'LL NEVER SEE IF YOPU OVERSHOOT
-//if(m_reply.position > m_motorSettings->p_max || m_reply.position < m_motorSettings->p_min){
-Serial.println("Detected position/velocity/torque overshoot ! Stopping the motor");
-Serial.print("Position at overshoot");
-Serial.print(m_reply.position);
-Serial.print(" Velocity at overshoot");
-Serial.print(m_reply.velocity);
-Serial.print(" Torque at overshoot");
-Serial.println(m_reply.torque);
-m_enabled = false;
-sendMessage(exitMotorMode);
-// leaving motor mode seems to disable logging of messages
-delay(1000);
-}
+    m_enabled = false;
+    sendMessage(exitMotorMode);
+    // leaving motor mode seems to disable logging of messages
+    }
 }
 
 void print_can_msg(MotorReply reply){
@@ -225,8 +226,8 @@ protected:
         uint16_t position = float_to_uint(
             constrain_float(
                 p_in,
-                m_motorConstraints->p_min,
-                m_motorConstraints->p_max
+                m_motorSoftwareConstraints->p_min,
+                m_motorSoftwareConstraints->p_max
             ),
             m_motorSettings->p_min,
             m_motorSettings->p_max,
@@ -236,8 +237,8 @@ protected:
         uint16_t velocity = float_to_uint(
             constrain_float(
                 v_in,
-                m_motorConstraints->v_min,
-                m_motorConstraints->v_max
+                m_motorSoftwareConstraints->v_min,
+                m_motorSoftwareConstraints->v_max
             ),
             m_motorSettings->v_min,
             m_motorSettings->v_max,
@@ -247,8 +248,8 @@ protected:
         uint16_t kp = float_to_uint(
             constrain_float(
                 kp_in,
-                m_motorConstraints->kp_min,
-                m_motorConstraints->kp_max
+                m_motorSoftwareConstraints->kp_min,
+                m_motorSoftwareConstraints->kp_max
             ),
             m_motorSettings->kp_min,
             m_motorSettings->kp_max,
@@ -258,8 +259,8 @@ protected:
         uint16_t kd = float_to_uint(
             constrain_float(
                 kd_in,
-                m_motorConstraints->kd_min,
-                m_motorConstraints->kd_max
+                m_motorSoftwareConstraints->kd_min,
+                m_motorSoftwareConstraints->kd_max
             ),
             m_motorSettings->kd_min,
             m_motorSettings->kd_max,
@@ -269,8 +270,8 @@ protected:
         uint16_t trq = float_to_uint(
             constrain_float(
                 trq_in,
-                m_motorConstraints->trq_min,
-                m_motorConstraints->trq_max
+                m_motorSoftwareConstraints->trq_min,
+                m_motorSoftwareConstraints->trq_max
             ),
             m_motorSettings->trq_min,
             m_motorSettings->trq_max,
@@ -392,14 +393,14 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
     class CANMotorMIT_Teensy : public CANMotorMIT {
 
     public:
-        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings,const AK60Params* motorConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
-        : CANMotorMIT(canId, motorSettings,motorConstraints,cmd,kPrintEvery)
+        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings,const AK60Params* motorSoftwareConstraints,const AK60Params* motorRunningConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        : CANMotorMIT(canId, motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
         {}
 
             virtual void begin(){
             // initializes the CAN controller on the Teensy 41
-            Serial.println("Now initializing CAN communication");
 
+                Serial.println("Now initializing CAN communication");
                 TeensyCAN.begin();
                 TeensyCAN.setBaudRate(1000000);//TeensyCAN.setBaudRate(1000000);
                 TeensyCAN.setMaxMB(16);
@@ -439,8 +440,8 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
     class CANMotorMIT_Renesas : public CANMotorMIT {
     //using PlatformCanBus = CanBus_RenesasRA;
     public:
-        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings,const AK60Params* motorConstraints,MotorCmd& cmd,uint32_t kPrintEvery=20)
-        : CANMotorMIT(canId,motorSettings,motorConstraints,cmd,kPrintEvery)
+        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings,const AK60Params* motorSoftwareConstraints,const AK60Params* motorRunningConstraints,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        : CANMotorMIT(canId,motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
         {}
 
             virtual void begin(){

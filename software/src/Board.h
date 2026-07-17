@@ -31,6 +31,12 @@ HW_VERSION_ENCODE(HW_VERSION_MAJOR, HW_VERSION_MINOR, HW_VERSION_PATCH)
 #define HW_VERSION_AT_LEAST(major, minor, patch) \
 (HARDWARE_VERSION >= HW_VERSION_ENCODE(major, minor, patch))
 
+#define HW_VERSION_AT_MOST(major, minor, patch) \
+(HARDWARE_VERSION <= HW_VERSION_ENCODE(major, minor, patch))
+
+#define HW_VERSION_EQUALS(major, minor, patch) \
+(HARDWARE_VERSION == HW_VERSION_ENCODE(major, minor, patch))
+
 #include <Arduino.h>
 
 enum class INA125Ref {
@@ -65,14 +71,26 @@ struct BoardConfig {
     int left_amp_2_exc;
     int right_amp_1_exc;
     int right_amp_2_exc;
+
+    // for the Arduino Nano BLE 33 Rev 2
+    int LC_L_1_Exc;
+    int LC_L_1_Vo;
+    int LC_L_2_Exc;
+    int LC_L_2_Vo;
+    int LC_R_1_Exc;
+    int LC_R_1_Vo;
+    int LC_R_2_Exc;
+    int LC_R_2_Vo;
 };
 
 // CHANGE THESE DEPENDING ON YOUR SETUP
-constexpr INA125Ref INA125_SELECTED_REF = INA125Ref::Bandgap_1V24;
+constexpr INA125Ref INA125_SELECTED_REF = INA125Ref::Ref_2V5;
 
 #if defined(PLATFORM_TEENSY41)
 
 constexpr BoardConfig boardConfig {
+
+    #if HW_VERSION_AT_MOST(1,1,0) // version 1.2 remaps ina125 to Nano to use differential ADC
     .ina125ExcitationRef = INA125_SELECTED_REF,
     .ina125IARef = INA125_SELECTED_REF,
     .ina125Supply = BoardSupply::V5V,
@@ -84,12 +102,14 @@ constexpr BoardConfig boardConfig {
 
     .ENCODER_LEFT_CS = 0, // Pin no 0 on Teensy
     .ENCODER_RIGHT_CS = 7, // Pin no 7 on Teensy
-
+    #endif
     // Note : only available past HW version 1.1.0
+    #if HW_VERSION_EQUALS(1,1,0)
     .left_amp_1_exc = 15,
     .left_amp_2_exc = 14,
     .right_amp_1_exc = 39,
     .right_amp_2_exc = 40,
+    #endif
 };
 
 #elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR)
@@ -106,6 +126,41 @@ constexpr BoardConfig boardConfig {
 
     .ENCODER_LEFT_CS = 10, // digital Pin 10 on Arduino Uno
     .ENCODER_RIGHT_CS = 9
+};
+
+
+#elif defined(PLATFORM_NORDIC)
+
+inline constexpr BoardConfig boardConfig{
+    .ina125ExcitationRef = INA125_SELECTED_REF,
+    .ina125IARef = INA125_SELECTED_REF,
+    .ina125Supply = BoardSupply::V5V,
+
+    // Not used by the Nordic-specific ADC class.
+    .LC_L_1_pin = -1,
+    .LC_L_2_pin = -1,
+    .LC_R_1_pin = -1,
+    .LC_R_2_pin = -1,
+
+    .ENCODER_LEFT_CS = -1,
+    .ENCODER_RIGHT_CS = -1,
+
+    .left_amp_1_exc = -1,
+    .left_amp_2_exc = -1,
+    .right_amp_1_exc = -1,
+    .right_amp_2_exc = -1,
+
+    .LC_L_1_Exc = A1,
+    .LC_L_1_Vo  = A0,
+
+    .LC_L_2_Exc = A3,
+    .LC_L_2_Vo  = A2,
+
+    .LC_R_1_Exc = A5,
+    .LC_R_1_Vo  = A4,
+
+    .LC_R_2_Exc = A7,
+    .LC_R_2_Vo  = A6
 };
 
 #else

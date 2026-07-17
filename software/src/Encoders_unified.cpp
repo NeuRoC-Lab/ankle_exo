@@ -30,7 +30,7 @@ void printPosition(const char* label, uint16_t pos)
     }
 }
 
-Encoder left_encoder(false,true); // using only the left encoder
+
 const int delay_time = 100; //ms
 const float dt = delay_time / 1000.0f; //time interval in s
 const float alpha = 0.15f; //EWMA Coefficient for filtering velocity, test with different values
@@ -43,10 +43,10 @@ void setup()
 {
     Serial.begin(115200);
     Serial.println("Tester script for the two encoders");
-    left_encoder.begin();
+    encoders.begin();
     delay(1000);
 
-    EncoderPositions positions = left_encoder.getPositions();
+    EncoderPositions positions = encoders.getPositions();
     previous_left_position = positions.left_position;
 }
 
@@ -54,12 +54,13 @@ void loop()
 {
     delay(delay_time); //time interval of 0.1s between each recorded position
     //TODO : add a setter for the encoder update frequency (the Serial.print rate) must be below 20khz, the frequency at which the encoder register updates
-    EncoderPositions positions = left_encoder.getPositions();
+    EncoderPositions positions = encoders.getPositions();
     Serial.print("Left encoder position : " );
     Serial.print(positions.left_position);
     Serial.print("Right encoder position : " );
     Serial.println(positions.right_position);
-
+    /*
+    Skip velocity calculations for now
     // Calculate raw velocity using v = delta/dt
     float current_left_position = positions.left_position;
     float current_right_position = positions.right_position;
@@ -87,34 +88,11 @@ void loop()
     // Update previous position
     previous_left_position = current_left_position;
     previous_right_position = current_right_position;
-
+    */
+    delay(100);
 }
 
 #else
 #error "You need at least board rev v1.0.1 in order to use the SPI on the Teensy. The version v1.0.0 does not support SPI for teensy, you must use an Arduino Uno R4 or R3 for that"
 #endif
 
-// OLD CODE IN CASE I BROKE SOMETHING
-
-// #include <Arduino.h>
-// #include "Encoder.h"
-// #include "Board.h"
-//
-// Encoder left_encoder(false,true); // using only the left encoder
-//
-// void setup() {
-//     Serial.begin(115200);
-//     Serial.println("Tester script for the two encoders");
-//     left_encoder.begin();
-//     delay(1000);
-// }
-//
-// void loop() {
-//     delay(100);
-//     //TODO : add a setter for the encoder update frequency (the Serial.print rate) must be below 20khz, the frequency at which the encoder register updates
-//     EncoderPositions positions = left_encoder.getPositions();
-//     Serial.print("Left encoder position : " );
-//     Serial.print(positions.left_position);
-//     Serial.print("Right encoder position : " );
-//     Serial.println(positions.right_position);
-// }

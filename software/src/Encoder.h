@@ -98,7 +98,7 @@ public:
   #error "No SPI port selected"
 #endif
 
-constexpr uint16_t INVALID_ENCODER_POSITION = UINT16_MAX;
+constexpr uint16_t INVALID_ENCODER_POSITION = UINT16_MAX; // when there is no valid data return maximum unsigned int16
 
 struct EncoderPositions {
     uint16_t left_position;
@@ -129,6 +129,8 @@ public:
         pinMode(boardConfig.ENCODER_LEFT_CS, OUTPUT);
         pinMode(boardConfig.ENCODER_RIGHT_CS, OUTPUT);
 
+
+        // idle BOTH encoders, even if only one is used
         digitalWrite(boardConfig.ENCODER_LEFT_CS, HIGH);
         digitalWrite(boardConfig.ENCODER_RIGHT_CS, HIGH);
 
@@ -143,7 +145,7 @@ public:
 
         uint8_t data;
 
-        SPI_PORT.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0));
+        SPI_PORT.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE0)); // 500Khz for debugging
 
         digitalWrite(csPin, LOW);
         data = SPI_PORT.transfer(sendByte);
@@ -161,8 +163,7 @@ public:
         uint8_t data;
         uint16_t timeoutCounter = 0;
 
-        // Important: store the response from the command byte,
-        // just like in your original working code.
+
         data = SPIWrite(rd_pos, isLeft);
 
         while (data != rd_pos && timeoutCounter++ < timeoutLimit)
@@ -187,6 +188,11 @@ public:
     {
         m_encoders.left_position =
             m_usingLeft ? readEncoder(true) : INVALID_ENCODER_POSITION;
+
+        if (m_usingLeft && m_usingRight)
+        {
+            delayMicroseconds(20);
+        }
 
         m_encoders.right_position =
             m_usingRight ? readEncoder(false) : INVALID_ENCODER_POSITION;

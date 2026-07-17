@@ -14,6 +14,7 @@ nav:
   - Software:
       - Overview: software/index.md
       - CAN Motor Interfaces: software/CANMotor.md
+      - CAN Motor API : software/CAN Motor API.md
       - API: software/api.md
       - Encoder testing: software/encoder.md
       - Sensors Plotting: software/plotting.md
