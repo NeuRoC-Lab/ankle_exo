@@ -79,7 +79,6 @@ fig.canvas.mpl_connect("close_event", close_plot)
 plt.show(block=False)
 
 
-
 # Start encoder test
 ser.write(b"y")
 ser.flush()
