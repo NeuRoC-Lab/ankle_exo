@@ -8,32 +8,44 @@
 // Here the Teensy will communicate with the Arduino through SPI as a temporary fix
 
 // Using the UART on the Arduino
+#include <Arduino.h>
+#include "MotorConfig.h"
+#include "Encoder.h"
+#include "Board.h"
+#include <ArduinoJson.h>
+#include "SerialConfig.h"
 
 #if defined(PLATFORM_RENESAS_RA)
-#include "Encoder.h"
-// upload the Arduino Uno R4 code here
-#include "Board.h"
 
-Encoder encoders(true, false); // left enabled, right disabled
+Encoder encoders(false, true); // left enabled, right disabled
 
-void setup(){
-encoders.begin();
-Serial1.begin(1000000); //1Mbaud
-// periodically send the encoder positions on Serial
-EncoderPositions positions = encoders.getPositions();
-// then send data over serial. Should we encode in binary for faster communication ?
+void setup()
+{
+    //Serial.begin(115200);
+    delay(1000);
+
+    encoders.begin();
+    Serial1.begin(57600);
 }
-void loop() {
+void loop()
+{
+    EncoderPositions positions = encoders.getPositions();
+
+    Serial.print("Left encoder position : " );
+    Serial.print(positions.left_position);
+    Serial.print("Right encoder position : " );
+    Serial.println(positions.right_position);
+
     Serial1.write(
-            reinterpret_cast<uint8_t*>(&positions),
-            sizeof(positions)
-        );
+        reinterpret_cast<const uint8_t*>(&positions),
+        sizeof(positions)
+    );
+
     delay(10);
 }
 
 #elif defined(PLATFORM_TEENSY41)
-#include <Arduino.h>
-#include "Encoder.h"
+
 #include "CANMotorMIT.h"
 #include "LoadCell.h"
 using CANController = CANMotorMIT_Teensy;
@@ -55,19 +67,7 @@ MotorCmd motor1Cmd {
     .kd = 0.0f
 };
 // define SOFT stop values here
-constexpr AK60Params motorSoftwareConstraints = {
 
-    -8.5f, 8.5f,   // position (rad)
-    -20.0f,  20.0f,   // velocity
-    -2.0f,  2.0f    // torque
-};
-
-constexpr AK60Params motorRunningConstraints = {
-
-    -10.0f, 10.0f,   // position (rad)
-    -25.0f,  25.0f,   // velocity
-    -4.0f,  4.0f    // torque
-};
 
 static_assert(
     constraintsInside(motorSoftwareConstraints, motorParams),
@@ -86,19 +86,43 @@ static_assert(
     ),
     "Software constraints must be inside running constraints"
 );
-constexpr byte MOTOR_ID = 0x01;
+constexpr byte MOTOR_ID = 0x02;
 
 CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
 
 #include "SerialMotorControl.h"
 SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
+JsonDocument createTelemetryPacket() {
+    JsonDocument doc;
+
+    doc[TelemetryKey::LeftLoadCell1] = LC_L_1.rawVoltage();
+    doc[TelemetryKey::LeftLoadCell2] = LC_L_2.rawVoltage();
+    doc[TelemetryKey::RightLoadCell1] = LC_R_1.rawVoltage();
+    doc[TelemetryKey::RightLoadCell2] = LC_R_2.rawVoltage();
+
+    doc[TelemetryKey::LeftEncoder] = positions.left_position;
+    doc[TelemetryKey::RightEncoder] = positions.right_position;
+
+    JsonArray motors =
+        doc[TelemetryKey::Motors].to<JsonArray>();
+
+    JsonObject motor1Object = motors.add<JsonObject>();
+    motor.writeReplyToJson(motor1Object);
+    // only one motor for now
+
+    //JsonObject motor2Object = motors.add<JsonObject>();
+    //motor2.writeReplyToJson(motor2Object);
+
+    return doc;
+}
+
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Initializing Serial communication with the Arduino UNO R4");
 
-    Serial1.begin(1000000);
+    Serial8.begin(57600); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
     motor.begin();
     if(!motor.resetMotor()){
@@ -117,25 +141,31 @@ void setup()
 
 void loop()
 {
-    if (Serial1.available() >= sizeof(positions))
+// switching to newline-delimited JSON (NDJSON) as it is easier to retrieve data later on python
+
+    if (Serial8.available() >= sizeof(positions))
     {
-        Serial1.readBytes(
+        Serial8.readBytes(
             reinterpret_cast<char*>(&positions),
             sizeof(positions)
         );
-
-        Serial.print("LeftEncoder:");
+// update the position object
+        /*
+        Serial.print("LENC:");
         Serial.print(positions.left_position);
         Serial.print("\t");
 
-        Serial.print("RightEncoder:");
+        Serial.print("RENC:");
         Serial.println(positions.right_position);
         Serial.print("\t");
+        */
+
         // reinterpret the position from the serialized struct
     }
     motor.update();
     serialControl.update();
-
+    delay(10);
+    /*
     Serial.print("L1:");
     Serial.print(LC_L_1.rawVoltage());
     Serial.print("\t");
@@ -150,8 +180,14 @@ void loop()
 
     Serial.print("R2:");
     Serial.println(LC_R_2.rawVoltage());
+    */
 
-    delay(10);
+    JsonDocument doc = createTelemetryPacket();
+    serializeJson(doc, Serial);
+    //Serial.println(positions.right_position);
+    //delay(500);
+    Serial.write('\n');
+
 }
 
 

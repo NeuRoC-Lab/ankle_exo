@@ -19,19 +19,23 @@ constexpr bool constraintsInside(
         inner.trq_max <= outer.trq_max;
 }
 
-constexpr AK60Params motorSoftwareConstraints = {
 
-    -8.5f, 8.5f,   // position (rad)
-    -20.0f,  20.0f,   // velocity
-    -2.0f,  2.0f    // torque
+constexpr AK60Params motorSoftwareConstraints = {
+    -8.5f,  8.5f,    // position, rad
+    -20.0f, 20.0f,   // velocity, rad/s
+    0.0f,  500.0f,   // kp
+    0.0f,  5.0f,     // kd
+    -4.0f, 4.0f      // torque, N*m
 };
 
 constexpr AK60Params motorRunningConstraints = {
-
-    -10.0f, 10.0f,   // position (rad)
-    -25.0f,  25.0f,   // velocity
-    -4.0f,  4.0f    // torque
+    -10.0f, 10.0f,   // position, rad
+    -25.0f, 25.0f,   // velocity, rad/s
+    0.0f,  500.0f,   // kp, not used for feedback checks
+    0.0f,  5.0f,     // kd, not used for feedback checks
+    -5.0f, 5.0f      // torque, N*m
 };
+
 
 static_assert(
     constraintsInside(motorSoftwareConstraints, motorParams),

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "SerialConfig.h"
 #pragma once
 
 float p_target = 10.0f;
@@ -27,9 +28,9 @@ constexpr AK60Params motorParams = {
 };
 
 
-extern const AK60Params motorSoftwareConstraints;
+//extern const AK60Params motorSoftwareConstraints;
 // These values clip the user's position, velocity and feedforward torque before sending them to the motor
-extern const AK60Params motorRunningConstraints;
+//extern const AK60Params motorRunningConstraints;
 // These values are compared against the motor's feedback messages and will enforce a hard stop if one/more of the velocity, position, torque exceeds the range specified here
 
 
@@ -161,7 +162,7 @@ void update(){
         while (readMessages(m_reply)) {
             checkHardStop();
             if (++m_printCounter >= m_kPrintEvery) {
-                print_can_msg(m_reply);
+                //print_can_msg(m_reply);
                 m_printCounter = 0;
             }
         }
@@ -188,7 +189,7 @@ void checkHardStop(){
     // leaving motor mode seems to disable logging of messages
     }
 }
-
+// This can be placed outside the class, it does not depend on any instance parameter
 void print_can_msg(MotorReply reply){
         Serial.print("  motor id: ");
         Serial.print(reply.can_id);
@@ -207,6 +208,16 @@ void print_can_msg(MotorReply reply){
 
         Serial.print(" err: ");
         Serial.println(reply.error);
+}
+
+void writeReplyToJson(JsonObject object) const
+{
+    object[TelemetryKey::MotorId] = m_reply.can_id;
+    object[TelemetryKey::MotorPos] = m_reply.position;
+    object[TelemetryKey::MotorVel] = m_reply.velocity;
+    object[TelemetryKey::MotorTrq] = m_reply.torque;
+    object[TelemetryKey::MotorTemp] = m_reply.temperature;
+    object[TelemetryKey::MotorErr] = m_reply.error;
 }
 
 // to prevent one from calling these functions directly from the SuperClass

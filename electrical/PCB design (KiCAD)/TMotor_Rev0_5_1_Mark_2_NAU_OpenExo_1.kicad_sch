@@ -3879,16 +3879,8 @@
 		(uuid "294f1a7e-beb7-499a-ad8c-ead1dc00aa25")
 	)
 	(no_connect
-		(at 115.57 138.43)
-		(uuid "303a9037-ed10-4271-9e1a-caec4e0b603f")
-	)
-	(no_connect
 		(at 213.36 106.68)
 		(uuid "32af2d27-b113-4621-9f32-2b231e231fd7")
-	)
-	(no_connect
-		(at 213.36 114.3)
-		(uuid "33659e1a-8d2f-45d5-801b-8a3ef8470222")
 	)
 	(no_connect
 		(at 115.57 135.89)
@@ -3911,14 +3903,6 @@
 		(uuid "40aea856-5f3b-4481-be40-d5cda3c0db08")
 	)
 	(no_connect
-		(at 213.36 111.76)
-		(uuid "46bc0e20-a69a-44ab-92a9-35231b025d30")
-	)
-	(no_connect
-		(at 115.57 140.97)
-		(uuid "476543b4-b3a1-4ab2-b4c6-c23ed311c6f5")
-	)
-	(no_connect
 		(at 172.72 91.44)
 		(uuid "5025d4f5-7e7b-454d-8bd1-f50db7e72f7e")
 	)
@@ -3939,16 +3923,8 @@
 		(uuid "612d2be8-cecb-40f7-87b2-f7b1d05a5930")
 	)
 	(no_connect
-		(at 115.57 148.59)
-		(uuid "671076fe-471f-4107-954e-d70097d9c13f")
-	)
-	(no_connect
 		(at 172.72 134.62)
 		(uuid "6ac9e34e-9e0f-4af7-8b1e-c12a5b94c4dc")
-	)
-	(no_connect
-		(at 172.72 116.84)
-		(uuid "7e79b6e4-6e9e-475b-96e5-be4e976b9089")
 	)
 	(no_connect
 		(at 46.99 53.34)
@@ -4003,8 +3979,8 @@
 		(uuid "a72091e1-f089-4a58-9e58-c4b2b2ba8bc4")
 	)
 	(no_connect
-		(at 115.57 146.05)
-		(uuid "a8a63b30-ff19-4528-8d17-af2a9d3c3581")
+		(at 115.57 138.43)
+		(uuid "baa99066-b09a-41c3-a96e-d790e2a13ae0")
 	)
 	(no_connect
 		(at 113.03 97.79)
@@ -4017,10 +3993,6 @@
 	(no_connect
 		(at 172.72 132.08)
 		(uuid "caf31716-f03f-4c14-8aeb-598700f6e228")
-	)
-	(no_connect
-		(at 115.57 143.51)
-		(uuid "ced64cd9-e2c3-4cc7-8061-2ce922535537")
 	)
 	(no_connect
 		(at 213.36 139.7)
@@ -4041,10 +4013,6 @@
 	(no_connect
 		(at 115.57 125.73)
 		(uuid "eb849bd7-9169-4805-ab58-4cc7ee983f70")
-	)
-	(no_connect
-		(at 213.36 101.6)
-		(uuid "f1e81315-9030-4082-9242-46fbc0e97b3f")
 	)
 	(no_connect
 		(at 172.72 111.76)
@@ -4384,6 +4352,16 @@
 	)
 	(wire
 		(pts
+			(xy 168.91 116.84) (xy 172.72 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "85cd0562-7a4e-4457-8c03-ab87e15e6ed9")
+	)
+	(wire
+		(pts
 			(xy 104.14 48.26) (xy 125.73 48.26)
 		)
 		(stroke
@@ -4612,6 +4590,16 @@
 		)
 		(uuid "ffd5b420-4dbe-4512-9357-574df7a6380f")
 	)
+	(label "NANO_MISO"
+		(at 213.36 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0ab3ff9c-86c5-4f4a-a5ba-e4956d468d29")
+	)
 	(label "SCK_5v"
 		(at 125.73 55.88 180)
 		(effects
@@ -4641,6 +4629,16 @@
 			(justify right bottom)
 		)
 		(uuid "1aa854e3-946e-439a-b169-78c071ce8bda")
+	)
+	(label "NANO_CS"
+		(at 213.36 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "206c89b8-0698-4880-9a27-25eec0df4543")
 	)
 	(label "CIPO_5v"
 		(at 125.73 50.8 180)
@@ -4692,6 +4690,16 @@
 		)
 		(uuid "40ae256f-1b46-4291-a17f-49cd50c68483")
 	)
+	(label "NANO_CS"
+		(at 115.57 140.97 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4457aa79-e8f7-4796-9a55-6117685d55ea")
+	)
 	(label "OE2"
 		(at 167.64 109.22 180)
 		(effects
@@ -4701,6 +4709,16 @@
 			(justify right bottom)
 		)
 		(uuid "48c2749f-62f8-4f28-9743-2f3d9376d192")
+	)
+	(label "NANO_MOSI"
+		(at 213.36 114.3 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5cdbb552-fbf7-496d-984c-d15ee4325d66")
 	)
 	(label "COPI_5v"
 		(at 125.73 53.34 180)
@@ -4732,6 +4750,36 @@
 		)
 		(uuid "790d0497-f8b4-49d0-82eb-1117262f4cce")
 	)
+	(label "NANO_SCK"
+		(at 168.91 116.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "94e7e311-71e5-4555-83db-1f2a80964b82")
+	)
+	(label "NANO_MISO"
+		(at 115.57 146.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9984953f-e169-4f58-ae60-16752b111a29")
+	)
+	(label "NANO_SCK"
+		(at 115.57 148.59 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "998b091f-58b6-4830-9953-82f890eb4240")
+	)
 	(label "NANO_RX"
 		(at 162.56 99.06 0)
 		(effects
@@ -4762,6 +4810,16 @@
 				(hide yes)
 			)
 		)
+	)
+	(label "NANO_MOSI"
+		(at 115.57 143.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b6b64ff7-ee1c-43ed-bb8b-c29ba6823570")
 	)
 	(label "NANO_RX"
 		(at 55.88 123.19 0)
