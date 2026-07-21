@@ -239,8 +239,8 @@ with open(path, "w", newline="") as csv_file:
         "Cable 2 Tension (V)",
         "Motor position (rad)",
         "Motor velocity (rad/s)",
-        "Motor Kp",
-        "Motor Kd",
+        #"Motor Kp",
+        #"Motor Kd",
         "Motor Feedforward Torque (Nm)",
         "Motor Temperature (C)",
         "Motor Torque (Nm)" # Calculate using the MIT mode formula
@@ -272,16 +272,16 @@ with open(path, "w", newline="") as csv_file:
 
             try:
 
-                ankle_pos = float(data[])
-                ankle_vel = float(data[])
-                l1_voltage = float(data[])
-                l2_voltage = float(data[])
-                motor_pos = float(data[])
-                motor_vel = float(data[])
-                motor_kp = float(data[])
-                motor_kd = float(data[])
-                motor_ff = float(data[])
-                motor_temp = float(data[])
+                ankle_pos = float(data["LENC"]) # or RENC
+                ankle_vel = 0.0 #TO CHANGE
+                l1_voltage = float(data["LLC1"]) # OR RLC1
+                l2_voltage = float(data["LLC2"]) # OR RLC2
+                motor_pos = float(data["MTR_POS_RAD"])
+                motor_vel = float(data["MTR_VEL_RADS"])
+                #motor_kp = float(data[])
+                #motor_kd = float(data[])
+                motor_ff = float(data["MTR_TRQ_NM"])
+                motor_temp = float(data["MTR_TEMP_DEG"])
 
                 #Update csv file
                 writer.writerow([
@@ -292,8 +292,8 @@ with open(path, "w", newline="") as csv_file:
                     l2_voltage,
                     motor_pos,
                     motor_vel,
-                    motor_kp,
-                    motor_kd,
+                    #motor_kp,
+                    #motor_kd,
                     motor_ff,
                     motor_temp
                 ])
