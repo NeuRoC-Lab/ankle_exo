@@ -18,6 +18,7 @@ nav:
       - API: software/api.md
       - Encoder testing: software/encoder.md
       - Sensors Plotting: software/plotting.md
+      - Serial Communication Protocol: software/Serial communication.md
   - Mechanical:
       - Overview: mechanical/index.md
       - Parts: mechanical/parts.md
@@ -31,6 +32,9 @@ theme:
 markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 
 extra_javascript:
   - javascripts/mathjax.js
