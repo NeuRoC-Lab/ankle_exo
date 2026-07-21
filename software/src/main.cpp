@@ -7,23 +7,37 @@
 
 // Here the Teensy will communicate with the Arduino through SPI as a temporary fix
 
-// Using the UART on the Arduino
 #include <Arduino.h>
-#include "MotorConfig.h"
-#include "Encoder.h"
 #include "Board.h"
-#include <ArduinoJson.h>
-#include "SerialConfig.h"
+#include "Encoder.h"
+#include "CANMotorMIT.h"
+#include "SerialProtocol.h"
 
 #if defined(PLATFORM_RENESAS_RA)
 
-Encoder encoders(false, true); // left enabled, right disabled
+// Renesas-only includes
+#include "Encoder.h"
+
+#elif defined(PLATFORM_TEENSY41)
+
+// Teensy-only CAN includes
+#include "MotorConfig.h"
+#include "LoadCell.h"
+#include <ArduinoJson.h>
+
+#elif defined(PLATFORM_NORDIC)
+
+// Nano-only includes
+#include <ArduinoBLE.h>
+
+#endif
+
+#if defined(PLATFORM_RENESAS_RA)
+
+Encoder encoders(true, true);
 
 void setup()
 {
-    //Serial.begin(115200);
-    delay(1000);
-
     encoders.begin();
     Serial1.begin(57600);
 }
@@ -36,18 +50,18 @@ void loop()
     Serial.print("Right encoder position : " );
     Serial.println(positions.right_position);
 
+
     Serial1.write(
         reinterpret_cast<const uint8_t*>(&positions),
         sizeof(positions)
-    );
+    ); // here it would be a waste to use sendPayload() because teh Arduino UNO R4 only sends encoder positions. Also this is temporary
 
     delay(10);
 }
 
 #elif defined(PLATFORM_TEENSY41)
 
-#include "CANMotorMIT.h"
-#include "LoadCell.h"
+
 using CANController = CANMotorMIT_Teensy;
 using LoadCellController = LoadCell_Teensy41;
 
@@ -66,26 +80,8 @@ MotorCmd motor1Cmd {
     .kp = 0.0f,
     .kd = 0.0f
 };
-// define SOFT stop values here
+// to change running and software constraints head to CANMotorMIT.h
 
-
-static_assert(
-    constraintsInside(motorSoftwareConstraints, motorParams),
-    "Software constraints exceed nominal motor limits"
-);
-
-static_assert(
-    constraintsInside(motorRunningConstraints, motorParams),
-    "Running constraints exceed nominal motor limits"
-);
-
-static_assert(
-    constraintsInside(
-        motorSoftwareConstraints,
-        motorRunningConstraints
-    ),
-    "Software constraints must be inside running constraints"
-);
 constexpr byte MOTOR_ID = 0x02;
 
 CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
@@ -142,7 +138,7 @@ void setup()
 void loop()
 {
 // switching to newline-delimited JSON (NDJSON) as it is easier to retrieve data later on python
-
+    // THIS IS TEMPORARY
     if (Serial8.available() >= sizeof(positions))
     {
         Serial8.readBytes(
@@ -165,29 +161,52 @@ void loop()
     motor.update();
     serialControl.update();
     delay(10);
-    /*
-    Serial.print("L1:");
-    Serial.print(LC_L_1.rawVoltage());
-    Serial.print("\t");
 
-    Serial.print("L2:");
-    Serial.print(LC_L_2.rawVoltage());
-    Serial.print("\t");
-
-    Serial.print("R1:");
-    Serial.print(LC_R_1.rawVoltage());
-    Serial.print("\t");
-
-    Serial.print("R2:");
-    Serial.println(LC_R_2.rawVoltage());
-    */
-
+    // to debug : the Teensy will stream data to your laptop through USB Serial, using ArduinoJSON for ease of unpacking
+    #if defined(DEBUG)
+    #pragma message "DEBUG mode is enabled, streaming data from Teensy to computer with ArduinoJSON"
     JsonDocument doc = createTelemetryPacket();
     serializeJson(doc, Serial);
-    //Serial.println(positions.right_position);
-    //delay(500);
     Serial.write('\n');
+    #else
+    LoadCellVoltages loadCells =
+    {
+    LC_L_1.rawVoltage(),
+    LC_L_2.rawVoltage(),
+    LC_R_1.rawVoltage(),
+    LC_R_2.rawVoltage(),
+    };
 
+    DataPayload payload = {
+    loadCells,
+    positions,
+    motor.m_reply,
+    };
+    sendPayload(payload, Serial8); // send data from Teensy's Serial8 to the Arduino Nano's Serial over UART
+    delay(10);
+    #endif
+
+}
+#elif defined(PLATFORM_NORDIC)
+
+// code for the Arduino Nano
+DataPayload payload;
+BLEHandler ble(payload);
+
+void setup(){
+    Serial.begin(9600);
+    Serial.println("Starting Arduino Nano script");
+    if(!ble.begin()){
+    Serial.println("BLE Initialization failed. Aborting");
+    while(1){}
+    }
+}
+
+void loop(){
+    while(readPayload(ble.m_payload,Serial1))
+    { // Serial1 is the UART port used by the Arduino Nano
+        ble.update(); // update the "bulletin board" on bluetooth
+    }
 }
 
 

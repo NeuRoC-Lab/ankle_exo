@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "SerialConfig.h"
+
 #pragma once
 
 float p_target = 10.0f;
@@ -76,8 +77,9 @@ typedef struct
     uint8_t error;
 } MotorReply;
 
-
-
+#if !defined(PLATFORM_TEENSY41) && !(defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR))
+#else
+#include <ArduinoJSON.h>
 class CANMotorMIT {
 /*
 Generic methods shared between the two CAN implementations (i.e Teensy 4.1 and Arduino UNO R4)
@@ -499,4 +501,6 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
 
 #if !defined(PLATFORM_TEENSY41) && !defined(PLATFORM_RENESAS_RA)
 #error "No CAN platform selected. Define PLATFORM_TEENSY41 or PLATFORM_RENESAS_RA."
+#endif
+
 #endif

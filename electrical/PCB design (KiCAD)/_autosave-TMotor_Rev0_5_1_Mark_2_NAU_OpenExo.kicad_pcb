@@ -972,7 +972,7 @@
 	(footprint "ISDF connector:SAMTEC_TFM-107-01-L-D-WT"
 		(layer "F.Cu")
 		(uuid "0ae051b2-deb3-40ba-9c27-6c75169ce3e3")
-		(at 148.9 154.49)
+		(at 149.57 154.935)
 		(property "Reference" "J13"
 			(at -4.61 -4.635 0)
 			(layer "F.SilkS")

@@ -90,6 +90,14 @@ public:
 #include "Board.h"
 #include <SPI.h>
 
+struct EncoderPositions {
+    uint16_t left_position;
+    uint16_t right_position;
+};
+
+#if !defined(PLATFORM_TEENSY41) && !(defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR))
+#else
+
 #if defined(PLATFORM_TEENSY41)
   #define SPI_PORT SPI1
 #elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR)
@@ -99,11 +107,6 @@ public:
 #endif
 
 constexpr uint16_t INVALID_ENCODER_POSITION = UINT16_MAX; // when there is no valid data return maximum unsigned int16
-
-struct EncoderPositions {
-    uint16_t left_position;
-    uint16_t right_position;
-};
 
 constexpr byte rd_pos = 0x10;
 constexpr byte nop = 0x00;
@@ -200,3 +203,4 @@ public:
         return m_encoders;
     }
 };
+#endif
