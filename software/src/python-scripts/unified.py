@@ -250,9 +250,10 @@ with open(path, "w", newline="") as csv_file:
                 and plt.fignum_exists(fig.number) == True
         ):
 
-            raw = ser.readline().decode(errors="ignore").strip()
-            print(raw)
-            
+            # Empty old serial backlog and keep newest packet
+            while ser.in_waiting:
+                raw = ser.readline().decode(errors="ignore").strip()
+
             # Skip empty lines
             if raw == "":
                 continue
@@ -368,3 +369,4 @@ with open(path, "w", newline="") as csv_file:
     finally:
         stop_all()
         plt.close("all")
+        print(f"CSV saved at: {path}")

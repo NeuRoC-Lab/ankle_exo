@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# python src/python-scripts/testUart.py COM6
 
 import argparse
 import json
@@ -139,10 +140,14 @@ class TelemetryHistory:
                 if self.encoder_zero[key] is None:
                     self.encoder_zero[key] = raw_encoder_value
 
-                # Relative encoder count
                 relative_count = raw_encoder_value - self.encoder_zero[key]
 
-                # Convert relative count to degrees
+                # Handle encoder rollover
+                if relative_count > 32768:
+                    relative_count -= 65536
+                elif relative_count < -32768:
+                    relative_count += 65536
+
                 encoder_value = relative_count * (360.0 / 65536.0)
 
             self.encoders[key].append(
@@ -435,7 +440,7 @@ class LiveTelemetryPlot:
         self.animation = FuncAnimation(
             self.figure,
             self.update,
-            interval=50,
+            interval=100,
             blit=False,
             cache_frame_data=False,
         )

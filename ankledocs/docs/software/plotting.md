@@ -1,13 +1,22 @@
 ## Reference Page for Real-Time Sensors Plotting Scripts
 
-The real-time plotting was originally intended to be achieved using MATLAB. However, we chose to use Python in the end because its advantages:
+The real-time plotting of the exoskeleton sensors and motors is achieved using Python 
+To check for the list of ports in CLion IDE, use python -m serial.tools.list_ports
 
-- more versatile
-- can handle higher sampling frequencies
-- more collaboration friendly
-- equally straightforward serial communication
+The result for a one leg setup can be found through the unified.py script under software/src/python-scripts
+It plots 6 graphs: 
 
-The python real time plotting script for each sensor can be found using the following links to the NeuroC-Lab ankle_exo git repository
+- encoder angle
+- encoder velocity
+- cable tension 1
+- cable tension 2
+- motor position
+- motor velocity
 
-Encoders:
-Load cells: 
+Challenges encountered and solution process:
+
+1. Find a way to control the motor while the plot is running
+- UI slider
+- Import threading
+
+2. 
