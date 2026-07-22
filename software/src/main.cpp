@@ -13,6 +13,19 @@
 #include "CANMotorMIT.h"
 #include "SerialProtocol.h"
 
+constexpr uint16_t PACKET_MAGIC = 0xA55A;
+
+struct PacketHeader {
+    uint16_t magic;
+    uint16_t payloadSize;
+    uint32_t sequence;
+};
+
+struct TelemetryPacket {
+    PacketHeader header;
+    DataPayload payload;
+};
+
 #if defined(PLATFORM_RENESAS_RA)
 
 // Renesas-only includes
@@ -61,6 +74,26 @@ void loop()
 
 #elif defined(PLATFORM_TEENSY41)
 
+inline size_t sendTelemetryPacket(
+    const DataPayload& payload,
+    HardwareSerial& serial
+) {
+    static uint32_t sequence = 0;
+
+    TelemetryPacket packet {
+        .header = {
+            .magic = PACKET_MAGIC,
+            .payloadSize = sizeof(DataPayload),
+            .sequence = sequence++,
+        },
+        .payload = payload,
+    };
+
+    return serial.write(
+        reinterpret_cast<const uint8_t*>(&packet),
+        sizeof(packet)
+    );
+}
 
 using CANController = CANMotorMIT_Teensy;
 using LoadCellController = LoadCell_Teensy41;
@@ -113,12 +146,14 @@ JsonDocument createTelemetryPacket() {
     return doc;
 }
 
+constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
+
 void setup()
 {
     Serial.begin(115200);
     Serial.println("Initializing Serial communication with the Arduino UNO R4");
 
-    Serial8.begin(57600); // using Serial 8 here, not serial 1
+    Serial8.begin(115200); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
     motor.begin();
     if(!motor.resetMotor()){
@@ -141,6 +176,7 @@ void loop()
 {
 // switching to newline-delimited JSON (NDJSON) as it is easier to retrieve data later on python
     // THIS IS TEMPORARY
+
     #if defined(EXTERNAL_ENCODER)
     if (Serial8.available() >= sizeof(positions))
     {
@@ -165,6 +201,8 @@ void loop()
     motor.update();
     serialControl.update();
     delay(10);
+    static uint32_t previousSend = 0;
+    const uint32_t now = micros();
 
     // to debug : the Teensy will stream data to your laptop through USB Serial, using ArduinoJSON for ease of unpacking
     #if defined(DEBUG)
@@ -175,34 +213,116 @@ void loop()
 
     #else
     // NORMAL UPDATING TO THE NANO
-    LoadCellVoltages loadCells =
-    {
-    LC_L_1.rawVoltage(),
-    LC_L_2.rawVoltage(),
-    LC_R_1.rawVoltage(),
-    LC_R_2.rawVoltage(),
-    };
+    if (now - previousSend >= TELEMETRY_PERIOD_US) {
+        previousSend = now;
 
-    DataPayload payload = {
-    loadCells,
-    positions,
-    motor.m_reply,
-    };
-    const size_t bytesSent = sendPayload(payload, Serial8);
+        LoadCellVoltages loadCells {
+            LC_L_1.rawVoltage(),
+            LC_L_2.rawVoltage(),
+            LC_R_1.rawVoltage(),
+            LC_R_2.rawVoltage(),
+        };
 
-    Serial.print("Sent ");
-    Serial.print(bytesSent);
-    Serial.print(" of ");
-    Serial.print(sizeof(DataPayload));
-    Serial.println(" bytes");
+        DataPayload payload {
+            loadCells,
+            positions,
+            motor.m_reply,
+        };
 
-    delay(1000);
-    Serial.println("Sent data to Nano");
+       sendTelemetryPacket(payload, Serial8);
+
+    }
     #endif
 
 }
 #elif defined(PLATFORM_NORDIC)
 
+bool readTelemetryPacket(
+    DataPayload& destination,
+    HardwareSerial& serial
+) {
+    constexpr uint8_t magicLow =
+        static_cast<uint8_t>(PACKET_MAGIC & 0xFF);
+
+    constexpr uint8_t magicHigh =
+        static_cast<uint8_t>((PACKET_MAGIC >> 8) & 0xFF);
+
+    static bool foundLowByte = false;
+
+    while (serial.available() > 0) {
+        const uint8_t byteRead =
+            static_cast<uint8_t>(serial.read());
+
+        if (!foundLowByte) {
+            if (byteRead == magicLow) {
+                foundLowByte = true;
+            }
+
+            continue;
+        }
+
+        if (byteRead != magicHigh) {
+            foundLowByte = byteRead == magicLow;
+            continue;
+        }
+
+        foundLowByte = false;
+
+        PacketHeader header {};
+        header.magic = PACKET_MAGIC;
+
+        constexpr size_t remainingHeaderSize =
+            sizeof(PacketHeader) - sizeof(header.magic);
+
+        const size_t headerBytesRead = serial.readBytes(
+            reinterpret_cast<char*>(&header)
+                + sizeof(header.magic),
+            remainingHeaderSize
+        );
+
+        if (headerBytesRead != remainingHeaderSize) {
+            return false;
+        }
+
+        if (header.payloadSize != sizeof(DataPayload)) {
+            Serial.print("Wrong payload size: ");
+            Serial.println(header.payloadSize);
+            continue;
+        }
+
+        const size_t payloadBytesRead = serial.readBytes(
+            reinterpret_cast<char*>(&destination),
+            sizeof(destination)
+        );
+
+        if (payloadBytesRead != sizeof(destination)) {
+            Serial.println("Incomplete payload");
+            return false;
+        }
+
+        static uint32_t previousSequence = 0;
+        static bool receivedFirstPacket = false;
+
+        if (receivedFirstPacket) {
+            const uint32_t expected =
+                previousSequence + 1;
+
+            if (header.sequence != expected) {
+                Serial.print("Dropped packets. Expected ");
+                Serial.print(expected);
+                Serial.print(", received ");
+                Serial.println(header.sequence);
+            }
+        }
+
+        previousSequence = header.sequence;
+        receivedFirstPacket = true;
+
+        return true;
+    }
+
+    return false;
+}
 unsigned long lastStatus = 0;
 
 float randomFloat(float minValue, float maxValue)
@@ -268,8 +388,12 @@ void setup(){
     randomSeed(analogRead(A0));
     delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
     Serial.begin(115200);
-    Serial1.begin(57600);
+    Serial1.begin(115200);
     delay(1000);
+
+    while (Serial1.available() > 0) {
+        Serial1.read();
+    }
     Serial.println("Starting Arduino Nano script");
     if(!ble.begin()){
     Serial.println("BLE Initialization failed. Aborting");
@@ -288,17 +412,16 @@ void loop(){
     }
     */
     // Read one complete payload from the Teensy.
-    if (readPayload(payload, Serial1)) {
-        Serial.println("Received payload from Teensy:");
-        printPayload(payload);
-    }
+        ble.update();
 
-    ble.update();
+        readTelemetryPacket(payload, Serial1);
+
     if (millis() - lastStatus >= 1000) {
         lastStatus = millis();
 
         Serial.print("UART bytes waiting: ");
-        Serial.println(Serial1.available());
+        //Serial.println(Serial1.available());
+        printPayload(payload);
     }
 
     // JUST TO TEST IF THE LOAD CELLS PAYLOAD IS CORRECTLY SENT OVER BLUETOOTH
