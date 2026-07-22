@@ -42,6 +42,7 @@ struct TelemetryPacket {
 
 // Nano-only includes
 #include <ArduinoBLE.h>
+#include <ArduinoJson.h>
 
 #endif
 
@@ -285,8 +286,8 @@ bool readTelemetryPacket(
         }
 
         if (header.payloadSize != sizeof(DataPayload)) {
-            Serial.print("Wrong payload size: ");
-            Serial.println(header.payloadSize);
+            //Serial.print("Wrong payload size: ");
+            //Serial.println(header.payloadSize);
             continue;
         }
 
@@ -308,10 +309,10 @@ bool readTelemetryPacket(
                 previousSequence + 1;
 
             if (header.sequence != expected) {
-                Serial.print("Dropped packets. Expected ");
-                Serial.print(expected);
-                Serial.print(", received ");
-                Serial.println(header.sequence);
+                //Serial.print("Dropped packets. Expected ");
+                //Serial.print(expected);
+                //Serial.print(", received ");
+                //Serial.println(header.sequence);
             }
         }
 
@@ -334,6 +335,31 @@ float randomFloat(float minValue, float maxValue)
     return minValue + normalized * (maxValue - minValue);
 }
 
+
+JsonDocument createTelemetryPacket(const DataPayload& payload) {
+    JsonDocument doc;
+
+    doc[TelemetryKey::LeftLoadCell1] = payload.loadCells.LeftLoadCell1;
+    doc[TelemetryKey::LeftLoadCell2] = payload.loadCells.LeftLoadCell2;
+    doc[TelemetryKey::RightLoadCell1] = payload.loadCells.RightLoadCell1;
+    doc[TelemetryKey::RightLoadCell2] = payload.loadCells.RightLoadCell2;
+
+    doc[TelemetryKey::LeftEncoder] = payload.encoders.left_position;
+    doc[TelemetryKey::RightEncoder] = payload.encoders.right_position;
+
+    JsonArray motors =
+        doc[TelemetryKey::Motors].to<JsonArray>();
+
+    JsonObject motor1Object = motors.add<JsonObject>();
+    motor1Object[TelemetryKey::MotorId] = payload.motorRep.can_id;
+    motor1Object[TelemetryKey::MotorPos] = payload.motorRep.position;
+    motor1Object[TelemetryKey::MotorVel] = payload.motorRep.velocity;
+    motor1Object[TelemetryKey::MotorTrq] = payload.motorRep.torque;
+    motor1Object[TelemetryKey::MotorTemp] = payload.motorRep.temperature;
+    motor1Object[TelemetryKey::MotorErr] = payload.motorRep.error;
+
+    return doc;
+}
 void printPayload(const DataPayload& payload)
 {
     Serial.println("----- DataPayload -----");
@@ -412,10 +438,13 @@ void loop(){
     }
     */
     // Read one complete payload from the Teensy.
+    bool receivedPacket = readTelemetryPacket(payload, Serial1);
+
+    #if defined(USING_BLE)
         ble.update();
+    #endif
 
-        readTelemetryPacket(payload, Serial1);
-
+    #if defined(DEBUG)
     if (millis() - lastStatus >= 1000) {
         lastStatus = millis();
 
@@ -423,14 +452,21 @@ void loop(){
         //Serial.println(Serial1.available());
         printPayload(payload);
     }
-
-    // JUST TO TEST IF THE LOAD CELLS PAYLOAD IS CORRECTLY SENT OVER BLUETOOTH
-    #if defined(DEBUG)
-    payload.loadCells.LeftLoadCell1  = randomFloat(-5.0f, 5.0f);
-    payload.loadCells.LeftLoadCell2  = randomFloat(-5.0f, 5.0f);
-    payload.loadCells.RightLoadCell1 = randomFloat(-5.0f, 5.0f);
-    payload.loadCells.RightLoadCell2 = randomFloat(-5.0f, 5.0f);
     #endif
+
+    #if defined(USING_SERIAL)
+    if (!receivedPacket) {
+        return;
+    }
+    else
+    {
+    JsonDocument doc = createTelemetryPacket(payload);
+    serializeJson(doc, Serial);
+    Serial.write('\n');
+    }
+    #endif
+
+
 }
 
 #endif
