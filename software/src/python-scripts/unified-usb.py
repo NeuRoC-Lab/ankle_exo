@@ -274,7 +274,7 @@ with open(path, "w", newline="") as csv_file:
                 l1_voltage = float(data["LLC1"]) # OR RLC1
                 l2_voltage = float(data["LLC2"]) # OR RLC2
 
-                motor = data["MOTORS"] #if nested list, use motor = data["MOTORS][0]
+                motor = data["MOTORS"][0] #if nested list, use motor = data["MOTORS][0]
                 motor_pos = float(motor["MTR_POS_RAD"])
                 motor_vel = float(motor["MTR_VEL_RADS"])
                 #motor_kp = float(data[])
