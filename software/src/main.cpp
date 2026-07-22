@@ -127,6 +127,8 @@ void setup()
     else {
         Serial.println("Successfully started motor");
     }
+    Serial.println("Stopping motor for now");
+    motor.sendMessage(exitMotorMode);
     Serial.println("Initializing Load Cells");
 
     LC_L_1.initialize();
@@ -139,6 +141,7 @@ void loop()
 {
 // switching to newline-delimited JSON (NDJSON) as it is easier to retrieve data later on python
     // THIS IS TEMPORARY
+    #if defined(EXTERNAL_ENCODER)
     if (Serial8.available() >= sizeof(positions))
     {
         Serial8.readBytes(
@@ -158,6 +161,7 @@ void loop()
 
         // reinterpret the position from the serialized struct
     }
+    #endif
     motor.update();
     serialControl.update();
     delay(10);
@@ -168,7 +172,9 @@ void loop()
     JsonDocument doc = createTelemetryPacket();
     serializeJson(doc, Serial);
     Serial.write('\n');
+
     #else
+    // NORMAL UPDATING TO THE NANO
     LoadCellVoltages loadCells =
     {
     LC_L_1.rawVoltage(),
@@ -182,33 +188,127 @@ void loop()
     positions,
     motor.m_reply,
     };
-    sendPayload(payload, Serial8); // send data from Teensy's Serial8 to the Arduino Nano's Serial over UART
-    delay(10);
+    const size_t bytesSent = sendPayload(payload, Serial8);
+
+    Serial.print("Sent ");
+    Serial.print(bytesSent);
+    Serial.print(" of ");
+    Serial.print(sizeof(DataPayload));
+    Serial.println(" bytes");
+
+    delay(1000);
+    Serial.println("Sent data to Nano");
     #endif
 
 }
 #elif defined(PLATFORM_NORDIC)
+
+unsigned long lastStatus = 0;
+
+float randomFloat(float minValue, float maxValue)
+{
+    long randomInteger = random(0, 1000000);
+
+    float normalized = static_cast<float>(randomInteger) / 999999.0f;
+
+    return minValue + normalized * (maxValue - minValue);
+}
+
+void printPayload(const DataPayload& payload)
+{
+    Serial.println("----- DataPayload -----");
+
+    Serial.println("Load cells:");
+    Serial.print("  Left 1:  ");
+    Serial.println(payload.loadCells.LeftLoadCell1, 6);
+
+    Serial.print("  Left 2:  ");
+    Serial.println(payload.loadCells.LeftLoadCell2, 6);
+
+    Serial.print("  Right 1: ");
+    Serial.println(payload.loadCells.RightLoadCell1, 6);
+
+    Serial.print("  Right 2: ");
+    Serial.println(payload.loadCells.RightLoadCell2, 6);
+
+    Serial.println("Encoders:");
+    Serial.print("  Left position:  ");
+    Serial.println(payload.encoders.left_position);
+
+    Serial.print("  Right position: ");
+    Serial.println(payload.encoders.right_position);
+
+    Serial.println("Motor:");
+    Serial.print("  CAN ID:      ");
+    Serial.println(payload.motorRep.can_id);
+
+    Serial.print("  Position:    ");
+    Serial.println(payload.motorRep.position, 6);
+
+    Serial.print("  Velocity:    ");
+    Serial.println(payload.motorRep.velocity, 6);
+
+    Serial.print("  Torque:      ");
+    Serial.println(payload.motorRep.torque, 6);
+
+    Serial.print("  Temperature: ");
+    Serial.println(payload.motorRep.temperature);
+
+    Serial.print("  Error:       ");
+    Serial.println(payload.motorRep.error);
+
+    Serial.println("-----------------------");
+}
 
 // code for the Arduino Nano
 DataPayload payload;
 BLEHandler ble(payload);
 
 void setup(){
-    Serial.begin(9600);
+    randomSeed(analogRead(A0));
+    delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
+    Serial.begin(115200);
+    Serial1.begin(57600);
+    delay(1000);
     Serial.println("Starting Arduino Nano script");
     if(!ble.begin()){
     Serial.println("BLE Initialization failed. Aborting");
     while(1){}
     }
+    Serial.println("BLE initialization successful");
 }
 
 void loop(){
+    /*
+    WHEN NOT RUNNING THE TEENSY (I.E NANO AND COMPUTER ALONE) COMMENT THIS
+    // TODO ADD A CHECK LIKE Serial1.available() to check if the teensy is actually sending valid and updated data
     while(readPayload(ble.m_payload,Serial1))
     { // Serial1 is the UART port used by the Arduino Nano
         ble.update(); // update the "bulletin board" on bluetooth
     }
-}
+    */
+    // Read one complete payload from the Teensy.
+    if (readPayload(payload, Serial1)) {
+        Serial.println("Received payload from Teensy:");
+        printPayload(payload);
+    }
 
+    ble.update();
+    if (millis() - lastStatus >= 1000) {
+        lastStatus = millis();
+
+        Serial.print("UART bytes waiting: ");
+        Serial.println(Serial1.available());
+    }
+
+    // JUST TO TEST IF THE LOAD CELLS PAYLOAD IS CORRECTLY SENT OVER BLUETOOTH
+    #if defined(DEBUG)
+    payload.loadCells.LeftLoadCell1  = randomFloat(-5.0f, 5.0f);
+    payload.loadCells.LeftLoadCell2  = randomFloat(-5.0f, 5.0f);
+    payload.loadCells.RightLoadCell1 = randomFloat(-5.0f, 5.0f);
+    payload.loadCells.RightLoadCell2 = randomFloat(-5.0f, 5.0f);
+    #endif
+}
 
 #endif
 

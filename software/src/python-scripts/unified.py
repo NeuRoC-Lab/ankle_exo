@@ -1,20 +1,4 @@
-"""
-This code plots the data for the encoder, loadcells, and motor (MIT mode) integrated together on the one leg setup
-This script extracts data from the following format:
 
-    (to enter)
-
-Check for port: python -m serial.tools.list_ports
-
-Command types:
-- Motor control command: start/stop id 1; set id 1 [param] [value]
-- Pause
-- Resume
-- Exit
-
-Type in CLion terminal to run code:
-python software\src\python-scripts\unified.py
-"""
 
 import serial
 import time
@@ -23,9 +7,10 @@ import threading
 import os
 import csv
 import json
+from time import sleep
 
 # Teensy Connection
-port = "COM6"  # Change port as necessary
+port = "/dev/cu.usbmodem198847901"  # Change port as necessary
 baud = 115200
 time_window = 10  # Plot x-axis window in seconds
 
@@ -249,9 +234,10 @@ with open(path, "w", newline="") as csv_file:
                 running["in_progress"] == True
                 and plt.fignum_exists(fig.number) == True
         ):
-
             raw = ser.readline().decode(errors="ignore").strip()
-            print(raw)
+            while ser.in_waiting > 0:
+                raw = ser.readline().decode(errors="ignore").strip()
+            #print(raw)
             
             # Skip empty lines
             if raw == "":
@@ -266,13 +252,13 @@ with open(path, "w", newline="") as csv_file:
 
             try:
 
-                ankle_pos = float(data["LENC"]) # or RENC
+                ankle_pos = int(data["LENC"]) # or RENC
                 ankle_vel = 0.0 #TO CHANGE
                 
                 l1_voltage = float(data["LLC1"]) # OR RLC1
                 l2_voltage = float(data["LLC2"]) # OR RLC2
 
-                motor = data["MOTORS"] #if nested list, use motor = data["MOTORS][0]
+                motor = data["MOTORS"][0] #if nested list, use motor = data["MOTORS][0]
                 motor_pos = float(motor["MTR_POS_RAD"])
                 motor_vel = float(motor["MTR_VEL_RADS"])
                 #motor_kp = float(data[])
@@ -310,7 +296,11 @@ with open(path, "w", newline="") as csv_file:
 
 
             time_data.append(current_time)
-            ankle_pos_data.append(ankle_pos)
+            if not (ankle_pos == 65535):
+                ankle_pos_data.append(ankle_pos)
+                print("Skipping invalid data")
+            else:
+                ankle_pos_data.append(ankle_pos_data[-1])
             ankle_vel_data.append(ankle_vel)
             loadcell1_data.append(l1_voltage)
             loadcell2_data.append(l2_voltage)
@@ -368,3 +358,19 @@ with open(path, "w", newline="") as csv_file:
     finally:
         stop_all()
         plt.close("all")
+'''
+This code plots the data for the encoder, loadcells, and motor (MIT mode) integrated together on the one leg setup
+This script extracts data from the following format:
+
+    (to enter)
+
+Check for port: python -m serial.tools.list_ports
+
+Command types:
+- Motor control command: start/stop id 1; set id 1 [param] [value]
+- Pause
+- Resume
+- Exit
+
+
+'''
