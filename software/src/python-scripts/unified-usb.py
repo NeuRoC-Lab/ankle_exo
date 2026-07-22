@@ -1,5 +1,6 @@
 """
 This code plots the data for the encoder, loadcells, and motor (MIT mode) integrated together on the one leg setup
+The data is read via USB cable from the Teensy
 This script extracts data from the following format:
 
     (to enter)
@@ -13,7 +14,7 @@ Command types:
 - Exit
 
 Type in CLion terminal to run code:
-python software\src\python-scripts\unified.py
+python software\src\python-scripts\unified-usb.py
 """
 
 import serial
@@ -250,16 +251,17 @@ with open(path, "w", newline="") as csv_file:
                 and plt.fignum_exists(fig.number) == True
         ):
 
-            raw = ser.readline().decode(errors="ignore").strip()
-            print(raw)
-            
+            # Empty old serial backlog and keep newest packet
+            while ser.in_waiting:
+                raw = ser.readline().decode(errors="ignore").strip()
+
             # Skip empty lines
             if raw == "":
                 continue
-            
+
             try:
                 data = json.loads(raw)
-            
+
             except json.JSONDecodeError:
                 print("Could not read JSON:", raw)
                 continue
@@ -268,7 +270,7 @@ with open(path, "w", newline="") as csv_file:
 
                 ankle_pos = float(data["LENC"]) # or RENC
                 ankle_vel = 0.0 #TO CHANGE
-                
+
                 l1_voltage = float(data["LLC1"]) # OR RLC1
                 l2_voltage = float(data["LLC2"]) # OR RLC2
 
@@ -368,3 +370,4 @@ with open(path, "w", newline="") as csv_file:
     finally:
         stop_all()
         plt.close("all")
+        print(f"CSV saved at: {path}")
