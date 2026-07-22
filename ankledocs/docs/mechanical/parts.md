@@ -1,3 +1,56 @@
+
+## Ankle Exoskeleton Mechanical Design Modifications
+
+The original mechanical design assembly can be found in the NeuroC Lab OneDrive folder following:
+
+### Pulley Cable Attach
+
+The original pulley cable attach design had multiple issues:
+
+- the screws used to assemble them to the pulley were touching, leaving no free space and thus making assembling the load cells difficult
+- no fillets to reinforce the thin walls
+- the side thin wall was only present on one side, making the part unnecessarily asymmetric (takes longer to adjust)
+
+The new design takes the following into consideration:
+
+- the cable stays tangential to its first point of contact to the pulley
+- there is some free space in between the 2 screws
+- the increased dimensions still make sure that no part will touch the floor
+- fillets added in inner edges
+- printed using CFRP (?)
+
+Original Part: ![Original PulleyCableAttach](../../mechanical/images/motor-mount.png)
+Revised Part: ![Revised PulleyCableAttach](../../mechanical/images/motor-mount.png)
+
+## Waist Belt Design
+
+General design considerations:
+
+- One belt that can be used for unilateral and bilateral exoskeletons
+- Can hold the weight of the exoskeleton + batteries + hardware with minimal load on the user
+
+### PCB Pocket
+
+The PCB design can be found here:
+
+Specific design considerations: 
+
+- Hold PCB and PCB case
+- Allow space for cables and connections
+
+The CAD file for the PCB pocket can be found here: ![Belt PCB Pocket](../CAD-files/pcb-pocket.prt)
+
+### Battery Pockets (4)
+
+Specific design considerations:
+
+- Hold one or two batteries at a time
+- Can attach and detach from belt
+- Allow space for two large cables
+- Thermal safety
+
+The CAD file for the battery pocket can be found here: ![Belt Battery Pocket](../CAD-files/battery-pocket.prt)
+
 ## Test Bench Parts
 
 ### Fixing the Motors (3D Print)
@@ -37,27 +90,3 @@ Each of the he CAD files can be found in Siemens NX (TO UPLOAD)
 Base: [Ankle Test Bench Part - Base](../CAD-files/ankle-mount-base.prt)
 Cap: [Ankle Test Bench Part - Cap](../CAD-files/ankle-mount-cap.prt)
 Clip: [Ankle Test Bench Part - Clip](../CAD-files/ankle-mount-clip.prt)
-
-## Ankle Exoskeleton Mechanical Design Modifications
-
-The original mechanical design assembly can be found in the NeuroC Lab OneDrive folder following:
-
-### Pulley Cable Attach
-
-The original pulley cable attach design had multiple issues:
-
-- the screws used to assemble them to the pulley were touching, leaving no free space and thus making assembling the load cells difficult
-- no fillets to reinforce the thin walls
-- the side thin wall was only present on one side, making the part unnecessarily asymmetric (takes longer to adjust)
-
-The new design takes the following into consideration:
-
-- the cable stays tangential to its first point of contact to the pulley
-- there is some free space in between the 2 screws
-- the increased dimensions still make sure that no part will touch the floor
-- fillets added in inner edges
-- printed using CFRP (?)
-
-Original Part: ![Original PulleyCableAttach](../../mechanical/images/motor-mount.png)
-Revised Part: ![Revised PulleyCableAttach](../../mechanical/images/motor-mount.png)
-
