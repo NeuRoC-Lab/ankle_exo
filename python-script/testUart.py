@@ -104,6 +104,10 @@ class TelemetryHistory:
             key: deque()
             for key in ENCODER_KEYS
         }
+        self.encoder_zero: dict[str, float | None] = {
+            key: None
+            for key in ENCODER_KEYS
+        }
 
         self.motor_position: deque[float] = deque()
 
@@ -121,17 +125,25 @@ class TelemetryHistory:
             )
 
         for key in self.encoders:
-            encoder_value = packet.get(key)
+            raw_encoder_value = packet.get(key)
 
-            # Check invalid BEFORE conversion
-            if encoder_value == INVALID_ENCODER_POSITION:
+            # Ignore invalid readings
+            if raw_encoder_value == INVALID_ENCODER_POSITION:
                 if self.encoders[key]:
                     encoder_value = self.encoders[key][-1]
                 else:
                     encoder_value = float("nan")
+
             else:
-                # Convert 16-bit count to degrees
-                encoder_value = encoder_value * (360.0 / 65536.0)
+                # Save first valid encoder reading as zero
+                if self.encoder_zero[key] is None:
+                    self.encoder_zero[key] = raw_encoder_value
+
+                # Relative encoder count
+                relative_count = raw_encoder_value - self.encoder_zero[key]
+
+                # Convert relative count to degrees
+                encoder_value = relative_count * (360.0 / 65536.0)
 
             self.encoders[key].append(
                 numeric_or_nan(encoder_value)
@@ -438,7 +450,7 @@ class LiveTelemetryPlot:
         )
 
         self.encoder_axis.set_title("Encoder")
-        self.encoder_axis.set_ylabel("Encoder counts")
+        self.encoder_axis.set_ylabel("Encoder angle")
         self.encoder_axis.grid(True)
         self.encoder_axis.legend(loc="upper left")
 
