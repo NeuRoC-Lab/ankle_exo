@@ -123,8 +123,15 @@ class TelemetryHistory:
         for key in self.encoders:
             encoder_value = packet.get(key)
 
+            # Check invalid BEFORE conversion
             if encoder_value == INVALID_ENCODER_POSITION:
-                encoder_value = None
+                if self.encoders[key]:
+                    encoder_value = self.encoders[key][-1]
+                else:
+                    encoder_value = float("nan")
+            else:
+                # Convert 16-bit count to degrees
+                encoder_value = encoder_value * (360.0 / 65536.0)
 
             self.encoders[key].append(
                 numeric_or_nan(encoder_value)

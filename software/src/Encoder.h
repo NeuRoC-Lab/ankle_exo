@@ -184,7 +184,11 @@ public:
         encoder_position = (SPIWrite(nop, isLeft) & 0x0F) << 8;
         encoder_position |= SPIWrite(nop, isLeft);
 
+        // Your math goes here
+        encoder_position = encoder_position * (360.0f / 65536.0f);
+
         return encoder_position;
+
     }
 
     EncoderPositions getPositions()
