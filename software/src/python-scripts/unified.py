@@ -20,6 +20,7 @@ import serial
 import time
 import matplotlib.pyplot as plt
 import threading
+import os
 import csv
 import json
 
@@ -39,15 +40,14 @@ running = {"in_progress": True}
 plotting = {"paused": False}
 
 def stop_all():
+
     running["in_progress"] = False
 
     if ser.is_open:
         ser.flush()
-        file.close() #Close csv file
-        print(f"CSV file saved as {filename}")
         ser.close()
-        print("Plotting and data logging stopped")
 
+    print("Plotting and data logging stopped")
 
 def close_plot(event):
     stop_all()
@@ -133,8 +133,6 @@ time.sleep(1)
 # Prepare CSV file
 filename = "SingleLegData.csv"
 path = os.path.abspath(filename)
-
-start_time = time.time()
 
 # Prepare plots data
 time_data = []
@@ -243,7 +241,6 @@ with open(path, "w", newline="") as csv_file:
         #"Motor Kd",
         "Motor Feedforward Torque (Nm)",
         "Motor Temperature (C)",
-        "Motor Torque (Nm)" # Calculate using the MIT mode formula
     ])
 
     try:
@@ -255,37 +252,40 @@ with open(path, "w", newline="") as csv_file:
 
             raw = ser.readline().decode(errors="ignore").strip()
             print(raw)
-
-            data = json.loads(raw)
-
+            
             # Skip empty lines
             if raw == "":
                 continue
-
-            # Skip startup / command / error messages
-            if raw.startswith("motor id:") == False:
-                print("!" + raw)
-                fig.canvas.flush_events()
+            
+            try:
+                data = json.loads(raw)
+            
+            except json.JSONDecodeError:
+                print("Could not read JSON:", raw)
                 continue
-
-            arr = raw.split()
 
             try:
 
                 ankle_pos = float(data["LENC"]) # or RENC
                 ankle_vel = 0.0 #TO CHANGE
+                
                 l1_voltage = float(data["LLC1"]) # OR RLC1
                 l2_voltage = float(data["LLC2"]) # OR RLC2
-                motor_pos = float(data["MTR_POS_RAD"])
-                motor_vel = float(data["MTR_VEL_RADS"])
+
+                motor = data["MOTORS"] #if nested list, use motor = data["MOTORS][0]
+                motor_pos = float(motor["MTR_POS_RAD"])
+                motor_vel = float(motor["MTR_VEL_RADS"])
                 #motor_kp = float(data[])
                 #motor_kd = float(data[])
-                motor_ff = float(data["MTR_TRQ_NM"])
-                motor_temp = float(data["MTR_TEMP_DEG"])
+                motor_ff = float(motor["MTR_TRQ_NM"])
+                motor_temp = float(motor["MTR_TEMP_DEG"])
+
+                # x-axis data
+                current_time = time.perf_counter() - start_time
 
                 #Update csv file
                 writer.writerow([
-                    time.time() - start_time,
+                    current_time,
                     ankle_pos,
                     ankle_vel,
                     l1_voltage,
@@ -308,8 +308,6 @@ with open(path, "w", newline="") as csv_file:
                 fig.canvas.flush_events()
                 continue
 
-            # x-axis data
-            current_time = time.perf_counter() - start_time
 
             time_data.append(current_time)
             ankle_pos_data.append(ankle_pos)
