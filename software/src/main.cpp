@@ -9,8 +9,8 @@
 
 #include <Arduino.h>
 #include "Board.h"
-#include "Encoder.h"
 #include "CANMotorMIT.h"
+#include "Encoder.h"
 #include "SerialProtocol.h"
 
 constexpr uint16_t PACKET_MAGIC = 0xA55A;
@@ -26,10 +26,10 @@ struct TelemetryPacket {
     DataPayload payload;
 };
 
+
 #if defined(PLATFORM_RENESAS_RA)
 
 // Renesas-only includes
-#include "Encoder.h"
 
 #elif defined(PLATFORM_TEENSY41)
 
@@ -48,10 +48,11 @@ struct TelemetryPacket {
 
 #if defined(PLATFORM_RENESAS_RA)
 
-Encoder encoders(true, true);
+Encoder encoders(true, false);
 
 void setup()
 {
+    Serial.begin(115200);
     encoders.begin();
     Serial1.begin(57600);
 }
@@ -64,12 +65,12 @@ void loop()
     Serial.print("Right encoder position : " );
     Serial.println(positions.right_position);
 
-
+    /*
     Serial1.write(
         reinterpret_cast<const uint8_t*>(&positions),
         sizeof(positions)
     ); // here it would be a waste to use sendPayload() because teh Arduino UNO R4 only sends encoder positions. Also this is temporary
-
+    */
     delay(10);
 }
 
@@ -149,8 +150,18 @@ JsonDocument createTelemetryPacket() {
 
 constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
 
+Encoder encoders(true, false);
+
 void setup()
 {
+    // encoder setup
+    pinMode(boardConfig.OE1, OUTPUT);
+    pinMode(boardConfig.OE2, OUTPUT);
+    digitalWrite(boardConfig.OE1,HIGH);
+    digitalWrite(boardConfig.OE2,HIGH);
+    delay(2000);
+    encoders.begin();
+
     Serial.begin(115200);
     Serial.println("Initializing Serial communication with the Arduino UNO R4");
 
@@ -164,7 +175,7 @@ void setup()
         Serial.println("Successfully started motor");
     }
     Serial.println("Stopping motor for now");
-    motor.sendMessage(exitMotorMode);
+    //motor.sendMessage(exitMotorMode);
     Serial.println("Initializing Load Cells");
 
     LC_L_1.initialize();
@@ -199,6 +210,7 @@ void loop()
         // reinterpret the position from the serialized struct
     }
     #endif
+    positions = encoders.getPositions();
     motor.update();
     serialControl.update();
     delay(10);
@@ -411,7 +423,7 @@ DataPayload payload;
 BLEHandler ble(payload);
 
 void setup(){
-    randomSeed(analogRead(A0));
+    //randomSeed(analogRead(A0));
     delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
     Serial.begin(115200);
     Serial1.begin(115200);
@@ -449,8 +461,8 @@ void loop(){
         lastStatus = millis();
 
         Serial.print("UART bytes waiting: ");
-        //Serial.println(Serial1.available());
-        printPayload(payload);
+        Serial.println(Serial1.available());
+        //printPayload(payload);
     }
     #endif
 

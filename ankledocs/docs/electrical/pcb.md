@@ -214,3 +214,16 @@ PCB assembly list :
 
 https://jlcpcb.com/help/article/how-to-generate-the-bom-and-centroid-file-from-kicad
 
+### 23/07 (v1.1.0)
+
+* Fixed XT30 connector pin mismatch on kicad which resulted in \(V_{batt}\) and \(GND\) nets not being actually electrically connected to the XT30 pins on the board. For this I renamed the pin names on the symbol from "P" and "N" to 2 and 1 respectively, as required in the footprint 
+* Replaced the imported Teensy symbol which made some pins not properly connected 
+* Remade Solder jumper annotations pertaining to each of the four amplifiers more consistently (INA_PWR_xx, INA_EXC_xx, INA_REF_xx) for 1,2,3,4
+* Converted 3-pins solder jumpers to 2-pins solder jumpers to avoid harming Nano ADC by connecting it to 5V
+
+### 25/07 (v1.1.1)
+* Replaced the P78E05-1000 with a [Würth Elektronik pin-compatible equivalent](https://www.we-online.com/components/products/datasheet/173010535.pdf?srsltid=AfmBOoqXnjU4nN0V3SnTI2uxeimFK-YTeBzOPeDcg751XvU_F-sQBI_F).
+  * MINOR ROUTING FIX (schematics/pcb) : While the pinout for P78E05-1000 is 1-Vin, 2-GND, 3-Vout, the v1.1.0 board that was obtained through JLCPCB (the second one) had 3) have pin 2 and 3 swapped and pin 1 not actually connected to Vin (battery). The routing was redone properly, and bulk capacitors were placed at input and output of the DC-DC converter
+
+* MINOR WIRING FIX (schematics/pcb) : The BAT54S clamping diode array was replaced with a more accurate one (BAS70-04). The cathode and anode were swapped in the old version, which has been fixed when adding the replacement diode array.
+* The Teensy 4.1's footprint and symbol was modified and I principally removed unused THT pins like VUSB,T+/T-,D+/D- and otherswhich would have overlapped with some components under the Teensy

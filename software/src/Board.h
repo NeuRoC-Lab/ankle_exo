@@ -66,6 +66,10 @@ struct BoardConfig {
     int ENCODER_LEFT_CS;
     int ENCODER_RIGHT_CS;
 
+    // output enable for the voltage shifters
+    int OE1;
+    int OE2;
+
     // analog pins to read the excitation voltage (IAREF) of the INA125U in order to validate the settings and proper operation of the board
     int left_amp_1_exc;
     int left_amp_2_exc;
@@ -88,6 +92,9 @@ constexpr INA125Ref INA125_SELECTED_REF = INA125Ref::Ref_2V5;
 
 #if defined(PLATFORM_TEENSY41)
 
+#if HW_VERSION_AT_LEAST(1, 1, 0)
+#pragma message("Defining OE1 and OE2")
+#endif
 constexpr BoardConfig boardConfig {
 
     #if HW_VERSION_AT_MOST(1,1,0) // version 1.2 remaps ina125 to Nano to use differential ADC
@@ -99,10 +106,19 @@ constexpr BoardConfig boardConfig {
     .LC_L_2_pin = A7,    // physical/digital pin 21
     .LC_R_1_pin = A11,   // physical/digital pin 25
     .LC_R_2_pin = A10,    // physical/digital pin 24
-
-    .ENCODER_LEFT_CS = 0, // Pin no 0 on Teensy
-    .ENCODER_RIGHT_CS = 7, // Pin no 7 on Teensy
     #endif
+
+    .ENCODER_LEFT_CS = 0, // Pin no 0 on Teensy (CS2)
+    .ENCODER_RIGHT_CS = 7, // Pin no 7 on Teensy (CS1)
+    //TODO replace usage with .CS1 and .CS2 instead because this is more meaningful
+
+
+    #if HW_VERSION_AT_LEAST(1,1,0)
+    // output enable pins added after rev v1.0.0
+    .OE1 = 6,
+    .OE2 = 3,
+    #endif
+
     // Note : only available past HW version 1.1.0
     #if HW_VERSION_EQUALS(1,1,0)
     .left_amp_1_exc = 15,
@@ -110,6 +126,7 @@ constexpr BoardConfig boardConfig {
     .right_amp_1_exc = 39,
     .right_amp_2_exc = 40,
     #endif
+
 };
 
 #elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR)
@@ -126,41 +143,50 @@ constexpr BoardConfig boardConfig {
 
     .ENCODER_LEFT_CS = 10, // digital Pin 10 on Arduino Uno
     .ENCODER_RIGHT_CS = 9
+
 };
 
 
 #elif defined(PLATFORM_NORDIC)
 
-inline constexpr BoardConfig boardConfig{
-    .ina125ExcitationRef = INA125_SELECTED_REF,
-    .ina125IARef = INA125_SELECTED_REF,
-    .ina125Supply = BoardSupply::V5V,
+inline constexpr BoardConfig boardConfig {
+    // INA125 configuration
+    INA125_SELECTED_REF, // ina125ExcitationRef
+    INA125_SELECTED_REF, // ina125IARef
+    BoardSupply::V5V,    // ina125Supply
 
-    // Not used by the Nordic-specific ADC class.
-    .LC_L_1_pin = -1,
-    .LC_L_2_pin = -1,
-    .LC_R_1_pin = -1,
-    .LC_R_2_pin = -1,
+    // Conventional load-cell analog pins
+    -1, // LC_L_1_pin
+    -1, // LC_L_2_pin
+    -1, // LC_R_1_pin
+    -1, // LC_R_2_pin
 
-    .ENCODER_LEFT_CS = -1,
-    .ENCODER_RIGHT_CS = -1,
+    // Encoder chip-select pins
+    -1, // ENCODER_LEFT_CS
+    -1, // ENCODER_RIGHT_CS
 
-    .left_amp_1_exc = -1,
-    .left_amp_2_exc = -1,
-    .right_amp_1_exc = -1,
-    .right_amp_2_exc = -1,
+    // Voltage-shifter output-enable pins
+    -1, // OE1
+    -1, // OE2
 
-    .LC_L_1_Exc = A1,
-    .LC_L_1_Vo  = A0,
+    // INA125 excitation measurement pins
+    -1, // left_amp_1_exc
+    -1, // left_amp_2_exc
+    -1, // right_amp_1_exc
+    -1, // right_amp_2_exc
 
-    .LC_L_2_Exc = A3,
-    .LC_L_2_Vo  = A2,
+    // Nordic differential ADC pins
+    A1, // LC_L_1_Exc
+    A0, // LC_L_1_Vo
 
-    .LC_R_1_Exc = A5,
-    .LC_R_1_Vo  = A4,
+    A3, // LC_L_2_Exc
+    A2, // LC_L_2_Vo
 
-    .LC_R_2_Exc = A7,
-    .LC_R_2_Vo  = A6
+    A5, // LC_R_1_Exc
+    A4, // LC_R_1_Vo
+
+    A7, // LC_R_2_Exc
+    A6  // LC_R_2_Vo
 };
 
 #else
@@ -180,10 +206,11 @@ constexpr float ina125SupplyVoltage(BoardSupply supply) {
                                          0.0f;
 }
 
+/*
 constexpr bool uses2V5Reference =
     boardConfig.ina125ExcitationRef == INA125Ref::Ref_2V5 ||
     boardConfig.ina125IARef == INA125Ref::Ref_2V5;
-
+*/
 struct INA125UParams {
     static constexpr float gainR = 470.0f;
     static constexpr float ampGain = 4.0f + 60000.0f / gainR;
@@ -194,9 +221,14 @@ struct INA125UParams {
 };
 
 static_assert(
-    boardConfig.ina125Supply == BoardSupply::V5V || !uses2V5Reference,
+    boardConfig.ina125Supply == BoardSupply::V5V ||
+    (
+        boardConfig.ina125ExcitationRef != INA125Ref::Ref_2V5 &&
+        boardConfig.ina125IARef != INA125Ref::Ref_2V5
+    ),
     "INA125U must be powered from +5V to use the +2.5V internal reference"
 );
+
 static_assert(INA125UParams::gainR > 0.0f, "Gain resistor must be positive");
 static_assert(INA125UParams::ampGain > 0.0f, "Gain value must be positive");
 

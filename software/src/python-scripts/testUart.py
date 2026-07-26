@@ -32,14 +32,15 @@ DEFAULT_KD = 1.0
 # These keys must match SerialConfig.h.
 LOAD_CELL_KEYS = {
     "LLC1": "Left load cell 1",
-    "LLC2": "Left load cell 2"
+    "RLC2": "Left load cell 2"
     #"RLC1": "Right load cell 1",
     #"RLC2": "Right load cell 2",
 }
 
 # Only the right encoder is currently displayed.
 ENCODER_KEYS = {
-    "LENC": "Right encoder",
+    "LENC": "Left encoder",
+    "RENC": "Right encoder",
 }
 
 MOTORS_KEY = "MOTORS"
@@ -148,7 +149,7 @@ class TelemetryHistory:
                 elif relative_count < -32768:
                     relative_count += 65536
 
-                encoder_value = relative_count * (360.0 / 65536.0)
+                encoder_value = relative_count # relative_count * (360.0 / 65536.0)
 
             self.encoders[key].append(
                 numeric_or_nan(encoder_value)

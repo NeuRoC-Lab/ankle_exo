@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.016,
-          "height": 1.7272,
-          "width": 1.7272
+          "drill": 0.0,
+          "height": 1.208,
+          "width": 1.208
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -69,52 +69,32 @@
           "Under the nano"
         ],
         [
-          "courtyards_overlap|137727500|111375000|5db49bad-6020-41ad-a8c4-bb60e0275c65|b89e7c9f-d7cf-4b54-b85b-7a4381a486e6",
-          "Under the nano"
-        ],
-        [
           "courtyards_overlap|137748770|95905460|5db49bad-6020-41ad-a8c4-bb60e0275c65|8c92a1ff-39a1-4cfc-a671-1920bcec34dd",
           "Under the nano"
         ],
         [
-          "courtyards_overlap|138605000|87225000|165fb0ec-26cd-4849-bcd1-0f6481bf97d4|5db49bad-6020-41ad-a8c4-bb60e0275c65",
-          "under the Nano"
+          "courtyards_overlap|140140957|103845000|5db49bad-6020-41ad-a8c4-bb60e0275c65|a3d82b42-42f3-4570-b7be-96aa0fcee2f6",
+          "under teensy"
         ],
         [
-          "courtyards_overlap|138883781|99672500|5db49bad-6020-41ad-a8c4-bb60e0275c65|eec604e7-3550-4b7d-86e4-06b831cef2b9",
-          "Under the nano"
+          "courtyards_overlap|141575000|97527500|05a0e407-c82f-4585-b0ac-a806170a13a1|5db49bad-6020-41ad-a8c4-bb60e0275c65",
+          "under teensy"
         ],
         [
-          "courtyards_overlap|138887500|119365000|5db49bad-6020-41ad-a8c4-bb60e0275c65|961f405c-0c06-43f4-bbce-a6dd76829a5b",
-          "Under the nano"
+          "courtyards_overlap|141992500|108505000|409b65c6-9757-43fe-9182-e54d9845ba29|5db49bad-6020-41ad-a8c4-bb60e0275c65",
+          "under teensy"
         ],
         [
-          "courtyards_overlap|140856755|119365000|3754ef72-4a03-4765-b58a-fcc7749eb74d|961f405c-0c06-43f4-bbce-a6dd76829a5b",
-          "Under the nano"
+          "courtyards_overlap|142210892|110715000|56e9ff07-d346-4c3e-893a-05109a016228|5db49bad-6020-41ad-a8c4-bb60e0275c65",
+          "under teensy"
         ],
         [
-          "courtyards_overlap|140885000|128337945|5db49bad-6020-41ad-a8c4-bb60e0275c65|be47168e-91e0-4348-a3fe-c6b9a79c6ff5",
-          "under the nano"
+          "courtyards_overlap|143735000|97632500|5db49bad-6020-41ad-a8c4-bb60e0275c65|b53c969f-92dc-4f52-915f-c8a7ccefdb3e",
+          "under teensy"
         ],
         [
-          "courtyards_overlap|141635000|100185000|5db49bad-6020-41ad-a8c4-bb60e0275c65|d1c6d4bc-a11c-477a-8500-fc77820a6f89",
-          "Under the nano"
-        ],
-        [
-          "courtyards_overlap|141725000|87195000|5db49bad-6020-41ad-a8c4-bb60e0275c65|9abc93ef-9151-416a-980d-b7d4366add14",
-          "Under the nano"
-        ],
-        [
-          "courtyards_overlap|142785000|127249424|3754ef72-4a03-4765-b58a-fcc7749eb74d|5db49bad-6020-41ad-a8c4-bb60e0275c65",
-          "Under the Nano"
-        ],
-        [
-          "courtyards_overlap|143530589|115095000|5db49bad-6020-41ad-a8c4-bb60e0275c65|eb0794c5-91e0-4b84-9b37-aa3e3632e506",
-          "Under the nano"
-        ],
-        [
-          "lib_footprint_mismatch|120005000|104424250|26b850e7-7f7a-4e53-b1da-b94dcbd44275|00000000-0000-0000-0000-000000000000",
-          "I modified the footprint on purpose to add the pinsockets"
+          "courtyards_overlap|144185000|93297500|5db49bad-6020-41ad-a8c4-bb60e0275c65|ccef70b3-cd7d-40a7-9878-1d77c5ee1391",
+          "under teensy"
         ],
         [
           "silk_edge_clearance|131714653|78489814|18f972f8-9ac9-4b49-9bea-5a89bb2e3aa0|e962a685-72c5-496e-830b-defbf508f33c",
@@ -122,10 +102,6 @@
         ],
         [
           "silk_edge_clearance|180189888|79314921|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
-          "its fine"
-        ],
-        [
-          "silk_edge_clearance|189574700|64008571|b483043c-bd55-49e3-ac1e-0b5c7e51eef8|a6eaeffe-316f-4226-bef0-5d2fc39d8f5d",
           "its fine"
         ]
       ],
@@ -632,6 +608,12 @@
       "Net-(J1-Pin_6)": [
         "Digital signals"
       ],
+      "Net-(U5-B1Y)": [
+        "Digital signals"
+      ],
+      "Net-(U5-B2Y)": [
+        "Digital signals"
+      ],
       "SCK1": [
         "Digital signals"
       ]
@@ -667,7 +649,7 @@
   },
   "schematic": {
     "annotate_start_num": 0,
-    "bom_export_filename": "${PROJECTNAME}.csv",
+    "bom_export_filename": "${PROJECTNAME}-NEW BOM.csv",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",
@@ -792,6 +774,12 @@
         },
         {
           "group_by": false,
+          "label": "SNAPEDA_PN",
+          "name": "SNAPEDA_PN",
+          "show": false
+        },
+        {
+          "group_by": false,
           "label": "STANDARD",
           "name": "STANDARD",
           "show": false
@@ -899,19 +887,19 @@
     ],
     [
       "ffb5542d-bbdd-4da7-9ada-f3fec1753454",
-      "Left LC Amplifier 2"
+      "Left LC Amplifier 2 (label 2)"
     ],
     [
       "944478cc-ad75-4fe3-a0cb-a0388ad7c18d",
-      "Left LC  Amplifier 1"
+      "Left LC  Amplifier 1 (label 1)"
     ],
     [
       "c0c136a9-715a-4523-84cb-168ac7440c43",
-      "Right LC  Amplifier 2"
+      "Right LC  Amplifier 2 (label 4)"
     ],
     [
       "4c7844ce-912f-4570-97a6-8e3b66425452",
-      "Right LC Amplifier 1"
+      "Right LC Amplifier 1 (label 3)"
     ]
   ],
   "text_variables": {}
