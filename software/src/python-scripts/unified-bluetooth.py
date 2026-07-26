@@ -44,7 +44,7 @@ ENCODER_UUID = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB"
 time_window = 10
 MAX_POINTS = 500
 
-ENCODER_COUNTS_PER_REVOLUTION = 65536
+encoder_max_count = 65536
 
 
 running = {"in_progress": True}
@@ -199,7 +199,6 @@ def encoder_callback(sender, data):
             data
         )
 
-
         (
             left,
             right
@@ -211,16 +210,11 @@ def encoder_callback(sender, data):
             if encoder_zero is None:
                 encoder_zero = right
 
-
-            telemetry.encoder = (
-                    right - encoder_zero
-            )
-
+            telemetry.encoder = right - encoder_zero
             telemetry.encoder_packets += 1
 
 
     except Exception as e:
-
         print("Encoder decode error:", e)
 
 
@@ -251,17 +245,11 @@ async def bluetooth_connection():
 
 
 def start_bluetooth():
-
     asyncio.run(bluetooth_connection())
-
 
 # Start BLE in background thread
 
-bluetooth_thread = threading.Thread(
-    target=start_bluetooth,
-    daemon=True
-)
-
+bluetooth_thread = threading.Thread(target=start_bluetooth, daemon=True)
 bluetooth_thread.start()
 
 # CSV setup
@@ -269,7 +257,7 @@ bluetooth_thread.start()
 filename = "SingleLegData_BLE.csv"
 path = os.path.abspath(filename)
 
-print("CSV will save at:",path)
+print("CSV will save at:" ,path)
 
 
 csv_file = open(path, "w", newline="")
@@ -296,7 +284,7 @@ plt.ion()
 print("Figure created")
 
 width = 12
-height = 8
+height = 6
 
 
 fig, axes = plt.subplots(
@@ -408,37 +396,21 @@ ax4.grid(True)
 ax5.grid(True)
 ax6.grid(True)
 
-
-axes_list = [
-    ax1,
-    ax2,
-    ax3,
-    ax4,
-    ax5,
-    ax6
-]
-
+axes_list = [ax1, ax2, ax3, ax4, ax5, ax6]
 
 fig.canvas.mpl_connect(
     "close_event",
-    lambda event: running.update(
-        {"in_progress":False}
-    )
+    lambda event: running.update({"in_progress":False})
 )
 
-
 plt.show(block=False)
+
 
 # Main plotting loop
 
 start_time = time.perf_counter()
 
-last_packets = (
-    -1,
-    -1,
-    -1
-)
-
+last_packets = (-1, -1, -1)
 
 try:
 
@@ -497,10 +469,10 @@ try:
             continue
 
         # Current time
-        current_time = (time.perf_counter() -start_time)
+        current_time = time.perf_counter() - start_time
 
         # Encoder conversion
-        ankle_angle = (snapshot["encoder"] * 360.0/ENCODER_COUNTS_PER_REVOLUTION)
+        ankle_angle = snapshot["encoder"] * 360.0/encoder_max_count
 
         # Save CSV
         writer.writerow([
@@ -528,41 +500,12 @@ try:
 
         # Update plots
 
-        line1.set_data(
-            time_data,
-            ankle_pos_data
-        )
-
-
-        line2.set_data(
-            time_data,
-            ankle_vel_data
-        )
-
-
-        line3.set_data(
-            time_data,
-            loadcell1_data
-        )
-
-
-        line4.set_data(
-            time_data,
-            loadcell2_data
-        )
-
-
-        line5.set_data(
-            time_data,
-            motor_pos_data
-        )
-
-
-        line6.set_data(
-            time_data,
-            motor_vel_data
-        )
-
+        line1.set_data(time_data, ankle_pos_data)
+        line2.set_data(time_data, ankle_vel_data)
+        line3.set_data(time_data, loadcell1_data)
+        line4.set_data(time_data, loadcell2_data)
+        line5.set_data(time_data, motor_pos_data)
+        line6.set_data(time_data, motor_vel_data)
 
         # Keep x-axis moving
 
