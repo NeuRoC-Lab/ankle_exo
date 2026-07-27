@@ -674,7 +674,7 @@ plt.ion()
 print("Figure created")
 
 width = 12
-height = 7
+height = 9
 
 
 fig, axes = plt.subplots(
@@ -1043,10 +1043,7 @@ try:
                 time_data.append(current_time)
 
                 ankle_pos_data.append(ankle_angle)
-
-                ankle_vel_data.append(
-                    0.0
-                )  # Encoder velocity placeholder
+                ankle_vel_data.append(0.0)  # Encoder velocity placeholder
 
                 loadcell1_data.append(loadcell1)
                 loadcell2_data.append(loadcell2)
@@ -1089,14 +1086,9 @@ try:
 
 
                 # Keep x-axis moving
-
                 for axis in axes_list:
-
                     axis.set_xlim(
-                        max(
-                            0,
-                            current_time - time_window
-                        ),
+                        max(0, current_time - time_window),
                         current_time
                     )
 
