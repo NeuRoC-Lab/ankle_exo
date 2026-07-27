@@ -1,5 +1,5 @@
 """
-BLE subscriber test for the Arduino Nano 33 BLE.
+New bluetooth plotting script test
 
 The script:
 1. Finds the AnkleExo peripheral.

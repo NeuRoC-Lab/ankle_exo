@@ -144,7 +144,7 @@ class TelemetryHistory:
                 relative_count = raw_encoder_value - self.encoder_zero[key]
 
                 # Handle encoder rollover
-                if relative_count > 32768:
+                if relative_count > 2047:
                     relative_count -= 65536
                 elif relative_count < -32768:
                     relative_count += 65536

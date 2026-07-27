@@ -13,7 +13,7 @@ Features:
 - No duplicate plotting when BLE data is unchanged
 
 Run:
-python software/src/python-scripts/unified-bluetooth.py
+python software/src/python-scripts/unified_bluetooth_new.py
 """
 
 
@@ -25,11 +25,15 @@ import os
 import struct
 import queue
 
+import matplotlib
+matplotlib.use("QtAgg")
+
 import matplotlib.pyplot as plt
 from matplotlib.widgets import TextBox, Button
 from collections import deque
 from dataclasses import dataclass, field
 from bleak import BleakClient, BleakScanner
+
 
 MOTOR_ID = 0x02
 
@@ -554,9 +558,9 @@ def parse_motor_command(text: str) -> MotorCommand:
 
 async def bluetooth_connection():
 
-    print("Searching for Bluetooth device...")
+    print("Searching for Bluetooth device... (15s timeout)")
 
-    device = await BleakScanner.find_device_by_name(DEVICE_NAME)
+    device = await BleakScanner.find_device_by_name(DEVICE_NAME, timeout=15.0)
 
     if device is None:
         print("Bluetooth device not found")
@@ -950,12 +954,22 @@ try:
 
             current_time = sample_time - start_time
 
-            ankle_angle = (
-                encoder
-               # encoder
-             #   * 360.0
-            #    / encoder_max_count
-            )
+            encoder_half_count = 4096 // 2
+            first_encoder_value = None
+
+            def count_to_deg_encoder(encoder):
+                global first_encoder_value
+
+                if first_encoder_value is None:
+                    first_encoder_value = encoder
+
+                ankle_angle = ((encoder - first_encoder_value) % 4096)
+
+                if ankle_angle >= encoder_half_count:
+                    ankle_angle -= 4096
+
+                ankle_angle = ankle_angle * 360.0 / 4096
+
 
 
             # Save every queued BLE update to CSV
