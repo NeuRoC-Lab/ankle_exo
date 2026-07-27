@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "Board.h"
+#include "ProtocolTypes.h"
 #include <SPI.h>
 
 /*
@@ -31,13 +32,6 @@
 #error "Encoder.h: No supported SPI platform selected"
 
 #endif
-
-
-struct EncoderPositions
-{
-    uint16_t left_position;
-    uint16_t right_position;
-};
 
 
 class Encoder

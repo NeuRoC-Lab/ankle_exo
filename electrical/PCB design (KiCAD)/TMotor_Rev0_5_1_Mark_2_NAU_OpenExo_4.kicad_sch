@@ -615,10 +615,6 @@
 		(uuid "ca1c37b7-be68-4bfa-88e8-e2144c0d6ee6")
 	)
 	(no_connect
-		(at 245.11 104.14)
-		(uuid "04b446ba-d39f-475a-828d-f4edee240c47")
-	)
-	(no_connect
 		(at 219.71 104.14)
 		(uuid "070d3583-7b2f-44e6-b985-25da49f8697b")
 	)
@@ -629,10 +625,6 @@
 	(no_connect
 		(at 125.73 140.97)
 		(uuid "364a756a-68f2-4c2a-b242-ab1aec098f47")
-	)
-	(no_connect
-		(at 125.73 143.51)
-		(uuid "36f97f16-8418-4c36-bcac-4f49b7ddbbca")
 	)
 	(no_connect
 		(at 100.33 140.97)
@@ -652,7 +644,7 @@
 	)
 	(no_connect
 		(at 245.11 99.06)
-		(uuid "bbfba19c-7953-4163-b077-fe6332d92f98")
+		(uuid "88045fa8-4b08-4828-b2f8-bae3d77daa62")
 	)
 	(no_connect
 		(at 219.71 99.06)
@@ -844,6 +836,16 @@
 	)
 	(wire
 		(pts
+			(xy 125.73 143.51) (xy 125.73 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95b8f705-2014-4865-810b-7cd1b9252584")
+	)
+	(wire
+		(pts
 			(xy 214.63 96.52) (xy 219.71 96.52)
 		)
 		(stroke
@@ -851,6 +853,16 @@
 			(type default)
 		)
 		(uuid "b04e197d-afeb-403b-908b-e62659a388b1")
+	)
+	(wire
+		(pts
+			(xy 245.11 104.14) (xy 245.11 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bcdda7fc-f4e9-41af-802c-ed206d528bcf")
 	)
 	(wire
 		(pts
@@ -1204,6 +1216,138 @@
 			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608"
 					(reference "#PWR088")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 125.73 146.05 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "474271d7-c9cd-4c8e-ad8e-546d6c7c9f86")
+		(property "Reference" "#PWR062"
+			(at 125.73 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "SHIELD"
+			(at 125.73 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 125.73 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 125.73 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 125.73 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f2e57e42-39bb-4818-94a2-5d06294f01ac")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608"
+					(reference "#PWR062")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 245.11 106.68 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "47479907-7af2-49cc-bc4f-01563d69fb2b")
+		(property "Reference" "#PWR052"
+			(at 245.11 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "SHIELD"
+			(at 245.11 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 245.11 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 245.11 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 245.11 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5cbd3703-0813-4899-aa28-0cf53c6134f9")
+		)
+		(instances
+			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
+				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd/76f1db6b-86f9-4936-9afd-1ff77552b608"
+					(reference "#PWR052")
 					(unit 1)
 				)
 			)

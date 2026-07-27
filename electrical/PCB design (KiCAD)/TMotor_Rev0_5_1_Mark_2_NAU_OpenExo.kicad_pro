@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.0,
-          "height": 1.208,
-          "width": 1.208
+          "drill": 0.84,
+          "height": 1.348,
+          "width": 1.348
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -65,8 +65,16 @@
       ],
       "drc_exclusions": [
         [
-          "courtyards_overlap|136720733|87237543|5db49bad-6020-41ad-a8c4-bb60e0275c65|7e6b3f86-2de4-4df0-908f-ec5603c5550e",
-          "Under the nano"
+          "courtyards_overlap|135990733|86777543|5db49bad-6020-41ad-a8c4-bb60e0275c65|7e6b3f86-2de4-4df0-908f-ec5603c5550e",
+          ""
+        ],
+        [
+          "courtyards_overlap|137555000|89062500|5db49bad-6020-41ad-a8c4-bb60e0275c65|b5dcaffc-908e-40dd-ab16-56b91565ea65",
+          ""
+        ],
+        [
+          "courtyards_overlap|137634761|89062500|7e6b3f86-2de4-4df0-908f-ec5603c5550e|b5dcaffc-908e-40dd-ab16-56b91565ea65",
+          ""
         ],
         [
           "courtyards_overlap|137748770|95905460|5db49bad-6020-41ad-a8c4-bb60e0275c65|8c92a1ff-39a1-4cfc-a671-1920bcec34dd",
@@ -89,20 +97,20 @@
           "under teensy"
         ],
         [
+          "courtyards_overlap|142487500|94555000|5db49bad-6020-41ad-a8c4-bb60e0275c65|ccef70b3-cd7d-40a7-9878-1d77c5ee1391",
+          "under nano"
+        ],
+        [
           "courtyards_overlap|143735000|97632500|5db49bad-6020-41ad-a8c4-bb60e0275c65|b53c969f-92dc-4f52-915f-c8a7ccefdb3e",
           "under teensy"
         ],
         [
-          "courtyards_overlap|144185000|93297500|5db49bad-6020-41ad-a8c4-bb60e0275c65|ccef70b3-cd7d-40a7-9878-1d77c5ee1391",
-          "under teensy"
+          "silk_edge_clearance|180958218|79502505|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
+          ""
         ],
         [
-          "silk_edge_clearance|131714653|78489814|18f972f8-9ac9-4b49-9bea-5a89bb2e3aa0|e962a685-72c5-496e-830b-defbf508f33c",
-          "its fine"
-        ],
-        [
-          "silk_edge_clearance|180189888|79314921|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
-          "its fine"
+          "silk_edge_clearance|180962154|81884691|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|5527de78-63a3-448d-948c-bfc995c073dc",
+          ""
         ]
       ],
       "meta": {

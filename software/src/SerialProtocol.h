@@ -1,64 +1,192 @@
-//
-// Created by Oscar Tesniere on 20/07/2026.
-// for handling communication between the Teensy and the Nano over UART
-// Requirements :
-// Serialize and deserialize data to/from teensy and nano
-// ease ofn implementation with both 1) direct serial communication b/w laptop and teensy (for debugging purposes) and 2) bluetooth interfacing with the Nano
-// Ideally have a datapayload struct which is common to both the pre-serialization (when teensy sends data to nano for ex) and post-deserialization(ex after the nano has deserialized the data). This makes it more modular
-//
+#pragma once
+
 #include <Arduino.h>
+#include <PacketSerial.h>
 
-struct LoadCellVoltages {
-    float LeftLoadCell1 {};
-    float LeftLoadCell2 {};
-    float RightLoadCell1 {};
-    float RightLoadCell2 {};
-};
+#include "ProtocolTypes.h"
 
-struct DataPayload {
-    // load cells
-    // encoders
-    LoadCellVoltages loadCells {};
-    EncoderPositions encoders {};
-    MotorReply motorRep {}; // to account for the two motors
-};
-
-inline size_t sendPayload(const DataPayload& payload,HardwareSerial& serial){
-// serial can be any of Serial1, Serial8 etc
-// first we need to reinterpret the poiunter to the struct as a pointer to an array of uint8_t
-// we are using the signature Serial.write(buf, len)
-return serial.write(reinterpret_cast<const uint8_t*>(&payload),
-                    sizeof(payload)
-                    );
-}
-
-inline bool readPayload(
-    DataPayload& response,
-    HardwareSerial& serial
-) {
-
-    constexpr size_t payloadSize = sizeof(DataPayload); // size resolved at compile time = safer
-
-    if (serial.available() < payloadSize) {
-        return false;
-    }
-
-    size_t bytesRead = serial.readBytes(
-        reinterpret_cast<char*>(&response),
-        payloadSize
+class UARTHandler
+{
+public:
+    using CommandHandler = void (*)(
+        void* context,
+        const CommandPayload& command
     );
 
-    return bytesRead == payloadSize;
-}
+#if defined(PLATFORM_TEENSY41)
 
-// Bluetooth components for the Arduino Nano
+    UARTHandler(
+        HardwareSerial& serial,
+        CommandHandler commandHandler,
+        void* commandContext
+    )
+        : m_serial(serial),
+          m_commandHandler(commandHandler),
+          m_commandContext(commandContext)
+    {
+        s_instance = this;
+    }
+
+#elif defined(PLATFORM_NORDIC)
+
+    explicit UARTHandler(
+        HardwareSerial& serial,
+        DataPayload& payload
+    )
+    : m_serial(serial),
+      m_payload(payload)
+    {
+        s_instance = this;
+    }
+
+#else
+#error "Unsupported platform"
+#endif
+
+    void begin()
+    {
+        m_packetSerial.setStream(&m_serial);
+        m_packetSerial.setPacketHandler(packetReceivedCallback);
+    }
+
+    void update()
+    {
+        m_packetSerial.update();
+    }
+
+#if defined(PLATFORM_TEENSY41)
+
+    void sendTelemetryPacket(const DataPayload& payload)
+    {
+        m_packetSerial.send(
+            reinterpret_cast<const uint8_t*>(&payload),
+            sizeof(payload)
+        );
+    }
+
+#elif defined(PLATFORM_NORDIC)
+
+    void sendCommandPacket(const CommandPayload& command)
+    {
+        m_packetSerial.send(
+            reinterpret_cast<const uint8_t*>(&command),
+            sizeof(command)
+        );
+    }
+
+#endif
+
+private:
+    inline static UARTHandler* s_instance = nullptr;
+
+    static void packetReceivedCallback(
+        const uint8_t* buffer,
+        size_t size
+    )
+    {
+        if (s_instance != nullptr) {
+            s_instance->handlePacketReceived(buffer, size);
+        }
+    }
+
+    void handlePacketReceived(
+        const uint8_t* buffer,
+        size_t size
+    )
+    {
+#if defined(PLATFORM_TEENSY41)
+
+        if (size != sizeof(CommandPayload)) {
+            return;
+        }
+
+        CommandPayload command {};
+
+        memcpy(
+            &command,
+            buffer,
+            sizeof(command)
+        );
+
+        if (m_commandHandler != nullptr) {
+            m_commandHandler(
+                m_commandContext,
+                command
+            );
+        }
+
+#elif defined(PLATFORM_NORDIC)
+
+        if (size != sizeof(DataPayload)) {
+            return;
+        }
+
+        memcpy(
+            &m_payload,
+            buffer,
+            sizeof(m_payload)
+        );
+
+#endif
+    }
+
+    HardwareSerial& m_serial;
+    PacketSerial m_packetSerial;
+
+#if defined(PLATFORM_NORDIC)
+    DataPayload& m_payload;
+#endif
+
+#if defined(PLATFORM_TEENSY41)
+    CommandHandler m_commandHandler = nullptr;
+    void* m_commandContext = nullptr;
+#endif
+};
+
+
 #if defined(PLATFORM_NORDIC)
 #include <ArduinoBLE.h>
+
+// This is a Arduino Nano-specific method for forwarding byte-for-byte commands sent from the BLE Central.
+void forwardCommand(BLEDevice central,BLECharacteristic characteristic) {
+        (void)central;
+
+        uint8_t buffer[sizeof(CommandPayload)];
+
+        const int bytesRead = characteristic.readValue(
+            buffer,
+            sizeof(buffer)
+        );
+
+        if (bytesRead != sizeof(buffer)) {
+            return;
+        }
+
+        Serial1.write(buffer, sizeof(buffer));
+    }
+
+
 // on mac generate 128bit UUIDs with uuidgen command
 constexpr char dataServiceUUID[] = "CF45813E-4358-4903-B961-09996BB081FB";
 constexpr char LLCCharacteristicUUID[] = "CA87289F-102B-4078-AD8C-8F53063547A6";
 constexpr char motorCharacteristicUUID[] = "E0D883F6-705C-4A11-B117-E2B0909CC68E";
 constexpr char encoderCharacteristicUUID[] = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB";
+
+constexpr char commandCharacteristicUUID[] = "83F363AA-762A-4344-A332-65862E42571";
+
+void blePeripheralConnectHandler(BLEDevice central) {
+    // central connected event handler
+    digitalWrite(LED_BUILTIN,HIGH);
+    Serial.print("Connected event, central: ");
+    Serial.println(central.address());
+}
+
+void blePeripheralDisconnectHandler(BLEDevice central) {
+    // central disconnected event handler
+    digitalWrite(LED_BUILTIN,LOW);
+    Serial.print("Disconnected event, central: ");
+    Serial.println(central.address());
+}
 
 class BLEHandler {
 public:
@@ -80,12 +208,21 @@ public:
               encoderCharacteristicUUID,
               BLERead | BLENotify,
               sizeof(EncoderPositions)
-          )
+          ),
+          m_commandCharacteristic(
+                commandCharacteristicUUID,
+                BLEWrite | BLEIndicate,
+                sizeof(CommandPayload)
+            )
     {
     }
 
     bool begin()
     {
+        BLE.setEventHandler(BLEConnected,blePeripheralConnectHandler);
+        BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
+        m_commandCharacteristic.setEventHandler(BLEWritten, forwardCommand);
+
         pinMode(LED_BUILTIN, OUTPUT);
 
         if (!BLE.begin()) {
@@ -119,12 +256,9 @@ public:
 
         BLEDevice central = BLE.central();
 
-        if (!central) {
-            digitalWrite(LED_BUILTIN, LOW);
-            return;
+        if(!central){
+        return; // don't bother updating data if no central is connected to save computation time and energy
         }
-
-        digitalWrite(LED_BUILTIN, HIGH);
 
         m_motorCharacteristic.writeValue(
             reinterpret_cast<const uint8_t*>(
@@ -160,6 +294,7 @@ private:
     BLECharacteristic m_loadCellCharacteristic;
     BLECharacteristic m_motorCharacteristic;
     BLECharacteristic m_encoderCharacteristic;
+    BLECharacteristic m_commandCharacteristic;
 };
 
 #endif

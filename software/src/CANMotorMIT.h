@@ -1,7 +1,9 @@
+#pragma once
 #include <Arduino.h>
 #include "SerialConfig.h"
+#include "ProtocolTypes.h"
+#include "SerialProtocol.h"
 
-#pragma once
 
 float p_target = 10.0f;
 float v_target = 0.0f;
@@ -55,27 +57,10 @@ static constexpr uint8_t neutralMITCommand[8] = {
     0x00, 0x00, 0x07, 0xFF
 };
 
-typedef struct
-{
-    float position;
-    float velocity;
-    float torque;
-    float kp;
-    float kd;
-} MotorCmd;
 //TODO determine if MotorCmd should be motor-agnostic or not i.e should it include the target motor's CAN ID?
 
 
 
-typedef struct
-{
-    uint8_t can_id;
-    float position;
-    float velocity;
-    float torque;
-    uint8_t temperature;
-    uint8_t error;
-} MotorReply;
 
 #if !defined(PLATFORM_TEENSY41) && !(defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR))
 #else
@@ -220,6 +205,30 @@ void writeReplyToJson(JsonObject object) const
     object[TelemetryKey::MotorTrq] = m_reply.torque;
     object[TelemetryKey::MotorTemp] = m_reply.temperature;
     object[TelemetryKey::MotorErr] = m_reply.error;
+}
+
+bool handleSerialCommand(const CommandPayload& command){
+    // handles a command
+    if (command.motorId != m_canId)
+        {
+        return false;
+        } // discard messages that do not match the motor's CAN ID
+
+    if(command.type == MotorCommandType::Stop){
+        return sendMessage(exitMotorMode);
+    }
+    else if (command.type == MotorCommandType::Start){
+        return sendMessage(enterMotorMode);
+     }
+    else if(command.type == MotorCommandType::Zero){
+        return sendMessage(setZeroPosition);
+    }
+    else if(command.type == MotorCommandType::Set){
+        m_cmd = command.cmd; // update m_cmd
+        update(); // call update to make sure the command is immediately packed and sent
+        return true;
+    }
+    return false;
 }
 
 // to prevent one from calling these functions directly from the SuperClass

@@ -13,18 +13,6 @@
 #include "Encoder.h"
 #include "SerialProtocol.h"
 
-constexpr uint16_t PACKET_MAGIC = 0xA55A;
-
-struct PacketHeader {
-    uint16_t magic;
-    uint16_t payloadSize;
-    uint32_t sequence;
-};
-
-struct TelemetryPacket {
-    PacketHeader header;
-    DataPayload payload;
-};
 
 
 #if defined(PLATFORM_RENESAS_RA)
@@ -38,6 +26,8 @@ struct TelemetryPacket {
 #include "LoadCell.h"
 #include <ArduinoJson.h>
 
+
+
 #elif defined(PLATFORM_NORDIC)
 
 // Nano-only includes
@@ -45,6 +35,7 @@ struct TelemetryPacket {
 #include <ArduinoJson.h>
 
 #endif
+
 
 #if defined(PLATFORM_RENESAS_RA)
 
@@ -76,26 +67,6 @@ void loop()
 
 #elif defined(PLATFORM_TEENSY41)
 
-inline size_t sendTelemetryPacket(
-    const DataPayload& payload,
-    HardwareSerial& serial
-) {
-    static uint32_t sequence = 0;
-
-    TelemetryPacket packet {
-        .header = {
-            .magic = PACKET_MAGIC,
-            .payloadSize = sizeof(DataPayload),
-            .sequence = sequence++,
-        },
-        .payload = payload,
-    };
-
-    return serial.write(
-        reinterpret_cast<const uint8_t*>(&packet),
-        sizeof(packet)
-    );
-}
 
 using CANController = CANMotorMIT_Teensy;
 using LoadCellController = LoadCell_Teensy41;
@@ -148,9 +119,31 @@ JsonDocument createTelemetryPacket() {
     return doc;
 }
 
-constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
+
 
 Encoder encoders(true, false);
+
+constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
+unsigned long now = millis();
+unsigned long previousSend = millis();
+
+void handleMotorCommand(
+    void* context,
+    const CommandPayload& command
+)
+{
+    auto* motor = static_cast<CANMotorMIT*>(context);
+
+    if (motor != nullptr) {
+        motor->handleSerialCommand(command);
+    }
+}
+
+UARTHandler uart(
+    Serial8,
+    handleMotorCommand,
+    &motor
+);
 
 void setup()
 {
@@ -160,6 +153,8 @@ void setup()
     digitalWrite(boardConfig.OE1,HIGH);
     digitalWrite(boardConfig.OE2,HIGH);
     delay(2000);
+    uart.begin();
+    Serial.println("Initializing UART communication with Nano");
     encoders.begin();
 
     Serial.begin(115200);
@@ -186,31 +181,7 @@ void setup()
 
 void loop()
 {
-// switching to newline-delimited JSON (NDJSON) as it is easier to retrieve data later on python
-    // THIS IS TEMPORARY
-
-    #if defined(EXTERNAL_ENCODER)
-    if (Serial8.available() >= sizeof(positions))
-    {
-        Serial8.readBytes(
-            reinterpret_cast<char*>(&positions),
-            sizeof(positions)
-        );
-// update the position object
-        /*
-        Serial.print("LENC:");
-        Serial.print(positions.left_position);
-        Serial.print("\t");
-
-        Serial.print("RENC:");
-        Serial.println(positions.right_position);
-        Serial.print("\t");
-        */
-
-        // reinterpret the position from the serialized struct
-    }
-    #endif
-    positions = encoders.getPositions();
+    uart.update();
     motor.update();
     serialControl.update();
     delay(10);
@@ -223,11 +194,11 @@ void loop()
     JsonDocument doc = createTelemetryPacket();
     serializeJson(doc, Serial);
     Serial.write('\n');
-
     #else
-    // NORMAL UPDATING TO THE NANO
     if (now - previousSend >= TELEMETRY_PERIOD_US) {
         previousSend = now;
+
+        EncoderPositions positions = encoders.getPositions();
 
         LoadCellVoltages loadCells {
             LC_L_1.rawVoltage(),
@@ -242,7 +213,7 @@ void loop()
             motor.m_reply,
         };
 
-       sendTelemetryPacket(payload, Serial8);
+        uart.sendTelemetryPacket(payload);
 
     }
     #endif
@@ -250,102 +221,7 @@ void loop()
 }
 #elif defined(PLATFORM_NORDIC)
 
-bool readTelemetryPacket(
-    DataPayload& destination,
-    HardwareSerial& serial
-) {
-    constexpr uint8_t magicLow =
-        static_cast<uint8_t>(PACKET_MAGIC & 0xFF);
-
-    constexpr uint8_t magicHigh =
-        static_cast<uint8_t>((PACKET_MAGIC >> 8) & 0xFF);
-
-    static bool foundLowByte = false;
-
-    while (serial.available() > 0) {
-        const uint8_t byteRead =
-            static_cast<uint8_t>(serial.read());
-
-        if (!foundLowByte) {
-            if (byteRead == magicLow) {
-                foundLowByte = true;
-            }
-
-            continue;
-        }
-
-        if (byteRead != magicHigh) {
-            foundLowByte = byteRead == magicLow;
-            continue;
-        }
-
-        foundLowByte = false;
-
-        PacketHeader header {};
-        header.magic = PACKET_MAGIC;
-
-        constexpr size_t remainingHeaderSize =
-            sizeof(PacketHeader) - sizeof(header.magic);
-
-        const size_t headerBytesRead = serial.readBytes(
-            reinterpret_cast<char*>(&header)
-                + sizeof(header.magic),
-            remainingHeaderSize
-        );
-
-        if (headerBytesRead != remainingHeaderSize) {
-            return false;
-        }
-
-        if (header.payloadSize != sizeof(DataPayload)) {
-            //Serial.print("Wrong payload size: ");
-            //Serial.println(header.payloadSize);
-            continue;
-        }
-
-        const size_t payloadBytesRead = serial.readBytes(
-            reinterpret_cast<char*>(&destination),
-            sizeof(destination)
-        );
-
-        if (payloadBytesRead != sizeof(destination)) {
-            Serial.println("Incomplete payload");
-            return false;
-        }
-
-        static uint32_t previousSequence = 0;
-        static bool receivedFirstPacket = false;
-
-        if (receivedFirstPacket) {
-            const uint32_t expected =
-                previousSequence + 1;
-
-            if (header.sequence != expected) {
-                //Serial.print("Dropped packets. Expected ");
-                //Serial.print(expected);
-                //Serial.print(", received ");
-                //Serial.println(header.sequence);
-            }
-        }
-
-        previousSequence = header.sequence;
-        receivedFirstPacket = true;
-
-        return true;
-    }
-
-    return false;
-}
 unsigned long lastStatus = 0;
-
-float randomFloat(float minValue, float maxValue)
-{
-    long randomInteger = random(0, 1000000);
-
-    float normalized = static_cast<float>(randomInteger) / 999999.0f;
-
-    return minValue + normalized * (maxValue - minValue);
-}
 
 
 JsonDocument createTelemetryPacket(const DataPayload& payload) {
@@ -421,11 +297,13 @@ void printPayload(const DataPayload& payload)
 // code for the Arduino Nano
 DataPayload payload;
 BLEHandler ble(payload);
+UARTHandler uart(Serial1,payload);
 
 void setup(){
     //randomSeed(analogRead(A0));
     delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
     Serial.begin(115200);
+    uart.begin();
     Serial1.begin(115200);
     delay(1000);
 
@@ -450,35 +328,17 @@ void loop(){
     }
     */
     // Read one complete payload from the Teensy.
-    bool receivedPacket = readTelemetryPacket(payload, Serial1);
+    uart.update();
 
     #if defined(USING_BLE)
         ble.update();
     #endif
 
-    #if defined(DEBUG)
-    if (millis() - lastStatus >= 1000) {
-        lastStatus = millis();
-
-        Serial.print("UART bytes waiting: ");
-        Serial.println(Serial1.available());
-        //printPayload(payload);
-    }
-    #endif
-
     #if defined(USING_SERIAL)
-    if (!receivedPacket) {
-        return;
-    }
-    else
-    {
     JsonDocument doc = createTelemetryPacket(payload);
     serializeJson(doc, Serial);
     Serial.write('\n');
-    }
     #endif
-
-
 }
 
 #endif
