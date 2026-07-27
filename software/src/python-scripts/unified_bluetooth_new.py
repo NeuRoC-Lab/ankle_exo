@@ -76,6 +76,7 @@ class MotorCommand:
             self.kp,
             self.kd,
         )
+
 # Bluetooth configuration
 
 DEVICE_NAME = "AnkleExo"
@@ -96,7 +97,10 @@ MAX_POINTS = 500
 # 0.1 s = approximately 10 plot updates per second.
 PLOT_INTERVAL = 0.1
 
-encoder_max_count = 4095 # 12 bits resolution
+encoder_max_count = 4096 # 12 bits resolution
+encoder_half_count = encoder_max_count // 2
+
+first_encoder_value = None
 
 
 running = {"in_progress": True}
@@ -130,8 +134,6 @@ class Telemetry:
 
 telemetry = Telemetry()
 
-encoder_zero = None
-
 
 # Queue containing every BLE update.
 # CSV logging drains this queue independently of plot refresh rate.
@@ -164,6 +166,32 @@ loadcell2_data = deque(maxlen=MAX_POINTS)
 
 motor_pos_data = deque(maxlen=MAX_POINTS)
 motor_vel_data = deque(maxlen=MAX_POINTS)
+
+
+# Encoder conversion
+
+def count_to_deg_encoder(encoder):
+
+    global first_encoder_value
+
+    if first_encoder_value is None:
+        first_encoder_value = encoder
+
+    ankle_angle = (
+        (encoder - first_encoder_value)
+        % encoder_max_count
+    )
+
+    if ankle_angle >= encoder_half_count:
+        ankle_angle -= encoder_max_count
+
+    ankle_angle = (
+        ankle_angle
+        * 360.0
+        / encoder_max_count
+    )
+
+    return ankle_angle
 
 
 # Queue latest telemetry snapshot
@@ -296,9 +324,6 @@ def encoder_callback(sender, data):
     uint16_t right
     """
 
-    global encoder_zero
-
-
     try:
 
         values = struct.unpack(
@@ -314,10 +339,6 @@ def encoder_callback(sender, data):
 
         with telemetry.lock:
 
-            if encoder_zero is None:
-                encoder_zero = left
-
-            #telemetry.encoder = left - encoder_zero
             telemetry.encoder = left
             telemetry.encoder_packets += 1
 
@@ -462,6 +483,7 @@ async def send_pending_commands(client: BleakClient) -> None:
         except Exception as exc:
             print("Could not send BLE command:", exc)
 
+
 def parse_motor_command(text: str) -> MotorCommand:
     """
     Accepted commands:
@@ -554,6 +576,8 @@ def parse_motor_command(text: str) -> MotorCommand:
         kp=float(values["kp"]),
         kd=float(values["kd"]),
     )
+
+
 # Bluetooth connection
 
 async def bluetooth_connection():
@@ -845,6 +869,7 @@ def send_command_from_box(_event=None):
     except ValueError as exc:
         print("Invalid motor command:", exc)
 
+
 def start_motor(_event=None):
     queue_motor_command(
         MotorCommand(
@@ -861,6 +886,7 @@ def stop_motor(_event=None):
             motor_id=MOTOR_ID,
         )
     )
+
 
 # Press Enter in the text box OR click Send.
 command_box.on_submit(send_command_from_box)
@@ -954,22 +980,9 @@ try:
 
             current_time = sample_time - start_time
 
-            encoder_half_count = 4096 // 2
-            first_encoder_value = None
-
-            def count_to_deg_encoder(encoder):
-                global first_encoder_value
-
-                if first_encoder_value is None:
-                    first_encoder_value = encoder
-
-                ankle_angle = ((encoder - first_encoder_value) % 4096)
-
-                if ankle_angle >= encoder_half_count:
-                    ankle_angle -= 4096
-
-                ankle_angle = ankle_angle * 360.0 / 4096
-
+            ankle_angle = count_to_deg_encoder(
+                encoder
+            )
 
 
             # Save every queued BLE update to CSV
