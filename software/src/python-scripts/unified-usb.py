@@ -24,13 +24,14 @@ import threading
 import os
 import csv
 import json
+from collections import deque
 
 # Teensy Connection
 port = "COM6"  # Change port as necessary
 baud = 115200
 time_window = 10  # Plot x-axis window in seconds
 
-ser = serial.Serial(port, baud, timeout=1)
+ser = serial.Serial(port, baud, timeout=0.01)
 time.sleep(2)
 
 # Clear old data
@@ -136,15 +137,19 @@ filename = "SingleLegData.csv"
 path = os.path.abspath(filename)
 
 # Prepare plots data
-time_data = []
-ankle_pos_data = []
-ankle_vel_data = []
-loadcell1_data = []
-loadcell2_data = []
-motor_pos_data = []
-motor_vel_data = []
+time_data = deque()
+ankle_pos_data = deque()
+ankle_vel_data = deque()
+loadcell1_data = deque()
+loadcell2_data = deque()
+motor_pos_data = deque()
+motor_vel_data = deque()
 
 start_time = time.perf_counter()
+
+# Plot refresh rate
+plot_interval = 0.05
+last_plot_time = 0
 
 # Create plot
 plt.ion()
@@ -225,6 +230,15 @@ ser.flush()
 print("MIT mode motor test starts now")
 print("Local commands: pause, resume, exit")
 
+# Start motor control terminal thread
+motor_thread = threading.Thread(
+    target=control_motor,
+    daemon=True
+)
+
+motor_thread.start()
+
+
 with open(path, "w", newline="") as csv_file:
 
     writer = csv.writer(csv_file)
@@ -251,12 +265,12 @@ with open(path, "w", newline="") as csv_file:
                 and plt.fignum_exists(fig.number) == True
         ):
 
-            # Empty old serial backlog and keep newest packet
-            while ser.in_waiting:
-                raw = ser.readline().decode(errors="ignore").strip()
+            # Read serial packet
+            raw = ser.readline().decode(errors="ignore").strip()
 
             # Skip empty lines
             if raw == "":
+                fig.canvas.flush_events()
                 continue
 
             try:
@@ -274,7 +288,7 @@ with open(path, "w", newline="") as csv_file:
                 l1_voltage = float(data["LLC1"]) # OR RLC1
                 l2_voltage = float(data["LLC2"]) # OR RLC2
 
-                motor = data["MOTORS"][0] #if nested list, use motor = data["MOTORS][0]
+                motor = data["MOTORS"][0] #if nested list, use motor = data["MOTORS"][0]
                 motor_pos = float(motor["MTR_POS_RAD"])
                 motor_vel = float(motor["MTR_VEL_RADS"])
                 #motor_kp = float(data[])
@@ -321,13 +335,23 @@ with open(path, "w", newline="") as csv_file:
 
             # Keep plot centered within time window
             while time_data and (current_time - time_data[0]) > time_window:
-                time_data.pop(0)
-                ankle_pos_data.pop(0)
-                ankle_vel_data.pop(0)
-                loadcell1_data.pop(0)
-                loadcell2_data.pop(0)
-                motor_pos_data.pop(0)
-                motor_vel_data.pop(0)
+                time_data.popleft()
+                ankle_pos_data.popleft()
+                ankle_vel_data.popleft()
+                loadcell1_data.popleft()
+                loadcell2_data.popleft()
+                motor_pos_data.popleft()
+                motor_vel_data.popleft()
+
+
+            # Only update plot at specified refresh rate
+            now = time.perf_counter()
+
+            if now - last_plot_time < plot_interval:
+                continue
+
+            last_plot_time = now
+
 
             # Update plots
             line1.set_data(time_data, ankle_pos_data)
@@ -361,7 +385,7 @@ with open(path, "w", newline="") as csv_file:
             ax6.relim()
             ax6.autoscale_view(scalex=False, scaley=True)
 
-            fig.canvas.draw()
+            fig.canvas.draw_idle()
             fig.canvas.flush_events()
 
     except KeyboardInterrupt:
