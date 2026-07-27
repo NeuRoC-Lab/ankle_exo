@@ -492,7 +492,7 @@ bluetooth_thread.start()
 
 # CSV setup
 
-filename = "SingleLegData_BLE.csv"
+filename = "../../SingleLegData_BLE.csv"
 path = os.path.abspath(filename)
 
 print("CSV will save at:", path)
