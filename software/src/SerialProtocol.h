@@ -148,22 +148,6 @@ private:
 #include <ArduinoBLE.h>
 
 // This is a Arduino Nano-specific method for forwarding byte-for-byte commands sent from the BLE Central.
-void forwardCommand(BLEDevice central,BLECharacteristic characteristic) {
-        (void)central;
-
-        uint8_t buffer[sizeof(CommandPayload)];
-
-        const int bytesRead = characteristic.readValue(
-            buffer,
-            sizeof(buffer)
-        );
-
-        if (bytesRead != sizeof(buffer)) {
-            return;
-        }
-
-        Serial1.write(buffer, sizeof(buffer));
-    }
 
 
 // on mac generate 128bit UUIDs with uuidgen command
@@ -172,7 +156,7 @@ constexpr char LLCCharacteristicUUID[] = "CA87289F-102B-4078-AD8C-8F53063547A6";
 constexpr char motorCharacteristicUUID[] = "E0D883F6-705C-4A11-B117-E2B0909CC68E";
 constexpr char encoderCharacteristicUUID[] = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB";
 
-constexpr char commandCharacteristicUUID[] = "83F363AA-762A-4344-A332-65862E42571";
+constexpr char commandCharacteristicUUID[] = "C94B7403-6BFB-4A06-BA12-6394765C328E";
 
 void blePeripheralConnectHandler(BLEDevice central) {
     // central connected event handler
@@ -188,11 +172,15 @@ void blePeripheralDisconnectHandler(BLEDevice central) {
     Serial.println(central.address());
 }
 
-class BLEHandler {
+class BLEHandler
+{
 public:
-    DataPayload& m_payload;
-    explicit BLEHandler(DataPayload& payload)
+    BLEHandler(
+        DataPayload& payload,
+        UARTHandler& uart
+    )
         : m_payload(payload),
+          m_uart(uart),
           m_dataService(dataServiceUUID),
           m_loadCellCharacteristic(
               LLCCharacteristicUUID,
@@ -210,24 +198,36 @@ public:
               sizeof(EncoderPositions)
           ),
           m_commandCharacteristic(
-                commandCharacteristicUUID,
-                BLEWrite | BLEIndicate,
-                sizeof(CommandPayload)
-            )
+              commandCharacteristicUUID,
+              BLEWrite | BLEWriteWithoutResponse,
+              sizeof(CommandPayload)
+          )
     {
+        s_instance = this;
     }
 
     bool begin()
     {
-        BLE.setEventHandler(BLEConnected,blePeripheralConnectHandler);
-        BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
-        m_commandCharacteristic.setEventHandler(BLEWritten, forwardCommand);
-
         pinMode(LED_BUILTIN, OUTPUT);
 
         if (!BLE.begin()) {
             return false;
         }
+
+        BLE.setEventHandler(
+            BLEConnected,
+            blePeripheralConnectHandler
+        );
+
+        BLE.setEventHandler(
+            BLEDisconnected,
+            blePeripheralDisconnectHandler
+        );
+
+        m_commandCharacteristic.setEventHandler(
+            BLEWritten,
+            commandWrittenCallback
+        );
 
         BLE.setLocalName("AnkleExo");
         BLE.setAdvertisedService(m_dataService);
@@ -244,6 +244,10 @@ public:
             m_encoderCharacteristic
         );
 
+        m_dataService.addCharacteristic(
+            m_commandCharacteristic
+        );
+
         BLE.addService(m_dataService);
         BLE.advertise();
 
@@ -256,8 +260,8 @@ public:
 
         BLEDevice central = BLE.central();
 
-        if(!central){
-        return; // don't bother updating data if no central is connected to save computation time and energy
+        if (!central) {
+            return;
         }
 
         m_motorCharacteristic.writeValue(
@@ -282,12 +286,54 @@ public:
         );
     }
 
-    DataPayload& payload()
+private:
+    inline static BLEHandler* s_instance = nullptr;
+
+    static void commandWrittenCallback(
+        BLEDevice central,
+        BLECharacteristic characteristic
+    )
     {
-        return m_payload;
+        if (s_instance != nullptr) {
+            s_instance->forwardCommand(
+                central,
+                characteristic
+            );
+        }
     }
 
-private:
+    void forwardCommand(
+        BLEDevice central,
+        BLECharacteristic characteristic
+    )
+    {
+        (void)central;
+
+        CommandPayload command {};
+
+        const int bytesRead = characteristic.readValue(
+            reinterpret_cast<uint8_t*>(&command),
+            sizeof(command)
+        );
+
+        if (
+            bytesRead
+            != static_cast<int>(sizeof(command))
+        ) {
+            Serial.print("Wrong command size: ");
+            Serial.print(bytesRead);
+            Serial.print(", expected: ");
+            Serial.println(sizeof(command));
+            return;
+        }
+
+        m_uart.sendCommandPacket(command);
+
+        Serial.println("Command forwarded to Teensy");
+    }
+
+    DataPayload& m_payload;
+    UARTHandler& m_uart;
 
     BLEService m_dataService;
 

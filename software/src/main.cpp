@@ -295,9 +295,17 @@ void printPayload(const DataPayload& payload)
 }
 
 // code for the Arduino Nano
-DataPayload payload;
-BLEHandler ble(payload);
-UARTHandler uart(Serial1,payload);
+DataPayload payload {};
+
+UARTHandler uart(
+    Serial1,
+    payload
+);
+
+BLEHandler ble(
+    payload,
+    uart
+);
 
 void setup(){
     //randomSeed(analogRead(A0));

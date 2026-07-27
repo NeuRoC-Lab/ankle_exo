@@ -31,7 +31,47 @@ from collections import deque
 from dataclasses import dataclass, field
 from bleak import BleakClient, BleakScanner
 
+MOTOR_ID = 0x02
 
+from enum import IntEnum
+
+
+class MotorCommandType(IntEnum):
+    START = 0
+    STOP = 1
+    ZERO = 2
+    SET = 3
+
+COMMAND_PACKET_FORMAT = "<BB2x5f"
+COMMAND_PACKET_SIZE = struct.calcsize(COMMAND_PACKET_FORMAT)
+
+print("Command packet size:", COMMAND_PACKET_SIZE)
+
+@dataclass
+class MotorCommand:
+    command_type: MotorCommandType
+    motor_id: int = 0
+
+    position: float = 0.0
+    velocity: float = 0.0
+    torque: float = 0.0
+    kp: float = 0.0
+    kd: float = 0.0
+
+    def to_bytes(self) -> bytes:
+        if not 0 <= self.motor_id <= 255:
+            raise ValueError("motor_id must be between 0 and 255")
+
+        return struct.pack(
+            COMMAND_PACKET_FORMAT,
+            int(self.command_type),
+            self.motor_id,
+            self.position,
+            self.velocity,
+            self.torque,
+            self.kp,
+            self.kd,
+        )
 # Bluetooth configuration
 
 DEVICE_NAME = "AnkleExo"
@@ -40,6 +80,7 @@ SERVICE_UUID = "CF45813E-4358-4903-B961-09996BB081FB"
 LOAD_CELL_UUID = "CA87289F-102B-4078-AD8C-8F53063547A6"
 MOTOR_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E"
 ENCODER_UUID = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB"
+COMMAND_UUID = "C94B7403-6BFB-4A06-BA12-6394765C328E"
 
 
 # Plot configuration
@@ -51,7 +92,7 @@ MAX_POINTS = 500
 # 0.1 s = approximately 10 plot updates per second.
 PLOT_INTERVAL = 0.1
 
-encoder_max_count = 65536
+encoder_max_count = 4095 # 12 bits resolution
 
 
 running = {"in_progress": True}
@@ -230,7 +271,7 @@ def loadcell_callback(sender, data):
         with telemetry.lock:
 
             telemetry.loadcell1 = left1
-            telemetry.loadcell2 = left2
+            telemetry.loadcell2 = right2
 
             telemetry.loadcell_packets += 1
 
@@ -270,9 +311,10 @@ def encoder_callback(sender, data):
         with telemetry.lock:
 
             if encoder_zero is None:
-                encoder_zero = right
+                encoder_zero = left
 
-            telemetry.encoder = right - encoder_zero
+            #telemetry.encoder = left - encoder_zero
+            telemetry.encoder = left
             telemetry.encoder_packets += 1
 
             queue_telemetry_snapshot()
@@ -285,22 +327,7 @@ def encoder_callback(sender, data):
 
 # Bluetooth motor command sending
 
-def queue_motor_command(command):
-
-    """
-    Queue a motor command entered from the plot window.
-
-    Examples:
-        set id 1 pos 0 vel 1 kp 0 kd 0.15 trq 0
-        start
-        stop
-    """
-
-    command = command.strip()
-
-    if command == "":
-        return
-
+def queue_motor_command(command: MotorCommand) -> None:
     command_queue.put(command)
 
 
@@ -377,10 +404,9 @@ def find_command_characteristic(client):
     return None
 
 
-async def send_pending_commands(client):
-
+async def send_pending_commands(client: BleakClient) -> None:
     """
-    Send all commands waiting in command_queue.
+    Send all queued binary CommandPayload packets.
     """
 
     command_uuid = command_characteristic_uuid["uuid"]
@@ -388,44 +414,142 @@ async def send_pending_commands(client):
     if command_uuid is None:
         return
 
-    while True:
+    characteristic = client.services.get_characteristic(command_uuid)
 
+    if characteristic is None:
+        print("BLE command characteristic not found")
+        return
+
+    properties = {
+        prop.lower()
+        for prop in characteristic.properties
+    }
+
+    use_response = "write" in properties
+
+    while True:
         try:
             command = command_queue.get_nowait()
-
         except queue.Empty:
             break
 
-        message = (command + "\n").encode("utf-8")
-
         try:
-            characteristic = client.services.get_characteristic(
-                command_uuid
-            )
+            packet = command.to_bytes()
 
-            if characteristic is None:
-                print("BLE command characteristic not found")
-                continue
-
-            properties = {
-                prop.lower()
-                for prop in characteristic.properties
-            }
-
-            use_response = "write" in properties
+            if len(packet) != COMMAND_PACKET_SIZE:
+                raise RuntimeError(
+                    f"Incorrect command size: {len(packet)}, "
+                    f"expected {COMMAND_PACKET_SIZE}"
+                )
 
             await client.write_gatt_char(
                 characteristic,
-                message,
-                response=use_response
+                packet,
+                response=use_response,
             )
 
-            print("BLE command sent:", command)
+            print(
+                "BLE command sent:",
+                command.command_type.name,
+                f"id={command.motor_id}",
+                f"size={len(packet)}",
+            )
 
-        except Exception as e:
-            print("Could not send BLE command:", e)
+        except Exception as exc:
+            print("Could not send BLE command:", exc)
 
+def parse_motor_command(text: str) -> MotorCommand:
+    """
+    Accepted commands:
 
+        start
+        start 2
+
+        stop
+        stop 2
+
+        zero
+        zero 2
+
+        set id 2 pos 0 vel 1 torque 0 kp 0 kd 0.15
+
+    Short aliases:
+        trq -> torque
+    """
+
+    tokens = text.strip().lower().split()
+
+    if not tokens:
+        raise ValueError("Command is empty")
+
+    command_name = tokens[0]
+
+    if command_name in {"start", "stop", "zero"}:
+        motor_id = int(tokens[1], 0) if len(tokens) >= 2 else 0x02
+
+        command_types = {
+            "start": MotorCommandType.START,
+            "stop": MotorCommandType.STOP,
+            "zero": MotorCommandType.ZERO,
+        }
+
+        return MotorCommand(
+            command_type=command_types[command_name],
+            motor_id=motor_id,
+        )
+
+    if command_name != "set":
+        raise ValueError(
+            "Expected start, stop, zero, or set"
+        )
+
+    values = {
+        "id": 0x02,
+        "pos": 0.0,
+        "vel": 0.0,
+        "torque": 0.0,
+        "kp": 0.0,
+        "kd": 0.0,
+    }
+
+    aliases = {
+        "trq": "torque",
+        "position": "pos",
+        "velocity": "vel",
+    }
+
+    index = 1
+
+    while index < len(tokens):
+        if index + 1 >= len(tokens):
+            raise ValueError(
+                f"Missing value after '{tokens[index]}'"
+            )
+
+        key = aliases.get(tokens[index], tokens[index])
+        value_text = tokens[index + 1]
+
+        if key not in values:
+            raise ValueError(
+                f"Unknown field '{tokens[index]}'"
+            )
+
+        if key == "id":
+            values[key] = int(value_text, 0)
+        else:
+            values[key] = float(value_text)
+
+        index += 2
+
+    return MotorCommand(
+        command_type=MotorCommandType.SET,
+        motor_id=int(values["id"]),
+        position=float(values["pos"]),
+        velocity=float(values["vel"]),
+        torque=float(values["torque"]),
+        kp=float(values["kp"]),
+        kd=float(values["kd"]),
+    )
 # Bluetooth connection
 
 async def bluetooth_connection():
@@ -704,29 +828,35 @@ stop_button = Button(
 
 
 def send_command_from_box(_event=None):
+    text = command_box.text.strip()
 
-    command = command_box.text.strip()
-
-    if command == "":
+    if not text:
         return
 
-    queue_motor_command(command)
+    try:
+        command = parse_motor_command(text)
+        queue_motor_command(command)
+        command_box.set_val("")
 
-    # Clear the text box after the command is queued.
-    command_box.set_val("")
-
+    except ValueError as exc:
+        print("Invalid motor command:", exc)
 
 def start_motor(_event=None):
-
-    queue_motor_command("start")
+    queue_motor_command(
+        MotorCommand(
+            command_type=MotorCommandType.START,
+            motor_id=MOTOR_ID,
+        )
+    )
 
 
 def stop_motor(_event=None):
-
-    # STOP remains immediately available even if the command box
-    # contains something else.
-    queue_motor_command("stop")
-
+    queue_motor_command(
+        MotorCommand(
+            command_type=MotorCommandType.STOP,
+            motor_id=MOTOR_ID,
+        )
+    )
 
 # Press Enter in the text box OR click Send.
 command_box.on_submit(send_command_from_box)
@@ -739,7 +869,12 @@ stop_button.on_clicked(stop_motor)
 def close_plot(_event):
 
     # Ask the Nano to stop the motor before shutting down.
-    queue_motor_command("stop")
+    queue_motor_command(
+        MotorCommand(
+            command_type=MotorCommandType.STOP,
+            motor_id=MOTOR_ID,
+        )
+    )
 
     # Give the BLE loop one short opportunity to transmit it.
     # The final shutdown still must not depend on this succeeding.
@@ -817,8 +952,9 @@ try:
 
             ankle_angle = (
                 encoder
-                * 360.0
-                / encoder_max_count
+               # encoder
+             #   * 360.0
+            #    / encoder_max_count
             )
 
 
