@@ -9,4 +9,5 @@
   (lib (name "Teensy 4.1 (DEV-16771)")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/DEV-16771.kicad_sym")(options "")(descr ""))
   (lib (name "173010535")(type "KiCad")(uri "/Users/oscartesniere/Downloads/WPME-FDSM_SIP-3/WPME-FDSM_SIP-3.kicad_sym")(options "")(descr ""))
   (lib (name "BAS70-04")(type "KiCad")(uri "/Users/oscartesniere/Downloads/BAS70-04/BAS70-04.kicad_sym")(options "")(descr ""))
+  (lib (name "INA232AIDDFR")(type "KiCad")(uri "/Users/oscartesniere/Downloads/ul_INA232AIDDFR/KiCADv6/2026-07-28_15-27-04.kicad_sym")(options "")(descr ""))
 )

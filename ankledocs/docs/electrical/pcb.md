@@ -227,3 +227,33 @@ https://jlcpcb.com/help/article/how-to-generate-the-bom-and-centroid-file-from-k
 
 * MINOR WIRING FIX (schematics/pcb) : The BAT54S clamping diode array was replaced with a more accurate one (BAS70-04). The cathode and anode were swapped in the old version, which has been fixed when adding the replacement diode array.
 * The Teensy 4.1's footprint and symbol was modified and I principally removed unused THT pins like VUSB,T+/T-,D+/D- and otherswhich would have overlapped with some components under the Teensy
+
+<iframe
+src="https://oscartesniere.com/3dviewer/viewer/embed.html#model=https://oscartesniere.com/3dviewer/models/AnkleExov1_1_0.glb"
+title="AnkleExo PCB v1.1.0"
+width="100%"
+height="700"
+style="
+display: block;
+width: 100%;
+border: 1px solid #cccccc;
+border-radius: 8px;
+"
+loading="lazy"
+allowfullscreen>
+</iframe>
+
+<iframe
+src="https://oscartesniere.com/3dviewer/viewer/embed.html#model=https://oscartesniere.com/3dviewer/models/AnkleExov1_1_1.glb"
+title="AnkleExo PCB v1.1.1"
+width="100%"
+height="700"
+style="
+display: block;
+width: 100%;
+border: 1px solid #cccccc;
+border-radius: 8px;
+"
+loading="lazy"
+allowfullscreen>
+</iframe>

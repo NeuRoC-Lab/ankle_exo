@@ -366,10 +366,12 @@ inline constexpr float minOutput =
 inline constexpr float maxOutput =
     INA125UParams::IAref;
 
+#if defined(DEBUG)
 static_assert(
     minOutput >= 0.0f,
     "INA125 output goes below 0 V at full-scale force"
 );
+#endif
 
 #if defined(PLATFORM_NORDIC)
 

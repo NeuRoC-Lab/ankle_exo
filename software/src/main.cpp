@@ -43,9 +43,9 @@ Encoder encoders(true, false);
 
 void setup()
 {
-    Serial.begin(115200);
+    Serial.begin(230400);
     encoders.begin();
-    Serial1.begin(57600);
+    Serial1.begin(230400);
 }
 void loop()
 {
@@ -123,7 +123,7 @@ JsonDocument createTelemetryPacket() {
 
 Encoder encoders(true, false);
 
-constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
+constexpr uint32_t TELEMETRY_PERIOD_US = 5000; // 20 ms = 50 Hz ; 5ms = 200Hz
 unsigned long now = millis();
 unsigned long previousSend = millis();
 
@@ -157,10 +157,10 @@ void setup()
     Serial.println("Initializing UART communication with Nano");
     encoders.begin();
 
-    Serial.begin(115200);
+    Serial.begin(230400);
     Serial.println("Initializing Serial communication with the Arduino UNO R4");
 
-    Serial8.begin(115200); // using Serial 8 here, not serial 1
+    Serial8.begin(230400); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
     motor.begin();
     if(!motor.resetMotor()){
@@ -177,6 +177,12 @@ void setup()
     LC_L_2.initialize();
     LC_R_2.initialize();
     LC_R_1.initialize();
+    delay(100);
+    LC_L_1.calibrateOffset();
+    LC_L_2.calibrateOffset();
+    LC_R_1.calibrateOffset();
+    LC_R_2.calibrateOffset();
+    Serial.println("Calibrated Load Cell offset");
 }
 
 void loop()
@@ -201,10 +207,10 @@ void loop()
         EncoderPositions positions = encoders.getPositions();
 
         LoadCellVoltages loadCells {
-            LC_L_1.rawVoltage(),
-            LC_L_2.rawVoltage(),
-            LC_R_1.rawVoltage(),
-            LC_R_2.rawVoltage(),
+            LC_L_1.voltageToN(),
+            LC_L_2.voltageToN(),
+            LC_R_1.voltageToN(),
+            LC_R_2.voltageToN(),
         };
 
         DataPayload payload {
@@ -310,9 +316,9 @@ BLEHandler ble(
 void setup(){
     //randomSeed(analogRead(A0));
     delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
-    Serial.begin(115200);
+    Serial.begin(230400);
     uart.begin();
-    Serial1.begin(115200);
+    Serial1.begin(230400);
     delay(1000);
 
     while (Serial1.available() > 0) {

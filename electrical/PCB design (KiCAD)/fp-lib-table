@@ -11,4 +11,5 @@
   (lib (name "173010535")(type "KiCad")(uri "/Users/oscartesniere/Downloads/WPME-FDSM_SIP-3/footprints.pretty")(options "")(descr ""))
   (lib (name "BAS70-04")(type "KiCad")(uri "/Users/oscartesniere/Downloads/BAS70-04/footprint.pretty")(options "")(descr ""))
   (lib (name "XT30 new version")(type "KiCad")(uri "/Users/oscartesniere/Downloads/XT30PW-F(2)")(options "")(descr ""))
+  (lib (name "INA232AIDDFR")(type "KiCad")(uri "/Users/oscartesniere/Downloads/ul_INA232AIDDFR/KiCADv6/footprints.pretty")(options "")(descr ""))
 )
