@@ -49,6 +49,7 @@ enum class BoardSupply {
     V5V   // JP: 2-1
 };
 
+
 struct BoardConfig {
     // LOAD CELL DEFINITIONS :
 
@@ -188,6 +189,7 @@ inline constexpr BoardConfig boardConfig {
     A7, // LC_R_2_Exc
     A6  // LC_R_2_Vo
 };
+
 
 #else
 #error "No platform selected for BoardConfig"

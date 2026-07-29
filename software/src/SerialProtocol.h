@@ -2,8 +2,9 @@
 
 #include <Arduino.h>
 #include <PacketSerial.h>
-
+#include <ArduinoJson.h>
 #include "ProtocolTypes.h"
+#include "SerialConfig.h"
 
 class UARTHandler
 {
@@ -28,6 +29,8 @@ public:
     }
 
 #elif defined(PLATFORM_NORDIC)
+
+
 
     explicit UARTHandler(
         HardwareSerial& serial,
@@ -146,6 +149,76 @@ private:
 
 #if defined(PLATFORM_NORDIC)
 #include <ArduinoBLE.h>
+
+JsonDocument createTelemetryPacket(const DataPayload& payload) {
+    JsonDocument doc;
+
+    doc[TelemetryKey::LeftLoadCell1] = payload.loadCells.LeftLoadCell1;
+    doc[TelemetryKey::LeftLoadCell2] = payload.loadCells.LeftLoadCell2;
+    doc[TelemetryKey::RightLoadCell1] = payload.loadCells.RightLoadCell1;
+    doc[TelemetryKey::RightLoadCell2] = payload.loadCells.RightLoadCell2;
+
+    doc[TelemetryKey::LeftEncoder] = payload.encoders.left_position;
+    doc[TelemetryKey::RightEncoder] = payload.encoders.right_position;
+
+    JsonArray motors =
+        doc[TelemetryKey::Motors].to<JsonArray>();
+
+    JsonObject motor1Object = motors.add<JsonObject>();
+    motor1Object[TelemetryKey::MotorId] = payload.motorRep.can_id;
+    motor1Object[TelemetryKey::MotorPos] = payload.motorRep.position;
+    motor1Object[TelemetryKey::MotorVel] = payload.motorRep.velocity;
+    motor1Object[TelemetryKey::MotorTrq] = payload.motorRep.torque;
+    motor1Object[TelemetryKey::MotorTemp] = payload.motorRep.temperature;
+    motor1Object[TelemetryKey::MotorErr] = payload.motorRep.error;
+
+    return doc;
+}
+void printPayload(const DataPayload& payload)
+{
+    Serial.println("----- DataPayload -----");
+
+    Serial.println("Load cells:");
+    Serial.print("  Left 1:  ");
+    Serial.println(payload.loadCells.LeftLoadCell1, 6);
+
+    Serial.print("  Left 2:  ");
+    Serial.println(payload.loadCells.LeftLoadCell2, 6);
+
+    Serial.print("  Right 1: ");
+    Serial.println(payload.loadCells.RightLoadCell1, 6);
+
+    Serial.print("  Right 2: ");
+    Serial.println(payload.loadCells.RightLoadCell2, 6);
+
+    Serial.println("Encoders:");
+    Serial.print("  Left position:  ");
+    Serial.println(payload.encoders.left_position);
+
+    Serial.print("  Right position: ");
+    Serial.println(payload.encoders.right_position);
+
+    Serial.println("Motor:");
+    Serial.print("  CAN ID:      ");
+    Serial.println(payload.motorRep.can_id);
+
+    Serial.print("  Position:    ");
+    Serial.println(payload.motorRep.position, 6);
+
+    Serial.print("  Velocity:    ");
+    Serial.println(payload.motorRep.velocity, 6);
+
+    Serial.print("  Torque:      ");
+    Serial.println(payload.motorRep.torque, 6);
+
+    Serial.print("  Temperature: ");
+    Serial.println(payload.motorRep.temperature);
+
+    Serial.print("  Error:       ");
+    Serial.println(payload.motorRep.error);
+
+    Serial.println("-----------------------");
+}
 
 // This is a Arduino Nano-specific method for forwarding byte-for-byte commands sent from the BLE Central.
 

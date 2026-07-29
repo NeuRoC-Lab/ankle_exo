@@ -8,21 +8,21 @@
 
 namespace TelemetryKey {
 
-    inline constexpr char LeftLoadCell1[]  = "LLC1";
-    inline constexpr char LeftLoadCell2[]  = "LLC2";
-    inline constexpr char RightLoadCell1[] = "RLC1";
-    inline constexpr char RightLoadCell2[] = "RLC2";
+     constexpr char LeftLoadCell1[]  = "LLC1";
+     constexpr char LeftLoadCell2[]  = "LLC2";
+     constexpr char RightLoadCell1[] = "RLC1";
+     constexpr char RightLoadCell2[] = "RLC2";
 
-    inline constexpr char Motors[]    = "MOTORS";
-    inline constexpr char MotorId[]   = "MTR_ID_DEC";
-    inline constexpr char MotorPos[]  = "MTR_POS_RAD";
-    inline constexpr char MotorVel[]  = "MTR_VEL_RADS";
-    inline constexpr char MotorTrq[]  = "MTR_TRQ_NM";
-    inline constexpr char MotorErr[]  = "MTR_ERR_DEC";
-    inline constexpr char MotorTemp[] = "MTR_TEMP_DEG";
+     constexpr char Motors[]    = "MOTORS";
+     constexpr char MotorId[]   = "MTR_ID_DEC";
+     constexpr char MotorPos[]  = "MTR_POS_RAD";
+     constexpr char MotorVel[]  = "MTR_VEL_RADS";
+     constexpr char MotorTrq[]  = "MTR_TRQ_NM";
+     constexpr char MotorErr[]  = "MTR_ERR_DEC";
+     constexpr char MotorTemp[] = "MTR_TEMP_DEG";
 
-    inline constexpr char LeftEncoder[]  = "LENC";
-    inline constexpr char RightEncoder[] = "RENC";
+     constexpr char LeftEncoder[]  = "LENC";
+     constexpr char RightEncoder[] = "RENC";
 
 }
 

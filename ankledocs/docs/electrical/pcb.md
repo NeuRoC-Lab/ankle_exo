@@ -165,6 +165,270 @@ V_{exc}
 }
 \]
 
+## Effect of the INA125 input-offset voltage
+
+In practice, the INA125 output does not necessarily equal \(V_{\text{IAREF}}\) when the load-cell bridge is perfectly balanced.
+
+One cause is the INA125 input-referred offset voltage, denoted \(V_{\text{OS}}\). The datasheet specifies an input-offset voltage of up to approximately \(250\,\mu\text{V}\). This is a systematic offset, not noise.
+
+The INA125 therefore behaves approximately as though \(V_{\text{OS}}\) were added to the true load-cell differential voltage:
+
+\[
+V_{\text{diff}}
+=
+V_{\text{diff,true}} + V_{\text{OS}}.
+\]
+
+The amplifier output becomes:
+
+\[
+V_o(F_{\text{applied}})
+=
+V_{\text{IAREF}}
+-
+G
+\left(
+V_{\text{diff,true}} + V_{\text{OS}}
+\right).
+\]
+
+If the offset is ignored, the raw force calculated from the output voltage is:
+
+\[
+F_{\text{raw}}
+=
+\frac{
+\left(
+V_{\text{IAREF}} - V_o
+\right)
+F_{FS}
+}{
+G\,S\,V_{\text{exc}}
+}.
+\]
+
+Substituting the amplifier equation gives:
+
+\[
+F_{\text{raw}}
+=
+\frac{
+\left(
+V_{\text{diff,true}} + V_{\text{OS}}
+\right)
+F_{FS}
+}{
+S\,V_{\text{exc}}
+}.
+\]
+
+Since
+
+\[
+V_{\text{diff,true}}
+=
+S\,V_{\text{exc}}
+\frac{
+F_{\text{mechanical}}
+}{
+F_{FS}
+},
+\]
+
+we obtain:
+
+\[
+F_{\text{raw}}
+=
+F_{\text{mechanical}}
++
+\frac{
+V_{\text{OS}}F_{FS}
+}{
+S\,V_{\text{exc}}
+}.
+\]
+
+The input-offset voltage therefore produces an equivalent force offset:
+
+\[
+\boxed{
+F_{\text{OS}}
+=
+\frac{
+V_{\text{OS}}F_{FS}
+}{
+S\,V_{\text{exc}}
+}
+}
+\]
+
+Notice that this equivalent force offset does not explicitly depend on the amplifier gain. The gain increases both the useful signal and the output-referred offset by the same factor.
+
+## Effect of residual cable tension
+
+When the ankle exoskeleton is assembled, the Bowden cable may already apply a nonzero preload to the load cell. This residual force is denoted:
+
+\[
+F_{\text{residual}}.
+\]
+
+The total mechanical force measured by the load cell is then:
+
+\[
+F_{\text{mechanical}}
+=
+F_{\text{applied}}
++
+F_{\text{residual}},
+\]
+
+where \(F_{\text{applied}}\) is the additional force of interest.
+
+Including both the INA125 offset and the residual cable tension gives:
+
+\[
+F_{\text{raw}}
+=
+F_{\text{applied}}
++
+F_{\text{residual}}
++
+F_{\text{OS}}.
+\]
+
+Therefore,
+
+\[
+\boxed{
+F_{\text{applied}}
+=
+F_{\text{raw}}
+-
+F_{\text{residual}}
+-
+F_{\text{OS}}
+}
+\]
+
+or, written directly in terms of the measured output voltage:
+
+\[
+\boxed{
+F_{\text{applied}}
+=
+\frac{
+\left(
+V_{\text{IAREF}} - V_o
+\right)
+F_{FS}
+}{
+G\,S\,V_{\text{exc}}
+}
+-
+F_{\text{residual}}
+-
+\frac{
+V_{\text{OS}}F_{FS}
+}{
+S\,V_{\text{exc}}
+}
+}
+\]
+
+## Practical zeroing procedure
+
+In practice, \(F_{\text{residual}}\) and \(V_{\text{OS}}\) do not need to be determined separately. Both effects can be removed by recording the amplifier output after the exoskeleton has been assembled and placed in its reference unloaded state.
+
+Let \(V_{o,0}\) be the output voltage measured in this reference state. It includes both the INA125 offset and the residual Bowden-cable tension:
+
+\[
+V_{o,0}
+=
+V_{\text{IAREF}}
+-
+G
+\left[
+S\,V_{\text{exc}}
+\frac{
+F_{\text{residual}}
+}{
+F_{FS}
+}
++
+V_{\text{OS}}
+\right].
+\]
+
+When an additional force \(F_{\text{applied}}\) is present:
+
+\[
+V_o
+=
+V_{\text{IAREF}}
+-
+G
+\left[
+S\,V_{\text{exc}}
+\frac{
+F_{\text{residual}} + F_{\text{applied}}
+}{
+F_{FS}
+}
++
+V_{\text{OS}}
+\right].
+\]
+
+Subtracting the two equations eliminates \(V_{\text{IAREF}}\), \(V_{\text{OS}}\), and the residual mechanical preload:
+
+\[
+V_{o,0} - V_o
+=
+G\,S\,V_{\text{exc}}
+\frac{
+F_{\text{applied}}
+}{
+F_{FS}
+}.
+\]
+
+The corrected applied force is therefore:
+
+\[
+\boxed{
+F_{\text{applied}}
+=
+\frac{
+\left(
+V_{o,0} - V_o
+\right)
+F_{FS}
+}{
+G\,S\,V_{\text{exc}}
+}
+}
+\]
+
+This equation assumes that the INA125 output decreases as the applied tensile force increases. If the output increases with force because the load-cell polarity is reversed, use:
+
+\[
+\boxed{
+F_{\text{applied}}
+=
+\frac{
+\left(
+V_o - V_{o,0}
+\right)
+F_{FS}
+}{
+G\,S\,V_{\text{exc}}
+}
+}
+\]
+
+
+
 ## Pinout of the PCB 
 
 

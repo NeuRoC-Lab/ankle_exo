@@ -1,0 +1,16 @@
+[env:one_leg_uno_r4]
+; The Arduino uno R4 -related script for main.cpp
+platform = renesas-ra
+board = uno_r4_wifi
+framework = arduino
+build_src_filter =
+    -<*>
+    +<main.cpp>
+build_flags =
+    -D MIT_MODE
+    -D PLATFORM_RENESAS_RA
+
+lib_deps =
+    bblanchon/ArduinoJson@^7.4.3
+
+targets=upload , monitor

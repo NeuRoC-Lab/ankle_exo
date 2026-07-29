@@ -1,8 +1,8 @@
 #pragma once
 #include <Arduino.h>
-#include "SerialConfig.h"
 #include "ProtocolTypes.h"
 #include "SerialProtocol.h"
+#include <ArduinoJson.h>
 
 
 float p_target = 10.0f;

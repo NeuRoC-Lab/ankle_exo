@@ -48,10 +48,10 @@ void setup()
 }
 
 void loop(){
+// "Blink" like example to test the shifter
 delay(1000);
 digitalWrite(COPI1,HIGH);
 delay(1000);
-Serial.print("Shoft");
 digitalWrite(COPI1,LOW);
 }
 #else
