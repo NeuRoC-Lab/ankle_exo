@@ -65,6 +65,14 @@
       ],
       "drc_exclusions": [
         [
+          "courtyards_overlap|119177500|84535000|1d924175-a3da-4d4e-94bd-b427961044b9|cc512022-7237-436b-9f6f-544ec256e2f6",
+          "under teensy"
+        ],
+        [
+          "courtyards_overlap|119327500|82555000|1d924175-a3da-4d4e-94bd-b427961044b9|9a48d8d9-c04d-4941-942f-ea31d82396cb",
+          "under teensy"
+        ],
+        [
           "courtyards_overlap|135990733|86777543|5db49bad-6020-41ad-a8c4-bb60e0275c65|7e6b3f86-2de4-4df0-908f-ec5603c5550e",
           ""
         ],
@@ -105,12 +113,40 @@
           "under teensy"
         ],
         [
+          "courtyards_overlap|162673339|74017500|a019e31f-e1eb-4c6d-8a1d-d7bdeec61156|e85f878b-2604-4e4c-9412-0b278208e8d6",
+          "Its ok dw"
+        ],
+        [
+          "courtyards_overlap|165800291|74097500|029ca9eb-d184-452e-ac3e-95c43fa18c58|e603f8b2-2986-44a6-9382-6f4b60debe68",
+          "its ok dw"
+        ],
+        [
+          "lib_footprint_mismatch|120457500|104800000|1d924175-a3da-4d4e-94bd-b427961044b9|00000000-0000-0000-0000-000000000000",
+          "modified"
+        ],
+        [
+          "lib_footprint_mismatch|160040000|67847500|0ae051b2-deb3-40ba-9c27-6c75169ce3e3|00000000-0000-0000-0000-000000000000",
+          "Shield"
+        ],
+        [
           "silk_edge_clearance|180958218|79502505|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
           ""
         ],
         [
           "silk_edge_clearance|180962154|81884691|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|5527de78-63a3-448d-948c-bfc995c073dc",
           ""
+        ],
+        [
+          "via_dangling|167680000|133420000|a0702b0a-af51-46c7-81a1-4aa0d1354c75|00000000-0000-0000-0000-000000000000",
+          "in case we opt for a GNDed CAN bus"
+        ],
+        [
+          "via_dangling|169780000|136480000|867911ef-489a-4897-a8c7-0bf8a03b7ed4|00000000-0000-0000-0000-000000000000",
+          "in case we opt for a GNDed CAN bus"
+        ],
+        [
+          "via_dangling|173227500|74602500|c0d08f4f-4877-46ad-9c14-ac71eedd5410|00000000-0000-0000-0000-000000000000",
+          "in case we opt for a GNDed CAN bus"
         ]
       ],
       "meta": {
@@ -649,7 +685,7 @@
       "plot": "EXPORT FOR V1.1(new)/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo.step",
+      "step": "AnkleExov1_1_1_CAD.step",
       "svg": "",
       "vrml": ""
     },
@@ -890,6 +926,10 @@
       "CAN and peripherals."
     ],
     [
+      "dd47953d-c1da-48d8-9df8-932bad56a9a1",
+      "FSR1"
+    ],
+    [
       "76f1db6b-86f9-4936-9afd-1ff77552b608",
       "Load cells"
     ],
@@ -908,6 +948,10 @@
     [
       "4c7844ce-912f-4570-97a6-8e3b66425452",
       "Right LC Amplifier 1 (label 3)"
+    ],
+    [
+      "b90b1361-dc3c-497e-9a40-bd75516131d5",
+      "FSR2"
     ]
   ],
   "text_variables": {}

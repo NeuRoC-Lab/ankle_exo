@@ -7,220 +7,231 @@
     #include "NanoBLE33LoadCellADC.h"
 #endif
 
+inline constexpr float voltage_scale = 3.3f;
+
 struct LoadCellParams
 {
     static constexpr float sensitivity = 0.001f; // 1 mV/V full-scale
     static constexpr float ratedN = 1000.0f;
 };
 
+enum class LoadCellId : uint8_t
+{
+    Left1,
+    Left2,
+    Right1,
+    Right2
+};
+
+
+struct NanoLoadCellPins
+{
+    int voPin;
+    int excPin;
+};
+
+// The use of a pointer-based array for ordering the load cells into the array gives us some extra flexibility : the order given into LoadCellHandler will be propagated to functions using it without ensuring that it follows a specific sequence.
+
 class LoadCell
 {
 public:
-    LoadCellParams m_lc_params;
-    INA125UParams m_ina_params;
-
-    int m_VoPin;
-    float m_offset = 0.0f;
-
-    explicit LoadCell(int VoPin)
-        : m_VoPin(VoPin)
+    LoadCell(
+        const INA125UParams& inaParams,
+        const LoadCellParams& loadCellParams
+    )
+        : m_loadCellParams(loadCellParams),
+          m_inaParams(inaParams)
     {
     }
 
     virtual ~LoadCell() = default;
 
-    virtual void initialize() = 0;
-    virtual float getVo() = 0;
-    virtual void calibrateOffset() = 0;
+    virtual void begin() = 0;
 
-    /*
-     * Default implementation for platforms that measure the absolute
-     * INA125 output voltage relative to GND.
-     */
-    virtual float voltageToN()
+    virtual float getDiffVoltage() = 0;
+
+    float sampleForce()
     {
-        const float correctedVo = getVo() - m_offset;
+        const float correctedVoltage =
+            getDiffVoltage() - m_zeroOffsetVoltage;
 
-        return
-            (m_ina_params.IAref - correctedVo)
-            * m_lc_params.ratedN
-            / (
-                m_ina_params.ampGain
-                * m_lc_params.sensitivity
-                * m_ina_params.Vexc
-            );
+        const float fullScaleDifferentialVoltage =
+            m_inaParams.ampGain
+            * m_loadCellParams.sensitivity
+            * m_inaParams.Vexc;
+
+        if (fullScaleDifferentialVoltage == 0.0f)
+        {
+            return 0.0f;
+        }
+
+        return correctedVoltage
+             * m_loadCellParams.ratedN
+             / fullScaleDifferentialVoltage;
     }
 
-    float rawVoltage()
+    void calibrateOffset(
+        uint16_t sampleCount = 100,
+        uint16_t delayMs = 2
+    )
     {
-        return getVo();
+        if (sampleCount == 0)
+        {
+            return;
+        }
+
+        float sum = 0.0f;
+
+        for (uint16_t i = 0; i < sampleCount; ++i)
+        {
+            sum += getDiffVoltage();
+
+            if (delayMs > 0)
+            {
+                delay(delayMs);
+            }
+        }
+
+        m_zeroOffsetVoltage =
+            sum / static_cast<float>(sampleCount);
     }
+
+    void setZeroOffset(float offset)
+    {
+        m_zeroOffsetVoltage = offset;
+    }
+
+protected:
+    LoadCellParams m_loadCellParams;
+    INA125UParams m_inaParams;
+
+    float m_zeroOffsetVoltage = 0.0f;
 };
 
 
-#if defined(PLATFORM_TEENSY41)
+class LoadCellHandler
+{
+public:
+    LoadCellHandler(LoadCell** lcArray, uint8_t lcCount,float* forceBuffer)
+        : m_lcArray(lcArray),
+          m_lcCount(lcCount),
+          m_forceBuffer(forceBuffer)
+    {
+    }
 
-// ============================================================
-// Teensy 4.1
-// ============================================================
+    virtual ~LoadCellHandler() = default;
 
-inline constexpr float voltage_scale = 3.3f;
+    virtual void begin()
+    {
+        for (uint8_t i = 0; i < m_lcCount; ++i)
+        {
+            if (m_lcArray[i] != nullptr)
+            {
+                m_lcArray[i]->begin();
+            }
+        }
+    }
+
+    uint8_t count() const
+    {
+        return m_lcCount;
+    }
+
+    virtual const float* sampleAll()
+    {
+    // the handler owns the float* array so that the function simply returns a pointer to the updated values
+        for (uint8_t i = 0; i < m_lcCount; ++i)
+        {
+            m_forceBuffer[i] = m_lcArray[i]->sampleForce();
+        }
+
+        return m_forceBuffer;
+    }
+    // returns an array of force readings from all the load cells
+
+
+    virtual void calibrateAllOffsets(
+        uint16_t sampleCount = 100
+    ) = 0;
+
+protected:
+    LoadCell** m_lcArray;
+    uint8_t m_lcCount;
+    float* m_forceBuffer;
+};
+
+#if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
+#pragma message "Compiling for Board versions <v1.1.1. This version assumes that load cell voltages are sampled through the Teensy. In later versions the Nano does it"
+
+
 inline constexpr uint16_t adc_resolution_bits = 12;
 inline constexpr uint32_t adc_max_value =
     (1UL << adc_resolution_bits) - 1UL;
 
-class LoadCell_Teensy41 : public LoadCell
+class LoadCell_Teensy41 final : public LoadCell
 {
 public:
-    explicit LoadCell_Teensy41(int VoPin)
-        : LoadCell(VoPin)
-    {
+
+    LoadCell_Teensy41(INA125UParams inaParams,LoadCellParams loadCellParams,int VoPin) : LoadCell(inaParams, loadCellParams), m_VoPin(VoPin) {}
+
+    void begin() override {
+        // initialize the array
+        pinMode(m_VoPin,INPUT);
     }
 
-    void initialize() override
-    {
-        analogReadResolution(adc_resolution_bits);
-        analogReadAveraging(16);
-    }
+    float getDiffVoltage() {
+        // gets the RAW differential voltage. It does so by substracting the preset IAREF voltage from the voltage read at pin Vo
+        return analogRead(m_VoPin)*voltage_scale/ static_cast<float>(adc_max_value) - m_inaParams.IAref;
+        }
 
-    float getVo() override
-    {
-        return static_cast<float>(analogRead(m_VoPin))
-             * voltage_scale
-             / static_cast<float>(adc_max_value);
-    }
-
-    void calibrateOffset() override
-    {
-        analogReadAveraging(32);
-        delay(1000);
-
-        Serial.println(
-            "Calibrating the load cell for 0 N force. "
-            "Do not change the tension in the cable."
-        );
-
-        /*
-         * getVo() is an absolute voltage.
-         *
-         * At zero force:
-         *     Vo = IAref + offset
-         *
-         * Therefore:
-         *     offset = Vo - IAref
-         */
-        m_offset = getVo() - m_ina_params.IAref;
-
-        analogReadAveraging(16);
-    }
+private:
+    int m_VoPin;
 };
 
-
-#elif defined(PLATFORM_RENESAS_RA)
-
-// ============================================================
-// Arduino UNO R4
-// ============================================================
-
-inline constexpr bool usingInternalRef = false;
-
-inline constexpr float voltage_scale =
-    usingInternalRef ? 1.5f : 5.0f;
-
-inline constexpr uint16_t adc_resolution_bits = 14;
-inline constexpr uint32_t adc_max_value =
-    (1UL << adc_resolution_bits) - 1UL;
-
-static_assert(
-    !usingInternalRef || INA125UParams::IAref <= 1.5f,
-    "Cannot use the UNO R4 1.5 V internal ADC reference when "
-    "the INA125 output offset is greater than 1.5 V"
-);
-
-class LoadCell_Renesas : public LoadCell
+class LoadCellHandler_Teensy41 : public LoadCellHandler
 {
 public:
-    explicit LoadCell_Renesas(int VoPin)
-        : LoadCell(VoPin)
+    LoadCellHandler_Teensy41(
+        LoadCell** lcArray,
+        uint8_t lcCount,
+        float* forceBuffer
+    )
+        : LoadCellHandler(
+              lcArray,
+              lcCount,
+              forceBuffer
+          )
     {
     }
 
-    void initialize() override
+    void begin() override
     {
-        analogReadResolution(adc_resolution_bits);
+        // Shared Teensy ADC configuration.
+        analogReadResolution(12);
+        analogReadAveraging(16);
 
-        if constexpr (usingInternalRef)
+        // Run the generic per-load-cell initialization.
+        LoadCellHandler::begin();
+    }
+
+    const float* sampleAll() override
+    {
+        return LoadCellHandler::sampleAll();
+    }
+
+    void calibrateAllOffsets(
+        uint16_t sampleCount = 100
+    ) override
+    {
+        for (uint8_t i = 0; i < m_lcCount; ++i)
         {
-            analogReference(AR_INTERNAL);
+            if (m_lcArray[i] != nullptr)
+            {
+                m_lcArray[i]->calibrateOffset(sampleCount);
+            }
         }
     }
-
-    float getVo() override
-    {
-        return static_cast<float>(analogRead(m_VoPin))
-             * voltage_scale
-             / static_cast<float>(adc_max_value);
-    }
-
-    void calibrateOffset() override
-    {
-        delay(1000);
-
-        Serial.println(
-            "Calibrating the load cell for 0 N force. "
-            "Do not change the tension in the cable."
-        );
-
-        m_offset = getVo() - m_ina_params.IAref;
-    }
 };
-
-
-#elif defined(PLATFORM_ATMEL_AVR)
-
-// ============================================================
-// Arduino UNO R3 / AVR
-// ============================================================
-
-inline constexpr uint16_t adc_resolution_bits = 10;
-inline constexpr uint32_t adc_max_value =
-    (1UL << adc_resolution_bits) - 1UL;
-
-inline constexpr float voltage_scale = 5.0f;
-
-class LoadCell_AtmelAVR : public LoadCell
-{
-public:
-    explicit LoadCell_AtmelAVR(int VoPin)
-        : LoadCell(VoPin)
-    {
-    }
-
-    void initialize() override
-    {
-        // Nothing required.
-    }
-
-    float getVo() override
-    {
-        return static_cast<float>(analogRead(m_VoPin))
-             * voltage_scale
-             / static_cast<float>(adc_max_value);
-    }
-
-    void calibrateOffset() override
-    {
-        delay(1000);
-
-        Serial.println(
-            "Calibrating the load cell for 0 N force. "
-            "Do not change the tension in the cable."
-        );
-
-        m_offset = getVo() - m_ina_params.IAref;
-    }
-};
-
 
 #elif defined(PLATFORM_NORDIC)
 
@@ -228,119 +239,632 @@ public:
 // Arduino Nano 33 BLE Rev2 / nRF52840
 // ============================================================
 
-class LoadCell_NanoBLE : public LoadCell
+/*
+use : #include <nrf_saadc.h>
+
+ANALOG_REF_INTERNAL_VAL : macro for the internal reference voltage
+`nrfx_analog_input_t` is an ENUM that catalogs references to all AIN channels
+
+8 analog inputs:          AIN0 ... AIN7
+8 hardware ADC channels:  CH[0] ... CH[7]
+So two different categories of channels
+
+struct nrfx_saadc_channel_t {
+nrf_saadc_channel_config_t channel_config; // see below
+nrfx_analog_input_t pin_p; // selecting positive input
+nrfx_analog_input_t pin_n; // selecting negative input
+uint8_t channel_index; // what is that for ???
+}
+
+struct nrf_saadc_channel_config_t {
+    nrf_saadc_resistor_t resistor_p;
+    nrf_saadc_resistor_t resistor_n;
+    nrf_saadc_gain_t gain;
+    nrf_saadc_reference_t reference;
+    nrf_saadc_acqtime_t acq_time;
+    nrf_saadc_mode_t mode = NRF_SAADC_MODE_DIFFERENTIAL; // for differential mode
+    nrf_saadc_burst_t burst;
+    nrf_saadc_chopping_t chopping;
+    nrf_saadc_highspeed_t highspeed;
+    uint8_t conv_time;
+}
+
+*/
+
+// ============================================================
+// Arduino Nano 33 BLE Rev2 / nRF52840
+// ============================================================
+
+#include <nrf_saadc.h>
+
+/*
+ * SAADC configuration:
+ *
+ * Internal reference: 0.6 V
+ * Gain:               1/5
+ * Resolution:         12-bit differential
+ *
+ * Differential full scale:
+ *
+ *     0.6 V / (1/5) = 3.0 V
+ *
+ * Differential 12-bit output:
+ *
+ *     -2048 ... +2047
+ */
+
+inline constexpr float nanoSaadcReferenceVoltage = 0.6f;
+inline constexpr float nanoSaadcGain = 1.0f / 5.0f;
+inline constexpr float nanoSaadcDifferentialCounts = 2048.0f;
+
+class LoadCell_NanoBLE final : public LoadCell
 {
 public:
-    using ADCChannel = NanoBLE33LoadCellADC::Channel;
-
-    explicit LoadCell_NanoBLE(ADCChannel channel)
-        : LoadCell(-1),
-          m_channel(channel)
+    LoadCell_NanoBLE(
+        const INA125UParams& inaParams,
+        const LoadCellParams& loadCellParams,
+        LoadCellId loadCellId,
+        uint8_t channelIndex
+    )
+        : LoadCell(inaParams, loadCellParams),
+          m_loadCellId(loadCellId),
+          m_channelIndex(channelIndex)
     {
     }
 
-    void initialize() override
+    void begin() override
     {
-        /*
-         * The SAADC peripheral is shared by all LoadCell_NanoBLE
-         * instances. Calling begin() repeatedly is unnecessary.
-         *
-         * initializeADC() ensures that initialization only happens once.
-         */
-        initializeADC();
-    }
-
-    float getVo() override
-    {
-        /*
-         * Despite the inherited function name, this does not return the
-         * absolute Vo voltage on the Nano BLE implementation.
-         *
-         * It directly returns:
-         *
-         *     Vo - Vexc
-         */
-        return adc_.sampleDifferential(m_channel);
-    }
-
-    void calibrateOffset() override
-    {
-        delay(1000);
-
-        Serial.println(
-            "Calibrating the load cell for 0 N force. "
-            "Do not change the tension in the cable."
-        );
-
-        constexpr uint16_t sampleCount = 100;
-        constexpr uint16_t sampleDelayMs = 2;
-
-        float sum = 0.0f;
-
-        for (uint16_t i = 0; i < sampleCount; ++i)
+        if (m_channelIndex >= NRF_SAADC_CHANNEL_COUNT)
         {
-            sum += getVo();
-            delay(sampleDelayMs);
+            Serial.print("Invalid SAADC channel index: ");
+            Serial.println(m_channelIndex);
+
+            m_valid = false;
+            return;
         }
 
-        /*
-         * getVo() already returns Vo - Vexc.
-         *
-         * At zero force:
-         *
-         *     m_offset = Vo_zero - Vexc
-         */
-        m_offset = sum / static_cast<float>(sampleCount);
+        const NanoLoadCellPins pins =
+            pinsForLoadCell(m_loadCellId);
 
-        Serial.print("Measured differential zero offset: ");
-        Serial.print(m_offset, 6);
-        Serial.println(" V");
+        const nrf_saadc_input_t positiveInput =
+            arduinoPinToSaadcInput(pins.voPin);
+
+        const nrf_saadc_input_t negativeInput =
+            arduinoPinToSaadcInput(pins.excPin);
+
+        if (
+            positiveInput == NRF_SAADC_INPUT_DISABLED
+            || negativeInput == NRF_SAADC_INPUT_DISABLED
+        )
+        {
+            Serial.println(
+                "Invalid SAADC input pair for load cell."
+            );
+
+            m_valid = false;
+            return;
+        }
+
+        m_pairConfig.resistor_p =
+            NRF_SAADC_RESISTOR_DISABLED;
+
+        m_pairConfig.resistor_n =
+            NRF_SAADC_RESISTOR_DISABLED;
+
+        m_pairConfig.gain =
+            NRF_SAADC_GAIN1_5;
+
+        m_pairConfig.reference =
+            NRF_SAADC_REFERENCE_INTERNAL;
+
+        m_pairConfig.acq_time =
+            NRF_SAADC_ACQTIME_15US;
+
+        m_pairConfig.mode =
+            NRF_SAADC_MODE_DIFFERENTIAL;
+
+        /*
+         * Differential measurement:
+         *
+         *     pin_p - pin_n
+         *     Vo    - Exc/IAref
+         */
+        m_pairConfig.pin_p = positiveInput;
+        m_pairConfig.pin_n = negativeInput;
+
+        nrf_saadc_channel_init(
+            m_channelIndex,
+            &m_pairConfig
+        );
+
+        m_valid = true;
     }
 
-    float voltageToN() override
+    float getDiffVoltage() override
     {
-        /*
-         * Differential SAADC reading:
-         *
-         *     measured = Vo - Vexc
-         *
-         * Corrected differential reading:
-         *
-         *     corrected = measured - zeroOffset
-         *
-         * With your polarity, Vo decreases under positive force, so
-         * corrected is negative. Negate it to obtain positive force.
-         */
-        const float correctedDifferential =
-            getVo() - m_offset;
+        return m_latestDiffVoltage;
+    }
 
-        return
-            -correctedDifferential
-            * m_lc_params.ratedN
-            / (
-                m_ina_params.ampGain
-                * m_lc_params.sensitivity
-                * m_ina_params.Vexc
-            );
+    void setLatestDiffVoltage(float voltage)
+    {
+        m_latestDiffVoltage = voltage;
+    }
+
+    uint8_t channelIndex() const
+    {
+        return m_channelIndex;
+    }
+
+    LoadCellId id() const
+    {
+        return m_loadCellId;
+    }
+
+    bool valid() const
+    {
+        return m_valid;
     }
 
 private:
-    ADCChannel m_channel;
-
-    inline static NanoBLE33LoadCellADC adc_{};
-    inline static bool adcInitialized_ = false;
-
-    static void initializeADC()
+    static NanoLoadCellPins pinsForLoadCell(
+        LoadCellId loadCellId
+    )
     {
-        if (!adcInitialized_)
+        switch (loadCellId)
         {
-            adc_.begin();
-            adcInitialized_ = true;
+            case LoadCellId::Left1:
+                return {
+                    boardConfig.LC_L_1_Vo,
+                    boardConfig.LC_L_1_Exc
+                };
+
+            case LoadCellId::Left2:
+                return {
+                    boardConfig.LC_L_2_Vo,
+                    boardConfig.LC_L_2_Exc
+                };
+
+            case LoadCellId::Right1:
+                return {
+                    boardConfig.LC_R_1_Vo,
+                    boardConfig.LC_R_1_Exc
+                };
+
+            case LoadCellId::Right2:
+                return {
+                    boardConfig.LC_R_2_Vo,
+                    boardConfig.LC_R_2_Exc
+                };
         }
+
+        /*
+         * Defensive fallback. All enum cases are already handled.
+         */
+        return {-1, -1};
+    }
+
+    static nrf_saadc_input_t arduinoPinToSaadcInput(
+        int arduinoPin
+    )
+    {
+        if (arduinoPin < 0)
+        {
+            return NRF_SAADC_INPUT_DISABLED;
+        }
+
+        const PinName pinName =
+            digitalPinToPinName(arduinoPin);
+
+        const uint32_t gpioPin =
+            static_cast<uint32_t>(pinName) & 0x1FU;
+
+        switch (gpioPin)
+        {
+            case 2:
+                return NRF_SAADC_INPUT_AIN0;
+
+            case 3:
+                return NRF_SAADC_INPUT_AIN1;
+
+            case 4:
+                return NRF_SAADC_INPUT_AIN2;
+
+            case 5:
+                return NRF_SAADC_INPUT_AIN3;
+
+            case 28:
+                return NRF_SAADC_INPUT_AIN4;
+
+            case 29:
+                return NRF_SAADC_INPUT_AIN5;
+
+            case 30:
+                return NRF_SAADC_INPUT_AIN6;
+
+            case 31:
+                return NRF_SAADC_INPUT_AIN7;
+
+            default:
+                Serial.print("Arduino pin ");
+                Serial.print(arduinoPin);
+                Serial.println(
+                    " is not connected to an nRF52840 SAADC input."
+                );
+
+                return NRF_SAADC_INPUT_DISABLED;
+        }
+    }
+
+    LoadCellId m_loadCellId;
+    uint8_t m_channelIndex;
+
+    nrf_saadc_channel_config_t m_pairConfig{};
+
+    float m_latestDiffVoltage = 0.0f;
+    bool m_valid = false;
+};
+
+class LoadCellHandler_NanoBLE final : public LoadCellHandler
+{
+public:
+    LoadCellHandler_NanoBLE(
+        LoadCell** lcArray,
+        uint8_t lcCount,
+        float* forceBuffer
+    )
+        : LoadCellHandler(
+              lcArray,
+              lcCount,
+              forceBuffer
+          )
+    {
+    }
+
+    void begin() override
+    {
+        if (m_lcCount == 0)
+        {
+            Serial.println(
+                "No load cells configured for the SAADC."
+            );
+
+            return;
+        }
+
+        if (m_lcCount > NRF_SAADC_CHANNEL_COUNT)
+        {
+            Serial.println(
+                "Too many load cells for the SAADC."
+            );
+
+            return;
+        }
+
+        /*
+         * Disable the SAADC before changing global configuration.
+         */
+        nrf_saadc_disable();
+
+        /*
+         * Disconnect every hardware channel first. This prevents
+         * an old channel configuration from unexpectedly appearing
+         * in the scan.
+         */
+        for (
+            uint8_t channel = 0;
+            channel < NRF_SAADC_CHANNEL_COUNT;
+            ++channel
+        )
+        {
+            nrf_saadc_channel_input_set(
+                channel,
+                NRF_SAADC_INPUT_DISABLED,
+                NRF_SAADC_INPUT_DISABLED
+            );
+        }
+
+        nrf_saadc_resolution_set(
+            NRF_SAADC_RESOLUTION_12BIT
+        );
+
+        nrf_saadc_oversample_set(
+            NRF_SAADC_OVERSAMPLE_DISABLED
+        );
+
+        nrf_saadc_enable();
+
+        calibrateSaadcHardwareOffset();
+
+        /*
+         * Configure every load-cell channel.
+         */
+        LoadCellHandler::begin();
+
+        /*
+         * This implementation expects:
+         *
+         * lcArray[0] -> SAADC CH[0]
+         * lcArray[1] -> SAADC CH[1]
+         * ...
+         *
+         * That guarantees the DMA result order matches lcArray.
+         */
+        for (uint8_t i = 0; i < m_lcCount; ++i)
+        {
+            LoadCell_NanoBLE* loadCell =
+                nanoLoadCellAt(i);
+
+            if (loadCell == nullptr)
+            {
+                Serial.println(
+                    "Null Nano load-cell pointer."
+                );
+
+                continue;
+            }
+
+            if (loadCell->channelIndex() != i)
+            {
+                Serial.print(
+                    "SAADC channel order mismatch at index "
+                );
+
+                Serial.println(i);
+            }
+        }
+    }
+
+    const float* sampleAll() override
+    {
+        if (!performScan())
+        {
+            /*
+             * Preserve the force-buffer length and return safe values
+             * if a conversion fails.
+             */
+            for (uint8_t i = 0; i < m_lcCount; ++i)
+            {
+                m_forceBuffer[i] = 0.0f;
+            }
+
+            return m_forceBuffer;
+        }
+
+        updateLoadCellVoltages();
+
+        /*
+         * The common implementation now calls sampleForce() for each
+         * load cell. sampleForce() obtains the cached differential
+         * voltage through getDiffVoltage().
+         */
+        return LoadCellHandler::sampleAll();
+    }
+
+    void calibrateAllOffsets(
+        uint16_t sampleCount = 100
+    ) override
+    {
+        if (sampleCount == 0)
+        {
+            return;
+        }
+
+        Serial.println(
+            "Calibrating all load cells at zero force. "
+            "Do not change cable tension."
+        );
+
+        /*
+         * Double is useful here for accumulation, even though each
+         * individual SAADC result is converted to float.
+         */
+        double sums[NRF_SAADC_CHANNEL_COUNT]{};
+
+        uint16_t successfulSamples = 0;
+
+        for (
+            uint16_t sample = 0;
+            sample < sampleCount;
+            ++sample
+        )
+        {
+            if (!performScan())
+            {
+                continue;
+            }
+
+            ++successfulSamples;
+
+            for (uint8_t i = 0; i < m_lcCount; ++i)
+            {
+                sums[i] += rawToDiffVoltage(
+                    m_rawBuffer[i]
+                );
+            }
+
+            delay(2);
+        }
+
+        if (successfulSamples == 0)
+        {
+            Serial.println(
+                "SAADC offset calibration failed: no samples."
+            );
+
+            return;
+        }
+
+        for (uint8_t i = 0; i < m_lcCount; ++i)
+        {
+            LoadCell_NanoBLE* loadCell =
+                nanoLoadCellAt(i);
+
+            if (loadCell == nullptr)
+            {
+                continue;
+            }
+
+            const float offset =
+                static_cast<float>(
+                    sums[i]
+                    / static_cast<double>(
+                        successfulSamples
+                    )
+                );
+
+            loadCell->setZeroOffset(offset);
+            loadCell->setLatestDiffVoltage(offset);
+        }
+    }
+
+private:
+    /*
+     * The SAADC supports up to eight active channel results.
+     * Only the first m_lcCount entries are used.
+     */
+    nrf_saadc_value_t
+        m_rawBuffer[NRF_SAADC_CHANNEL_COUNT]{};
+
+    static void waitForEvent(
+        nrf_saadc_event_t event
+    )
+    {
+        while (!nrf_saadc_event_check(event))
+        {
+        }
+
+        nrf_saadc_event_clear(event);
+    }
+
+    static void calibrateSaadcHardwareOffset()
+    {
+        nrf_saadc_event_clear(
+            NRF_SAADC_EVENT_CALIBRATEDONE
+        );
+
+        nrf_saadc_task_trigger(
+            NRF_SAADC_TASK_CALIBRATEOFFSET
+        );
+
+        waitForEvent(
+            NRF_SAADC_EVENT_CALIBRATEDONE
+        );
+    }
+
+    bool performScan()
+    {
+        if (!nrf_saadc_enable_check())
+        {
+            return false;
+        }
+
+        /*
+         * One result is generated for every active channel.
+         */
+        nrf_saadc_buffer_init(
+            m_rawBuffer,
+            m_lcCount
+        );
+
+        nrf_saadc_event_clear(
+            NRF_SAADC_EVENT_STARTED
+        );
+
+        nrf_saadc_event_clear(
+            NRF_SAADC_EVENT_END
+        );
+
+        nrf_saadc_event_clear(
+            NRF_SAADC_EVENT_STOPPED
+        );
+
+        nrf_saadc_task_trigger(
+            NRF_SAADC_TASK_START
+        );
+
+        waitForEvent(
+            NRF_SAADC_EVENT_STARTED
+        );
+
+        /*
+         * In scan mode, one SAMPLE task samples every enabled
+         * hardware channel.
+         */
+        nrf_saadc_task_trigger(
+            NRF_SAADC_TASK_SAMPLE
+        );
+
+        waitForEvent(
+            NRF_SAADC_EVENT_END
+        );
+
+        nrf_saadc_task_trigger(
+            NRF_SAADC_TASK_STOP
+        );
+
+        waitForEvent(
+            NRF_SAADC_EVENT_STOPPED
+        );
+
+        return true;
+    }
+
+    static float rawToDiffVoltage(
+        nrf_saadc_value_t raw
+    )
+    {
+        return
+            static_cast<float>(raw)
+            * nanoSaadcReferenceVoltage
+            / (
+                nanoSaadcGain
+                * nanoSaadcDifferentialCounts
+            );
+    }
+
+    void updateLoadCellVoltages()
+    {
+        for (uint8_t i = 0; i < m_lcCount; ++i)
+        {
+            LoadCell_NanoBLE* loadCell =
+                nanoLoadCellAt(i);
+
+            if (loadCell == nullptr)
+            {
+                continue;
+            }
+
+            loadCell->setLatestDiffVoltage(
+                rawToDiffVoltage(m_rawBuffer[i])
+            );
+        }
+    }
+
+    LoadCell_NanoBLE* nanoLoadCellAt(uint8_t index)
+    {
+        if (
+            index >= m_lcCount
+            || m_lcArray[index] == nullptr
+        )
+        {
+            return nullptr;
+        }
+
+        /*
+         * LoadCellHandler_NanoBLE must only be constructed with
+         * LoadCell_NanoBLE objects.
+         *
+         * static_cast is used instead of dynamic_cast because RTTI is
+         * often disabled in embedded builds.
+         */
+        return static_cast<LoadCell_NanoBLE*>(
+            m_lcArray[index]
+        );
     }
 };
 
-
+#elif defined(PLATFORM_TEENSY41) && HW_VERSION_AT_LEAST(1,1,1)
+#pragma message "WARNING : not linking anything from LoadCell.h since using version v1.1.1+ on the Teensy"
 #else
 
     #error "No supported load-cell platform selected"
@@ -366,10 +890,12 @@ inline constexpr float minOutput =
 inline constexpr float maxOutput =
     INA125UParams::IAref;
 
+#if defined(DEBUG)
 static_assert(
     minOutput >= 0.0f,
     "INA125 output goes below 0 V at full-scale force"
 );
+#endif
 
 #if defined(PLATFORM_NORDIC)
 
@@ -383,11 +909,12 @@ static_assert(
  */
 inline constexpr float nanoDifferentialFullScale = 3.0f;
 
+/*
 static_assert(
     fullScaleOutputSpan <= nanoDifferentialFullScale,
     "INA125 differential output span exceeds the Nano BLE SAADC range"
 );
-
+*/
 #else
 
 static_assert(

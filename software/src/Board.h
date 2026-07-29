@@ -49,6 +49,7 @@ enum class BoardSupply {
     V5V   // JP: 2-1
 };
 
+
 struct BoardConfig {
     // LOAD CELL DEFINITIONS :
 
@@ -189,6 +190,7 @@ inline constexpr BoardConfig boardConfig {
     A6  // LC_R_2_Vo
 };
 
+
 #else
 #error "No platform selected for BoardConfig"
 #endif
@@ -212,7 +214,7 @@ constexpr bool uses2V5Reference =
     boardConfig.ina125IARef == INA125Ref::Ref_2V5;
 */
 struct INA125UParams {
-    static constexpr float gainR = 470.0f;
+    static constexpr float gainR = 10.0f;
     static constexpr float ampGain = 4.0f + 60000.0f / gainR;
 
     static constexpr float IAref = refVoltage(boardConfig.ina125IARef);

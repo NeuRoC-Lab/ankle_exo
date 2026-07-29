@@ -15,11 +15,7 @@
 
 
 
-#if defined(PLATFORM_RENESAS_RA)
-
-// Renesas-only includes
-
-#elif defined(PLATFORM_TEENSY41)
+#if defined(PLATFORM_TEENSY41)
 
 // Teensy-only CAN includes
 #include "MotorConfig.h"
@@ -37,64 +33,117 @@
 #endif
 
 
-#if defined(PLATFORM_RENESAS_RA)
-
-Encoder encoders(true, false);
-
-void setup()
-{
-    Serial.begin(115200);
-    encoders.begin();
-    Serial1.begin(57600);
-}
-void loop()
-{
-    EncoderPositions positions = encoders.getPositions();
-
-    Serial.print("Left encoder position : " );
-    Serial.print(positions.left_position);
-    Serial.print("Right encoder position : " );
-    Serial.println(positions.right_position);
-
-    /*
-    Serial1.write(
-        reinterpret_cast<const uint8_t*>(&positions),
-        sizeof(positions)
-    ); // here it would be a waste to use sendPayload() because teh Arduino UNO R4 only sends encoder positions. Also this is temporary
-    */
-    delay(10);
-}
-
-#elif defined(PLATFORM_TEENSY41)
+// TEENSY SPECIFIC CONFIGURATION
 
 
-using CANController = CANMotorMIT_Teensy;
-using LoadCellController = LoadCell_Teensy41;
 
-LoadCellController LC_L_1(boardConfig.LC_L_1_pin);
-LoadCellController LC_L_2(boardConfig.LC_L_2_pin);
-LoadCellController LC_R_2(boardConfig.LC_R_2_pin);
-LoadCellController LC_R_1(boardConfig.LC_R_1_pin);
+// LOAD CELL CONFIGURATION
+constexpr uint8_t loadCellCount = 4;
+
+// Load Cell configuration in version up to (and including) 1.1.0 and past (but including) 1.1.1
+#if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
+
+INA125UParams inaParams{};
+LoadCellParams loadCellParams{};
+
+LoadCell_Teensy41 LC_L_1(
+    inaParams,
+    loadCellParams,
+    boardConfig.LC_L_1_Vo
+);
+
+LoadCell_Teensy41 LC_L_2(
+    inaParams,
+    loadCellParams,
+    boardConfig.LC_L_2_Vo
+);
+
+LoadCell_Teensy41 LC_R_1(
+    inaParams,
+    loadCellParams,
+    boardConfig.LC_R_1_Vo
+);
+
+LoadCell_Teensy41 LC_R_2(
+    inaParams,
+    loadCellParams,
+    boardConfig.LC_R_2_Vo
+);
+
+LoadCell* loadCells[loadCellCount] = {
+    &LC_L_1,
+    &LC_L_2,
+    &LC_R_1,
+    &LC_R_2
+};
+
+float forceBuffer[loadCellCount]{};
+
+LoadCellHandler_Teensy41 loadCellController(
+    loadCells,
+    loadCellCount,
+    forceBuffer
+);
+
+#elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1,1,1)
+#include "LoadCell.h"
+INA125UParams inaParams{};
+LoadCellParams loadCellParams{};
+
+LoadCell_NanoBLE LC_L_1(
+    inaParams,
+    loadCellParams,
+    LoadCellId::Left1,
+    0
+);
+
+LoadCell_NanoBLE LC_L_2(
+    inaParams,
+    loadCellParams,
+    LoadCellId::Left2,
+    1
+);
+
+LoadCell_NanoBLE LC_R_1(
+    inaParams,
+    loadCellParams,
+    LoadCellId::Right1,
+    2
+);
+
+LoadCell_NanoBLE LC_R_2(
+    inaParams,
+    loadCellParams,
+    LoadCellId::Right2,
+    3
+);
+
+LoadCell* loadCells[loadCellCount] = {
+    &LC_L_1,
+    &LC_L_2,
+    &LC_R_1,
+    &LC_R_2
+};
+
+float forceBuffer[loadCellCount]{};
+
+LoadCellHandler_NanoBLE loadCellController(
+    loadCells,
+    loadCellCount,
+    forceBuffer
+);
+
+#endif
+
+
 //NOTE : only two load cells are actually used. Remove the two extras when testing (after identifying which is which)
 
-EncoderPositions positions;
 
-MotorCmd motor1Cmd {
-    .position = 0.0f,
-    .velocity = 0.0f,
-    .torque = 0.0f,
-    .kp = 0.0f,
-    .kd = 0.0f
-};
-// to change running and software constraints head to CANMotorMIT.h
 
-constexpr byte MOTOR_ID = 0x02;
+//#include "SerialMotorControl.h"
+//SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
-CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
-
-#include "SerialMotorControl.h"
-SerialMotorControl serialControl(Serial, motor1Cmd, motor);
-
+/*
 JsonDocument createTelemetryPacket() {
     JsonDocument doc;
 
@@ -118,12 +167,32 @@ JsonDocument createTelemetryPacket() {
 
     return doc;
 }
+*/
 
+// TEENSY CODE
 
+#if defined(PLATFORM_TEENSY41)
+
+using CANController = CANMotorMIT_Teensy;
+
+EncoderPositions positions;
+
+MotorCmd motor1Cmd {
+    .position = 0.0f,
+    .velocity = 0.0f,
+    .torque = 0.0f,
+    .kp = 0.0f,
+    .kd = 0.0f
+};
+// to change running and software constraints head to CANMotorMIT.h
 
 Encoder encoders(true, false);
 
-constexpr uint32_t TELEMETRY_PERIOD_US = 20000; // 20 ms = 50 Hz
+constexpr byte MOTOR_ID = 0x02;
+
+CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+
+constexpr uint32_t TELEMETRY_PERIOD_US = 5000; // 20 ms = 50 Hz ; 5ms = 200Hz
 unsigned long now = millis();
 unsigned long previousSend = millis();
 
@@ -157,10 +226,10 @@ void setup()
     Serial.println("Initializing UART communication with Nano");
     encoders.begin();
 
-    Serial.begin(115200);
+    Serial.begin(230400);
     Serial.println("Initializing Serial communication with the Arduino UNO R4");
 
-    Serial8.begin(115200); // using Serial 8 here, not serial 1
+    Serial8.begin(230400); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
     motor.begin();
     if(!motor.resetMotor()){
@@ -171,19 +240,26 @@ void setup()
     }
     Serial.println("Stopping motor for now");
     //motor.sendMessage(exitMotorMode);
-    Serial.println("Initializing Load Cells");
+     #if HW_VERSION_AT_MOST(1,1,0)
+    Serial.println("Initializing Load Cell Handler");
+    loadCellController.begin();
 
-    LC_L_1.initialize();
-    LC_L_2.initialize();
-    LC_R_2.initialize();
-    LC_R_1.initialize();
+    Serial.println(
+        "Keep all load cells unloaded during calibration."
+    );
+
+    delay(1000);
+
+    loadCellController.calibrateAllOffsets(100);
+    Serial.println("Calibrated Load Cell offset");
+    #endif
 }
 
 void loop()
 {
     uart.update();
     motor.update();
-    serialControl.update();
+    //serialControl.update();
     delay(10);
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
@@ -200,12 +276,24 @@ void loop()
 
         EncoderPositions positions = encoders.getPositions();
 
+        #if HW_VERSION_AT_MOST(1,1,0)
+        // versions before and up to v1.1.0 : sample the load cells from the Teensy
+        const float* forces = loadCellController.sampleAll();
         LoadCellVoltages loadCells {
-            LC_L_1.rawVoltage(),
-            LC_L_2.rawVoltage(),
-            LC_R_1.rawVoltage(),
-            LC_R_2.rawVoltage(),
+            forces[0],
+            forces[1],
+            forces[2],
+            forces[3],
         };
+        #else
+        // versions above (and including) v1.1.1 : leave it up to the Arduino Nano to populate the load cell voltages
+        LoadCellVoltages loadCells {
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+        };
+        #endif
 
         DataPayload payload {
             loadCells,
@@ -220,79 +308,6 @@ void loop()
 
 }
 #elif defined(PLATFORM_NORDIC)
-
-unsigned long lastStatus = 0;
-
-
-JsonDocument createTelemetryPacket(const DataPayload& payload) {
-    JsonDocument doc;
-
-    doc[TelemetryKey::LeftLoadCell1] = payload.loadCells.LeftLoadCell1;
-    doc[TelemetryKey::LeftLoadCell2] = payload.loadCells.LeftLoadCell2;
-    doc[TelemetryKey::RightLoadCell1] = payload.loadCells.RightLoadCell1;
-    doc[TelemetryKey::RightLoadCell2] = payload.loadCells.RightLoadCell2;
-
-    doc[TelemetryKey::LeftEncoder] = payload.encoders.left_position;
-    doc[TelemetryKey::RightEncoder] = payload.encoders.right_position;
-
-    JsonArray motors =
-        doc[TelemetryKey::Motors].to<JsonArray>();
-
-    JsonObject motor1Object = motors.add<JsonObject>();
-    motor1Object[TelemetryKey::MotorId] = payload.motorRep.can_id;
-    motor1Object[TelemetryKey::MotorPos] = payload.motorRep.position;
-    motor1Object[TelemetryKey::MotorVel] = payload.motorRep.velocity;
-    motor1Object[TelemetryKey::MotorTrq] = payload.motorRep.torque;
-    motor1Object[TelemetryKey::MotorTemp] = payload.motorRep.temperature;
-    motor1Object[TelemetryKey::MotorErr] = payload.motorRep.error;
-
-    return doc;
-}
-void printPayload(const DataPayload& payload)
-{
-    Serial.println("----- DataPayload -----");
-
-    Serial.println("Load cells:");
-    Serial.print("  Left 1:  ");
-    Serial.println(payload.loadCells.LeftLoadCell1, 6);
-
-    Serial.print("  Left 2:  ");
-    Serial.println(payload.loadCells.LeftLoadCell2, 6);
-
-    Serial.print("  Right 1: ");
-    Serial.println(payload.loadCells.RightLoadCell1, 6);
-
-    Serial.print("  Right 2: ");
-    Serial.println(payload.loadCells.RightLoadCell2, 6);
-
-    Serial.println("Encoders:");
-    Serial.print("  Left position:  ");
-    Serial.println(payload.encoders.left_position);
-
-    Serial.print("  Right position: ");
-    Serial.println(payload.encoders.right_position);
-
-    Serial.println("Motor:");
-    Serial.print("  CAN ID:      ");
-    Serial.println(payload.motorRep.can_id);
-
-    Serial.print("  Position:    ");
-    Serial.println(payload.motorRep.position, 6);
-
-    Serial.print("  Velocity:    ");
-    Serial.println(payload.motorRep.velocity, 6);
-
-    Serial.print("  Torque:      ");
-    Serial.println(payload.motorRep.torque, 6);
-
-    Serial.print("  Temperature: ");
-    Serial.println(payload.motorRep.temperature);
-
-    Serial.print("  Error:       ");
-    Serial.println(payload.motorRep.error);
-
-    Serial.println("-----------------------");
-}
 
 // code for the Arduino Nano
 DataPayload payload {};
@@ -310,9 +325,9 @@ BLEHandler ble(
 void setup(){
     //randomSeed(analogRead(A0));
     delay(1000); // add a delay because sometimes the Serial connection takes more time to be established and the arduino code has already moved on to execution of loop
-    Serial.begin(115200);
+    Serial.begin(230400);
     uart.begin();
-    Serial1.begin(115200);
+    Serial1.begin(230400);
     delay(1000);
 
     while (Serial1.available() > 0) {
@@ -337,6 +352,17 @@ void loop(){
     */
     // Read one complete payload from the Teensy.
     uart.update();
+    #if HW_VERSION_AT_LEAST(1,1,1)
+    // version v1.1.1 and onwards : the Arduino Nano is the one sampling the load cell voltages so it directly modifies the payload object sent from the Teensy before posting it on BLE
+    const float* forces = loadCellController.sampleAll();
+
+    payload.loadCells = {
+        forces[0],
+        forces[1],
+        forces[2],
+        forces[3],
+    };
+    #endif
 
     #if defined(USING_BLE)
         ble.update();

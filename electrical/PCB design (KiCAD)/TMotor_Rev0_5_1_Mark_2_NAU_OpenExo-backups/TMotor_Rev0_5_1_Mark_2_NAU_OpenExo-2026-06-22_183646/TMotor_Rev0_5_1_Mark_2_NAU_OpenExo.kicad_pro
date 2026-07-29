@@ -567,7 +567,7 @@
       "plot": ".",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "ankleexov1_1_0.step",
       "svg": "",
       "vrml": ""
     },
