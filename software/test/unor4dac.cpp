@@ -11,7 +11,7 @@ void setup()
     analogWriteResolution(12);
 
     // 1.000 V approximately, assuming a 5 V DAC full scale.
-    constexpr float requestedVoltage = 1.0f;
+    constexpr float requestedVoltage = 2.0f;
     constexpr float dacFullScale = 5.0f;
     constexpr uint16_t dacMaximum = 4095;
 

@@ -45,7 +45,7 @@ from plottingCSV import (
 # This is defined before the Bluetooth thread starts.
 
 start_time = time.perf_counter()
-
+MOTOR_ID = 2
 
 # Sensor setup
 

@@ -21,7 +21,7 @@ constexpr bool constraintsInside(
 
 
 constexpr AK60Params motorSoftwareConstraints = {
-    -8.5f,  8.5f,    // position, rad
+    -4.0f,  2.0f,    // position, rad
     -20.0f, 20.0f,   // velocity, rad/s
     0.0f,  500.0f,   // kp
     0.0f,  5.0f,     // kd
@@ -29,7 +29,7 @@ constexpr AK60Params motorSoftwareConstraints = {
 };
 
 constexpr AK60Params motorRunningConstraints = {
-    -10.0f, 10.0f,   // position, rad
+    -5.0f, 3.0f,   // position, rad
     -25.0f, 25.0f,   // velocity, rad/s
     0.0f,  500.0f,   // kp, not used for feedback checks
     0.0f,  5.0f,     // kd, not used for feedback checks

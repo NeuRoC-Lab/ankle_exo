@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "ABX00087")(type "KiCad")(uri "/Users/oscartesniere/Downloads/ABX00087")(options "")(descr ""))
+  (lib (name "Teensy41")(type "KiCad")(uri "/Users/oscartesniere/Downloads/DEV-16771(1)")(options "")(descr ""))
+)

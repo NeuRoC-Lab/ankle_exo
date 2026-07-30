@@ -86,6 +86,7 @@ LoadCellHandler_Teensy41 loadCellController(
 );
 
 #elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1,1,1)
+#pragma message "Enabling Arduino Nano ADC"
 #include "LoadCell.h"
 INA125UParams inaParams{};
 LoadCellParams loadCellParams{};
@@ -140,8 +141,6 @@ LoadCellHandler_NanoBLE loadCellController(
 
 
 
-//#include "SerialMotorControl.h"
-//SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
 /*
 JsonDocument createTelemetryPacket() {
@@ -192,6 +191,9 @@ constexpr byte MOTOR_ID = 0x02;
 
 CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
 
+#include "SerialMotorControl.h"
+SerialMotorControl serialControl(Serial, motor1Cmd, motor);
+
 constexpr uint32_t TELEMETRY_PERIOD_US = 5000; // 20 ms = 50 Hz ; 5ms = 200Hz
 unsigned long now = millis();
 unsigned long previousSend = millis();
@@ -241,7 +243,7 @@ void setup()
     Serial.println("Stopping motor for now");
     //motor.sendMessage(exitMotorMode);
      #if HW_VERSION_AT_MOST(1,1,0)
-    Serial.println("Initializing Load Cell Handler");
+    Serial.println("Initializing Load Cell Controller (PCB version v1.1.0 and -)");
     loadCellController.begin();
 
     Serial.println(
@@ -259,7 +261,7 @@ void loop()
 {
     uart.update();
     motor.update();
-    //serialControl.update();
+    serialControl.update();
     delay(10);
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
@@ -334,6 +336,13 @@ void setup(){
         Serial1.read();
     }
     Serial.println("Starting Arduino Nano script");
+    #if HW_VERSION_AT_LEAST(1,1,1)
+    Serial.println("Initializing Arduino Nano LoadCell Handler (PCB v1.1.1+)");
+    loadCellController.begin();
+    loadCellController.calibrateAllOffsets(100);
+    Serial.println("Do not move the load cells ! Calibration in progress");
+    delay(1000);
+    #endif
     if(!ble.begin()){
     Serial.println("BLE Initialization failed. Aborting");
     while(1){}

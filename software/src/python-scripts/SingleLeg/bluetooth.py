@@ -128,9 +128,10 @@ class BluetoothManager:
     def _queue_telemetry_snapshot(self):
         (
             loadcell1,
-            loadcell2,
-            _,
-            _,
+            loadcell2#,
+            #TODO understand why you can't unpack the other two load cell values
+            #_,
+            #_,
         ) = self.loadcells.get_cable_tensions()
 
 
@@ -179,7 +180,6 @@ class BluetoothManager:
                 "<B3x3fBB2x",
                 data
             )
-
             (
                 can_id,
                 position,
@@ -196,7 +196,6 @@ class BluetoothManager:
                 temperature=temperature,
                 error=error,
             )
-
             self._queue_telemetry_snapshot()
 
         except Exception as e:

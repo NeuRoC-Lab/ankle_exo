@@ -1,0 +1,12 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/TMotor_Rev0_5_1_Mark_2_NAU_OpenExo-eagle-import.kicad_sym")(options "")(descr ""))
+  (lib (name "P78E05-1000")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/P78E05-1000.kicad_sym")(options "")(descr ""))
+  (lib (name "TXU0104")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/TXU0104PWR.kicad_sym")(options "")(descr ""))
+  (lib (name "TXU0304-Q1")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/2026-06-17_15-25-16.kicad_sym")(options "")(descr ""))
+  (lib (name "XT30 conn")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/XT30PW-F.kicad_sym")(options "")(descr ""))
+  (lib (name "TFM-107-01-L-D-WT")(type "KiCad")(uri "/Users/oscartesniere/Downloads/TFM-107-01-L-D-WT/TFM-107-01-L-D-WT.kicad_sym")(options "")(descr ""))
+  (lib (name "Teensy 4.1 (DEV-16771)")(type "KiCad")(uri "${KIPRJMOD}/libraries/symbols/DEV-16771.kicad_sym")(options "")(descr ""))
+  (lib (name "173010535")(type "KiCad")(uri "/Users/oscartesniere/Downloads/WPME-FDSM_SIP-3/WPME-FDSM_SIP-3.kicad_sym")(options "")(descr ""))
+  (lib (name "BAS70-04")(type "KiCad")(uri "/Users/oscartesniere/Downloads/BAS70-04/BAS70-04.kicad_sym")(options "")(descr ""))
+)

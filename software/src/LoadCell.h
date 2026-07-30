@@ -3,9 +3,6 @@
 #include <Arduino.h>
 #include "Board.h"
 
-#if defined(PLATFORM_NORDIC)
-    #include "NanoBLE33LoadCellADC.h"
-#endif
 
 inline constexpr float voltage_scale = 3.3f;
 
@@ -128,6 +125,7 @@ public:
             if (m_lcArray[i] != nullptr)
             {
                 m_lcArray[i]->begin();
+                // no need to call begin() on every individual load cell. The handler does it for you
             }
         }
     }
@@ -142,7 +140,12 @@ public:
     // the handler owns the float* array so that the function simply returns a pointer to the updated values
         for (uint8_t i = 0; i < m_lcCount; ++i)
         {
+            #if defined(NANO_DEBUG)
+            m_forceBuffer[i] = m_lcArray[i]->getDiffVoltage(); // temporarily get diff voltage for debug purposes
+            #else
             m_forceBuffer[i] = m_lcArray[i]->sampleForce();
+            #endif
+
         }
 
         return m_forceBuffer;
@@ -358,7 +361,7 @@ public:
             NRF_SAADC_REFERENCE_INTERNAL;
 
         m_pairConfig.acq_time =
-            NRF_SAADC_ACQTIME_15US;
+            NRF_SAADC_ACQTIME_3US; // recommended for max 10k Ohms input resistance (ref : Table 95: Acquisition time)
 
         m_pairConfig.mode =
             NRF_SAADC_MODE_DIFFERENTIAL;
@@ -568,7 +571,7 @@ public:
         );
 
         nrf_saadc_oversample_set(
-            NRF_SAADC_OVERSAMPLE_DISABLED
+            NRF_SAADC_OVERSAMPLE_DISABLED // oversampling is not recommended when using all 8 channels as effective sampling frequency would significantly drop
         );
 
         nrf_saadc_enable();

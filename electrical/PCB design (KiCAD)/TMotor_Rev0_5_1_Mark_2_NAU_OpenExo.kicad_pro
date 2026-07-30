@@ -113,14 +113,6 @@
           "under teensy"
         ],
         [
-          "courtyards_overlap|162673339|74017500|a019e31f-e1eb-4c6d-8a1d-d7bdeec61156|e85f878b-2604-4e4c-9412-0b278208e8d6",
-          "Its ok dw"
-        ],
-        [
-          "courtyards_overlap|165800291|74097500|029ca9eb-d184-452e-ac3e-95c43fa18c58|e603f8b2-2986-44a6-9382-6f4b60debe68",
-          "its ok dw"
-        ],
-        [
           "lib_footprint_mismatch|120457500|104800000|1d924175-a3da-4d4e-94bd-b427961044b9|00000000-0000-0000-0000-000000000000",
           "modified"
         ],
@@ -129,23 +121,11 @@
           "Shield"
         ],
         [
-          "silk_edge_clearance|180958218|79502505|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|d0c1270b-a936-4c8c-9044-00d5c10bc891",
-          ""
-        ],
-        [
-          "silk_edge_clearance|180962154|81884691|f7c37320-9c29-48dd-bb1c-cb4acb44d6b8|5527de78-63a3-448d-948c-bfc995c073dc",
-          ""
-        ],
-        [
           "via_dangling|167680000|133420000|a0702b0a-af51-46c7-81a1-4aa0d1354c75|00000000-0000-0000-0000-000000000000",
           "in case we opt for a GNDed CAN bus"
         ],
         [
           "via_dangling|169780000|136480000|867911ef-489a-4897-a8c7-0bf8a03b7ed4|00000000-0000-0000-0000-000000000000",
-          "in case we opt for a GNDed CAN bus"
-        ],
-        [
-          "via_dangling|173227500|74602500|c0d08f4f-4877-46ad-9c14-ac71eedd5410|00000000-0000-0000-0000-000000000000",
           "in case we opt for a GNDed CAN bus"
         ]
       ],
@@ -682,7 +662,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "EXPORT FOR V1.1(new)/",
+      "plot": "EXPORT FOR v1.1.1/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "AnkleExov1_1_1_CAD.step",

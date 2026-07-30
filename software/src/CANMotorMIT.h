@@ -94,88 +94,100 @@ public:
     MotorCmd& m_cmd;   // reference, not copy
     MotorReply m_reply;
     bool m_enabled;
+    bool m_hardStopActive = false;
     const AK60Params* m_motorSettings;
     const AK60Params* m_motorSoftwareConstraints;
     const AK60Params* m_motorRunningConstraints;
 
+    enum class HardStopState : uint8_t
+    {
+        Normal,
+        RecoveringFromLowerPosition,
+        RecoveringFromUpperPosition
+    };
 
-bool resetMotor()
-{
-    m_enabled = false;
+    HardStopState m_hardStopState = HardStopState::Normal;
 
-    Serial.println("Exiting MIT motor mode...");
 
-    if (!sendMessage(exitMotorMode)) {
-        return false;
-    }
+    bool resetMotor()
+    {
+        m_enabled = false;
+        m_hardStopActive = false;
 
-    delay(500);
+        Serial.println("Exiting MIT motor mode...");
 
-    Serial.println("Entering MIT motor mode...");
-
-    if (!sendMessage(enterMotorMode)) {
-        return false;
-    }
-
-    delay(100);
-
-    // Zero position, velocity, gains, and feedforward torque.
-    if (!sendMessage(neutralMITCommand)) {
-        return false;
-    }
-
-    m_enabled = true;
-
-    return true;
-}
-
-void update(){
-
-        if(m_enabled){
-        uint8_t tx_buf[8];
-        pack_cmd(
-            tx_buf,
-            m_cmd.position,
-            m_cmd.velocity,
-            m_cmd.kp,
-            m_cmd.kd,
-            m_cmd.torque
-        );
-        if (!sendMessage(tx_buf)) {
-            Serial.println("MIT command send failed");
-        }
+        if (!sendMessage(exitMotorMode))
+        {
+            return false;
         }
 
-        while (readMessages(m_reply)) {
-            checkHardStop();
-            if (++m_printCounter >= m_kPrintEvery) {
-                //print_can_msg(m_reply);
+        delay(500);
+
+        Serial.println("Entering MIT motor mode...");
+
+        if (!sendMessage(enterMotorMode))
+        {
+            return false;
+        }
+
+        delay(100);
+
+        if (!sendMessage(neutralMITCommand))
+        {
+            return false;
+        }
+
+        m_enabled = true;
+        return true;
+    }
+
+
+    void update()
+    {
+        while (readMessages(m_reply))
+        {
+            updateHardStopState();
+
+            if (++m_printCounter >= m_kPrintEvery)
+            {
+                // print_can_msg(m_reply);
                 m_printCounter = 0;
             }
         }
-    }
-void checkHardStop(){
-    if (m_enabled &&
-        (m_reply.torque   > m_motorRunningConstraints->trq_max ||
-         m_reply.torque   < m_motorRunningConstraints->trq_min ||
-         m_reply.velocity > m_motorRunningConstraints->v_max   ||
-         m_reply.velocity < m_motorRunningConstraints->v_min   ||
-         m_reply.position > m_motorRunningConstraints->p_max   ||
-         m_reply.position < m_motorRunningConstraints->p_min))
-    {
-    Serial.println("Detected position/velocity/torque overshoot ! Stopping the motor");
-    Serial.print("Position at overshoot");
-    Serial.print(m_reply.position);
-    Serial.print(" Velocity at overshoot");
-    Serial.print(m_reply.velocity);
-    Serial.print(" Torque at overshoot");
-    Serial.println(m_reply.torque);
 
-    m_enabled = false;
-    sendMessage(exitMotorMode);
-    // leaving motor mode seems to disable logging of messages
+        if (!m_enabled)
+        {
+            return;
+        }
+
+        uint8_t tx_buf[8];
+
+        if (commandAllowedByHardStop())
+        {
+            pack_cmd(
+                tx_buf,
+                m_cmd.position,
+                m_cmd.velocity,
+                m_cmd.kp,
+                m_cmd.kd,
+                m_cmd.torque
+            );
+        }
+        else
+        {
+            memcpy(
+                tx_buf,
+                neutralMITCommand,
+                sizeof(tx_buf)
+            );
+        }
+
+        if (!sendMessage(tx_buf))
+        {
+            Serial.println("MIT command send failed");
+        }
     }
-}
+
 // This can be placed outside the class, it does not depend on any instance parameter
 void print_can_msg(MotorReply reply){
         Serial.print("  motor id: ");
@@ -214,21 +226,266 @@ bool handleSerialCommand(const CommandPayload& command){
         return false;
         } // discard messages that do not match the motor's CAN ID
 
-    if(command.type == MotorCommandType::Stop){
-        return sendMessage(exitMotorMode);
+        if (command.type == MotorCommandType::Stop)
+        {
+            const bool success = sendMessage(exitMotorMode);
+
+            if (success)
+            {
+                m_enabled = false;
+                m_hardStopActive = false;
+            }
+
+            return success;
+        }
+        else if (command.type == MotorCommandType::Start)
+        {
+            const bool success = sendMessage(enterMotorMode);
+
+            if (success)
+            {
+                m_enabled = true;
+                m_hardStopActive = false;
+            }
+
+            return success;
+        }
+        else if (command.type == MotorCommandType::Zero)
+        {
+            return sendMessage(setZeroPosition);
+        }
+        else if (command.type == MotorCommandType::Set)
+        {
+            m_cmd = command.cmd;
+            update();// call update to make sure the command is immediately packed and sent
+            return true;
+        }
+    return false;
+}
+
+bool isOutsideRunningLimits() const
+{
+    return
+        m_reply.position < m_motorRunningConstraints->p_min ||
+        m_reply.position > m_motorRunningConstraints->p_max ||
+
+        m_reply.velocity < m_motorRunningConstraints->v_min ||
+        m_reply.velocity > m_motorRunningConstraints->v_max ||
+
+        m_reply.torque < m_motorRunningConstraints->trq_min ||
+        m_reply.torque > m_motorRunningConstraints->trq_max;
+}
+
+
+void updateHardStopState()
+{
+    switch (m_hardStopState)
+    {
+        case HardStopState::Normal:
+        {
+            // Running constraints are the outer hard-stop limits.
+            if (m_reply.position <= m_motorRunningConstraints->p_min)
+            {
+                Serial.println(
+                    "Lower position hard stop reached. "
+                    "Only positive recovery commands are allowed."
+                );
+
+                m_hardStopState =
+                    HardStopState::RecoveringFromLowerPosition;
+
+                sendMessage(neutralMITCommand);
+            }
+            else if (
+                m_reply.position >=
+                m_motorRunningConstraints->p_max
+            )
+            {
+                Serial.println(
+                    "Upper position hard stop reached. "
+                    "Only negative recovery commands are allowed."
+                );
+
+                m_hardStopState =
+                    HardStopState::RecoveringFromUpperPosition;
+
+                sendMessage(neutralMITCommand);
+            }
+
+            break;
+        }
+
+        case HardStopState::RecoveringFromLowerPosition:
+        {
+            /*
+             * Remain in recovery mode until the motor enters the
+             * normal software-constrained operating region.
+             */
+            if (
+                m_reply.position >=
+                m_motorSoftwareConstraints->p_min
+            )
+            {
+                Serial.println(
+                    "Motor recovered past lower software limit."
+                );
+
+                m_hardStopState = HardStopState::Normal;
+            }
+
+            break;
+        }
+
+        case HardStopState::RecoveringFromUpperPosition:
+        {
+            if (
+                m_reply.position <=
+                m_motorSoftwareConstraints->p_max
+            )
+            {
+                Serial.println(
+                    "Motor recovered past upper software limit."
+                );
+
+                m_hardStopState = HardStopState::Normal;
+            }
+
+            break;
+        }
     }
-    else if (command.type == MotorCommandType::Start){
-        return sendMessage(enterMotorMode);
-     }
-    else if(command.type == MotorCommandType::Zero){
-        return sendMessage(setZeroPosition);
+}
+
+
+/*
+ * Return:
+ *
+ *   +1: recovery requires increasing motor position / positive torque
+ *   -1: recovery requires decreasing motor position / negative torque
+ *    0: no violation
+ *    2: conflicting violations; no unambiguous recovery direction
+ */
+int8_t requiredRecoveryDirection() const
+{
+    bool requiresPositive = false;
+    bool requiresNegative = false;
+
+    // Position hard stop.
+    if (m_reply.position < m_motorRunningConstraints->p_min)
+    {
+        requiresPositive = true;
     }
-    else if(command.type == MotorCommandType::Set){
-        m_cmd = command.cmd; // update m_cmd
-        update(); // call update to make sure the command is immediately packed and sent
+    else if (m_reply.position > m_motorRunningConstraints->p_max)
+    {
+        requiresNegative = true;
+    }
+
+    // Velocity hard stop.
+    if (m_reply.velocity < m_motorRunningConstraints->v_min)
+    {
+        requiresPositive = true;
+    }
+    else if (m_reply.velocity > m_motorRunningConstraints->v_max)
+    {
+        requiresNegative = true;
+    }
+
+    // Torque hard stop.
+    if (m_reply.torque < m_motorRunningConstraints->trq_min)
+    {
+        requiresPositive = true;
+    }
+    else if (m_reply.torque > m_motorRunningConstraints->trq_max)
+    {
+        requiresNegative = true;
+    }
+
+    if (requiresPositive && requiresNegative)
+    {
+        return 2;
+    }
+
+    if (requiresPositive)
+    {
+        return +1;
+    }
+
+    if (requiresNegative)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+    bool commandAllowedByHardStop() const
+    {
+        constexpr float torqueEpsilon = 0.01f;
+
+        const float estimatedTorque =
+            estimatedCommandedTorque();
+
+        switch (m_hardStopState)
+        {
+            case HardStopState::Normal:
+                return true;
+
+            case HardStopState::RecoveringFromLowerPosition:
+                // Positive torque should increase position.
+                return estimatedTorque > torqueEpsilon;
+
+            case HardStopState::RecoveringFromUpperPosition:
+                // Negative torque should decrease position.
+                return estimatedTorque < -torqueEpsilon;
+        }
+
+        return false;
+    }
+
+    float estimatedCommandedTorque() const
+    {
+        const float positionContribution =
+            m_cmd.kp *
+            (m_cmd.position - m_reply.position);
+
+        const float velocityContribution =
+            m_cmd.kd *
+            (m_cmd.velocity - m_reply.velocity);
+
+        return positionContribution +
+               velocityContribution +
+               m_cmd.torque;
+    }
+
+
+bool commandMovesTowardValidRegion() const
+{
+    const int8_t requiredDirection = requiredRecoveryDirection();
+
+    if (requiredDirection == 0)
+    {
         return true;
     }
-    return false;
+
+    if (requiredDirection == 2)
+    {
+        // Conflicting violations: remain neutral.
+        return false;
+    }
+
+    const float commandedTorque = estimatedCommandedTorque();
+
+    /*
+     * Avoid accepting tiny numerical values as intentional recovery commands.
+     * Adjust this threshold for your motor if necessary.
+     */
+    constexpr float recoveryTorqueEpsilon = 0.01f;
+
+    if (requiredDirection > 0)
+    {
+        return commandedTorque > recoveryTorqueEpsilon;
+    }
+
+    return commandedTorque < -recoveryTorqueEpsilon;
 }
 
 // to prevent one from calling these functions directly from the SuperClass
