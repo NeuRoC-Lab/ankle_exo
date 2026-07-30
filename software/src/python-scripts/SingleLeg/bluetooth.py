@@ -126,9 +126,13 @@ class BluetoothManager:
     # Queue latest telemetry snapshot
 
     def _queue_telemetry_snapshot(self):
-        loadcell1, loadcell2 = (
-            self.loadcells.get_cable_tensions()
-        )
+        (
+            loadcell1,
+            loadcell2,
+            _,
+            _,
+        ) = self.loadcells.get_cable_tensions()
+
 
         (
             motor_position,

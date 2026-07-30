@@ -25,7 +25,7 @@ import time
 from bluetooth import BluetoothManager
 
 from sensors import (
-    MOTOR_ID,
+    Motor_ID,
     Encoder,
     LoadCells,
     Motor,
@@ -34,7 +34,7 @@ from sensors import (
     parse_motor_command,
 )
 
-from plotting-csv import (
+from plottingCSV import (
     CSVLogger,
     PlotManager,
     PLOT_INTERVAL,
@@ -69,6 +69,8 @@ def connect_to_arduino(
         motor,
         stop_event,
 ):
+
+    print("Creating BluetoothManager...")
     bluetooth = BluetoothManager(
         encoder=encoder,
         loadcells=loadcells,
@@ -77,6 +79,7 @@ def connect_to_arduino(
     )
 
     bluetooth.connect()
+    print("Bluetooth connected")
 
     return bluetooth
 
@@ -333,7 +336,7 @@ def shutdown(
 # Main program
 
 def main():
-    stop_event = threading.Event()
+    stop_event = threading.Event() # to stop safely bluetooth and plotting
 
     (
         encoder,
@@ -341,6 +344,7 @@ def main():
         motor,
     ) = setup_sensors()
 
+    # start bluetooth communication
     bluetooth = connect_to_arduino(
         encoder,
         loadcells,

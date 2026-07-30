@@ -65,6 +65,8 @@ class LoadCells:
 
     def __init__(self):
         self.left1 = 0.0
+        self.left2 = 0.0
+        self.right1 = 0.0
         self.right2 = 0.0
 
         self.lock = threading.Lock()
@@ -72,15 +74,24 @@ class LoadCells:
     def update( # add left2 and right1 later when they are being used
             self,
             left1,
+            left2,
+            right1,
             right2,
     ):
         with self.lock:
             self.left1 = left1
+            self.lef2 = left2
+            self.right1 = right1
             self.right2 = right2
 
     def get_values(self):
         with self.lock:
-            return(self.left1, self.right2)
+            return(
+                self.left1,
+                self.left2,
+                self.right1,
+                self.right2
+            )
 
     def get_cable_tensions(self):
         with self.lock:
@@ -165,7 +176,7 @@ class Motor:
 
 def parse_motor_command(text): # convert user text into MotorCommand object
 
-    tokens = text.strip().lower().strip()
+    tokens = text.strip().lower().split()
     if not tokens:
         raise ValueError("Command is empty")
 
