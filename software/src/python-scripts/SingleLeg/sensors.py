@@ -1,7 +1,8 @@
 """
 This script contains the modules for the sensors and motor
-- 2 loadcels
+- 2 load cells
 - 1 encoder
+    -
 - 1 motor in MIT mode
 """
 
@@ -25,7 +26,6 @@ class Encoder:
         self.raw_count = 0
         self.first_value = None
         self.angle_deg = 0.0
-        self.ankle_velocity = 0.0
 
         self.raw_vel = 0.0
         self.filtered_vel = 0.0
@@ -76,7 +76,7 @@ class Encoder:
 
             if self.first_velocity: # do not apply EWMA on the first velocity reading
                 self.filtered_vel = self.raw_vel
-                self.filtered_vel = False
+                self.first_velocity = False
 
             else:
                 self.filtered_vel = (
