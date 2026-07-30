@@ -22,28 +22,15 @@ class Encoder:
         self.raw_count = 0
         self.first_value = None
         self.angle_deg = 0.0
-        self.ankle_velocity = 0.0
-
-        self.raw_vel = 0.0
-        self.filtered_vel = 0.0
-        self.ankle_velocity = 0.0
-
-        self.alpha = 0.2 # test and adjust EWMA filter coefficient (0 < alpha < 1)
-        self.first_velocity = True
-
-        # values used for velocity calculation and filtering
-        self.prev_angle = 0.0
-        self.prev_time = None
 
         self.lock = threading.Lock()
 
-    def update(self, raw_count, current_time):
+    def update(self, raw_count):
 
         with self.lock:
 
             self.raw_count = raw_count
 
-            # encoder position
             if self.first_value is None: # zero the encoder at the beginning
                 self.first_value = raw_count
 
@@ -53,40 +40,7 @@ class Encoder:
             if relative_count >= half_count:
                 relative_count -= max_count
 
-            new_angle = (relative_count * 360.0 / max_count)
-
-            # encoder raw velocity
-
-            if self.prev_time is not None:
-
-                dt = current_time - self.prev_time
-
-                if dt > 0:
-                    self.raw_vel = (new_angle - self.prev_angle)/dt
-
-            self.prev_angle = new_angle
-            self.prev_time = current_time
-
-            self.angle_deg = new_angle
-
-            # EWMA filter on encoder raw velocity https://corporatefinanceinstitute.com/resources/uncategorized/exponentially-weighted-moving-average-ewma/
-
-            if self.first_velocity: # do not apply EWMA on the first velocity reading
-                self.filtered_vel = self.raw_vel
-                self.filtered_vel = False
-
-            else:
-                self.filtered_vel = (
-                    self.alpha * self.raw_vel
-                    + (1 - self.alpha) * self.filtered_vel
-                )
-
-            self.ankle_velocity = self.filtered_vel
-
-    def set_zero(self):
-        with self.lock:
-            self.first_value = self.raw_count
-            self.angle_deg = 0.0
+            self.angle_deg = (relative_count * 360.0 / max_count)
 
     def get_angle_deg(self):
         with self.lock:
@@ -96,9 +50,10 @@ class Encoder:
         with self.lock:
             return self.raw_count
 
-    def get_ankle_vel(self):
+    def set_zero(self):
         with self.lock:
-            return self.ankle_velocity
+            self.first_value = self.raw_count
+            self.angle_deg = 0.0
 
 
 
