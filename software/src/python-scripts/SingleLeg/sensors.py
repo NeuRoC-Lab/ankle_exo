@@ -31,10 +31,10 @@ class Encoder:
 
             self.raw_count = raw_count
 
-            if self.first_value is None:
+            if self.first_value is None: # zero the encoder at the beginning
                 self.first_value = raw_count
 
-            relative_count = (raw_count - self.first_value) % max_count
+            relative_count = (raw_count - self.first_value) % max_count 
 
             # Avoid jumps from max count to zero
             if relative_count >= half_count:
@@ -69,7 +69,7 @@ class LoadCells:
 
         self.lock = threading.Lock()
 
-    def update(
+    def update( # add left2 and right1 later when they are being used
             self,
             left1,
             right2,
@@ -91,7 +91,7 @@ MOTOR
 """
 Motor_ID = 0x02
 
-class MotorCommandType(IntEnum):
+class MotorCommandType(IntEnum): # assign integer to each motor command
     START = 0
     STOP = 1
     ZERO = 2
@@ -211,18 +211,30 @@ def parse_motor_command(text):
 
     while index < len(tokens):
         if index + 1 >= len(tokens):
-            raise ValueError(f"Missing value after '{tokens[index]}'")
+            raise ValueError(
+                f"Missing value after '{tokens[index]}'"
+            )
 
-        key = aliases.get(tokens[index], tokens[index,])
+        key = tokens[index]
+        value = tokens[index + 1]
 
-        value = tokens[index+1]
+        # in case the full word is used instead of the shortened version and vice versa
+        if key == "trq":
+            key = "torque"
+
+        if key == "position":
+            key = "pos"
+
+        if key == "velocity":
+            key = "vel"
 
         if key not in values:
-            raise ValueError(f"Unknown '{tokens[index]}")
+            raise ValueError(
+                f"Unknown field '{key}'"
+            )
 
         if key == "id":
             values[key] = int(value, 0)
-
         else:
             values[key] = float(value)
 
