@@ -49,7 +49,7 @@ start_time = time.perf_counter()
 
 # Sensor setup
 
-def setup_sensors():
+def setup_sensors(): # create objects for sensors
     encoder = Encoder()
     loadcells = LoadCells()
     motor = Motor()
@@ -107,9 +107,7 @@ def send_command_from_box(
 
     try:
         command = parse_motor_command(text)
-
         bluetooth.queue_motor_command(command)
-
         plotter.clear_command_text()
 
     except ValueError as exc:
@@ -199,12 +197,10 @@ def close_plot(
     # Ask the Nano to stop the motor before shutting down.
     stop_motor(bluetooth)
 
-    # Give the BLE loop one short opportunity to transmit it.
-    # The final shutdown still must not depend on this succeeding.
     deadline = time.perf_counter() + 0.10
 
     while (
-            bluetooth.has_pending_commands()
+            bluetooth.has_pending_commands() # wait until all motor commands are sent
             and
             time.perf_counter() < deadline
     ):
@@ -252,15 +248,8 @@ def process_bluetooth_data(
 
 # Update plot
 
-def update_plot(
-        plotter,
-        current_time,
-        snapshot,
-):
-    plotter.update(
-        current_time,
-        snapshot
-    )
+def update_plot(plotter, current_time,snapshot):
+    plotter.update(current_time, snapshot)
 
 
 # Main plotting loop
@@ -275,11 +264,7 @@ def run_plotting_loop(
 
     pending_plot_snapshot = None
 
-    while (
-            not stop_event.is_set()
-            and
-            plotter.is_open()
-    ):
+    while (not stop_event.is_set() and plotter.is_open()):
 
         newest_snapshot = process_bluetooth_data(
             bluetooth,
@@ -379,9 +364,7 @@ def main():
         )
 
     except KeyboardInterrupt:
-        print(
-            "Ctrl+C pressed, closing figure"
-        )
+        print("Ctrl+C pressed, closing figure")
 
     finally:
         shutdown(

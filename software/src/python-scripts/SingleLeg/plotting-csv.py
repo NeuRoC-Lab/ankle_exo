@@ -168,16 +168,10 @@ class PlotManager:
             +---------+---------+
         """
 
-        self.fig.suptitle(
-            "Real Time Data Of One Ankle Exoskeleton",
-            fontsize=14
-        )
+        self.fig.suptitle("Real Time Data Of One Ankle Exoskeleton", fontsize=14)
 
-        # Reserve room at the bottom for motor controls.
-        self.fig.subplots_adjust(
-            bottom=0.18,
-            hspace=0.55
-        )
+        # Leave room at the bottom for motor controls.
+        self.fig.subplots_adjust(bottom=0.18, hspace=0.55)
 
         self.line1, = ax1.plot(
             [],
@@ -271,7 +265,7 @@ class PlotManager:
         ]
 
 
-        # Motor control widgets
+        # Motor control widgets, values may be adjusted
 
         command_axis = self.fig.add_axes(
             [0.10, 0.055, 0.55, 0.045]

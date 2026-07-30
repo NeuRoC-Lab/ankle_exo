@@ -5,7 +5,7 @@ This script contains the modules for the sensors and motor
 - 1 motor in MIT mode
 """
 
-import struct
+import struct # convert variables into raw bytes for the arduino
 import threading
 from dataclasses import dataclass
 from enum import IntEnum
@@ -89,7 +89,7 @@ class LoadCells:
 """
 MOTOR
 """
-Motor_ID = 0x02
+Motor_ID = 0x02 # current motor id set as 2, modify as needed
 
 class MotorCommandType(IntEnum): # assign integer to each motor command
     START = 0
@@ -163,7 +163,7 @@ class Motor:
                 self.error,
             )
 
-def parse_motor_command(text):
+def parse_motor_command(text): # convert user text into MotorCommand object
 
     tokens = text.strip().lower().strip()
     if not tokens:
