@@ -146,6 +146,10 @@ public:
     {
         while (readMessages(m_reply))
         {
+            if(isOutsideSoftwareLimits()){
+            //Serial.println("Reached software limits. Increasing damping factor to slow down the motor inertia");
+            m_cmd.kd = 2;
+            }
             updateHardStopState();
 
             if (++m_printCounter >= m_kPrintEvery)
@@ -275,6 +279,19 @@ bool isOutsideRunningLimits() const
         m_reply.torque < m_motorRunningConstraints->trq_min ||
         m_reply.torque > m_motorRunningConstraints->trq_max;
 }
+
+    bool isOutsideSoftwareLimits() const
+    {
+        return
+            m_reply.position < m_motorSoftwareConstraints->p_min ||
+            m_reply.position > m_motorSoftwareConstraints->p_max ||
+
+            m_reply.velocity < m_motorSoftwareConstraints->v_min ||
+            m_reply.velocity > m_motorSoftwareConstraints->v_max ||
+
+            m_reply.torque < m_motorSoftwareConstraints->trq_min ||
+            m_reply.torque > m_motorSoftwareConstraints->trq_max;
+    }
 
 
 void updateHardStopState()

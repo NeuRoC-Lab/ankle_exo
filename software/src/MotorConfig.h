@@ -25,7 +25,7 @@ constexpr AK60Params motorSoftwareConstraints = {
     -20.0f, 20.0f,   // velocity, rad/s
     0.0f,  500.0f,   // kp
     0.0f,  5.0f,     // kd
-    -4.0f, 4.0f      // torque, N*m
+    -10.0f, 10.0f      // torque, N*m
 };
 
 constexpr AK60Params motorRunningConstraints = {
@@ -33,7 +33,7 @@ constexpr AK60Params motorRunningConstraints = {
     -25.0f, 25.0f,   // velocity, rad/s
     0.0f,  500.0f,   // kp, not used for feedback checks
     0.0f,  5.0f,     // kd, not used for feedback checks
-    -5.0f, 5.0f      // torque, N*m
+    -12.0f, 12.0f      // torque, N*m
 };
 
 
