@@ -18,7 +18,7 @@ from bleak import BleakClient, BleakScanner
 
 from sensors import (
     COMMAND_PACKET_SIZE,
-    Encoder,
+    Encoders,
     LoadCells,
     Motor,
     MotorCommand,
@@ -42,6 +42,7 @@ class TelemetrySnapshot:
 
     encoder: int
     ankle_angle: float
+    ankle_velocity: float
 
     loadcell1: float
     loadcell2: float
@@ -149,6 +150,7 @@ class BluetoothManager:
 
                 encoder=self.encoder.get_raw_count(),
                 ankle_angle=self.encoder.get_angle_deg(),
+                ankle_velocity=self.encoder.get_ankle_vel(),
 
                 loadcell1=loadcell1,
                 loadcell2=loadcell2,
@@ -258,7 +260,7 @@ class BluetoothManager:
             ) = values
 
             # Existing single-leg code uses the left encoder.
-            self.encoder.update(left)
+            self.encoder.update(left, time.perf_counter())
 
             self._queue_telemetry_snapshot()
 

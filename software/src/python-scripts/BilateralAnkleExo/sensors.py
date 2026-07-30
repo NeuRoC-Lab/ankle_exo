@@ -1,8 +1,8 @@
 """
-This script contains the modules for the sensors and motor
-- 2 loadcels
-- 1 encoder
-- 1 motor in MIT mode
+This script contains the modules for the sensors and motor, including:
+4 load cells
+2 encoders
+2 motors interfaced in MIT mode
 """
 
 import struct # convert variables into raw bytes for the arduino
@@ -11,26 +11,41 @@ from dataclasses import dataclass
 from enum import IntEnum
 
 """
-ENCODER
+ENCODERS
 """
+def clamp(value, minimum=-1000.0, maximum=1000.0):
+    return max(minimum, min(value, maximum))
+
 
 max_count = 4096
 half_count = max_count // 2
 
-class Encoder:
+class Encoders:
     def __init__(self):
         self.raw_count = 0
         self.first_value = None
         self.angle_deg = 0.0
 
+        self.raw_vel = 0.0
+        self.filtered_vel = 0.0
+        self.ankle_velocity = 0.0
+
+        self.alpha = 0.2 # test and adjust EWMA filter coefficient (0 < alpha < 1)
+        self.first_velocity = True
+
+        # values used for velocity calculation and filtering
+        self.prev_angle = 0.0
+        self.prev_time = None
+
         self.lock = threading.Lock()
 
-    def update(self, raw_count):
+    def update(self, raw_count, current_time):
 
         with self.lock:
 
             self.raw_count = raw_count
 
+            # encoder position
             if self.first_value is None: # zero the encoder at the beginning
                 self.first_value = raw_count
 
@@ -40,7 +55,40 @@ class Encoder:
             if relative_count >= half_count:
                 relative_count -= max_count
 
-            self.angle_deg = (relative_count * 360.0 / max_count)
+            new_angle = (relative_count * 360.0 / max_count)
+
+            # encoder raw velocity
+
+            if self.prev_time is not None:
+
+                dt = current_time - self.prev_time
+
+                if dt > 0:
+                    self.raw_vel = (new_angle - self.prev_angle)/dt
+
+            self.prev_angle = new_angle
+            self.prev_time = current_time
+
+            self.angle_deg = new_angle
+
+            # EWMA filter on encoder raw velocity https://corporatefinanceinstitute.com/resources/uncategorized/exponentially-weighted-moving-average-ewma/
+
+            if self.first_velocity: # do not apply EWMA on the first velocity reading
+                self.filtered_vel = self.raw_vel
+                self.first_velocity = False
+
+            else:
+                self.filtered_vel = (
+                    self.alpha * self.raw_vel
+                    + (1 - self.alpha) * self.filtered_vel
+                )
+
+            self.ankle_velocity =  self.raw_vel # self.filtered_vel values are weird
+
+    def set_zero(self):
+        with self.lock:
+            self.first_value = self.raw_count
+            self.angle_deg = 0.0
 
     def get_angle_deg(self):
         with self.lock:
@@ -50,10 +98,9 @@ class Encoder:
         with self.lock:
             return self.raw_count
 
-    def set_zero(self):
+    def get_ankle_vel(self):
         with self.lock:
-            self.first_value = self.raw_count
-            self.angle_deg = 0.0
+            return self.ankle_velocity
 
 
 
@@ -79,10 +126,10 @@ class LoadCells:
             right2,
     ):
         with self.lock:
-            self.left1 = left1
-            self.lef2 = left2
-            self.right1 = right1
-            self.right2 = right2
+            self.left1 = clamp(left1)
+            self.lef2 = clamp(left2)
+            self.right1 = clamp(right1)
+            self.right2 = clamp(right2)
 
     def get_values(self):
         with self.lock:
