@@ -140,11 +140,8 @@ public:
     // the handler owns the float* array so that the function simply returns a pointer to the updated values
         for (uint8_t i = 0; i < m_lcCount; ++i)
         {
-            #if defined(NANO_DEBUG)
-            m_forceBuffer[i] = m_lcArray[i]->getDiffVoltage(); // temporarily get diff voltage for debug purposes
-            #else
+            //m_forceBuffer[i] = m_lcArray[i]->getDiffVoltage(); // temporarily get diff voltage for debug purposes
             m_forceBuffer[i] = m_lcArray[i]->sampleForce();
-            #endif
 
         }
 

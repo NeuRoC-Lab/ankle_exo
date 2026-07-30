@@ -49,25 +49,25 @@ LoadCellParams loadCellParams{};
 LoadCell_Teensy41 LC_L_1(
     inaParams,
     loadCellParams,
-    boardConfig.LC_L_1_Vo
+    boardConfig.LC_L_1_pin
 );
 
 LoadCell_Teensy41 LC_L_2(
     inaParams,
     loadCellParams,
-    boardConfig.LC_L_2_Vo
+    boardConfig.LC_L_2_pin
 );
 
 LoadCell_Teensy41 LC_R_1(
     inaParams,
     loadCellParams,
-    boardConfig.LC_R_1_Vo
+    boardConfig.LC_R_1_pin
 );
 
 LoadCell_Teensy41 LC_R_2(
     inaParams,
     loadCellParams,
-    boardConfig.LC_R_2_Vo
+    boardConfig.LC_R_2_pin
 );
 
 LoadCell* loadCells[loadCellCount] = {
@@ -135,40 +135,6 @@ LoadCellHandler_NanoBLE loadCellController(
 );
 
 #endif
-
-
-//NOTE : only two load cells are actually used. Remove the two extras when testing (after identifying which is which)
-
-
-
-
-/*
-JsonDocument createTelemetryPacket() {
-    JsonDocument doc;
-
-    doc[TelemetryKey::LeftLoadCell1] = LC_L_1.rawVoltage();
-    doc[TelemetryKey::LeftLoadCell2] = LC_L_2.rawVoltage();
-    doc[TelemetryKey::RightLoadCell1] = LC_R_1.rawVoltage();
-    doc[TelemetryKey::RightLoadCell2] = LC_R_2.rawVoltage();
-
-    doc[TelemetryKey::LeftEncoder] = positions.left_position;
-    doc[TelemetryKey::RightEncoder] = positions.right_position;
-
-    JsonArray motors =
-        doc[TelemetryKey::Motors].to<JsonArray>();
-
-    JsonObject motor1Object = motors.add<JsonObject>();
-    motor.writeReplyToJson(motor1Object);
-    // only one motor for now
-
-    //JsonObject motor2Object = motors.add<JsonObject>();
-    //motor2.writeReplyToJson(motor2Object);
-
-    return doc;
-}
-*/
-
-// TEENSY CODE
 
 #if defined(PLATFORM_TEENSY41)
 
@@ -250,10 +216,10 @@ void setup()
         "Keep all load cells unloaded during calibration."
     );
 
-    delay(1000);
+    //delay(1000);
 
-    loadCellController.calibrateAllOffsets(100);
-    Serial.println("Calibrated Load Cell offset");
+    //loadCellController.calibrateAllOffsets(100);
+    //Serial.println("Calibrated Load Cell offset");
     #endif
 }
 
@@ -296,6 +262,9 @@ void loop()
             0.0f,
         };
         #endif
+
+        //Serial.println((float)analogRead(boardConfig.LC_L_1_pin)*3.3f/4095.0f);
+        //Serial.println((float)analogRead(boardConfig.LC_R_2_pin)*3.3f/4095.0f);
 
         DataPayload payload {
             loadCells,

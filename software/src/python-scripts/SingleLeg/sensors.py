@@ -13,6 +13,9 @@ from enum import IntEnum
 """
 ENCODER
 """
+def clamp(value, minimum=-1000.0, maximum=1000.0):
+    return max(minimum, min(value, maximum))
+
 
 max_count = 4096
 half_count = max_count // 2
@@ -79,10 +82,10 @@ class LoadCells:
             right2,
     ):
         with self.lock:
-            self.left1 = left1
-            self.lef2 = left2
-            self.right1 = right1
-            self.right2 = right2
+            self.left1 = clamp(left1)
+            self.lef2 = clamp(left2)
+            self.right1 = clamp(right1)
+            self.right2 = clamp(right2)
 
     def get_values(self):
         with self.lock:
