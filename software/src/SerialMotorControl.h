@@ -2,7 +2,7 @@
 
 class SerialMotorControl  {
 public:
-    SerialMotorControl(Stream& serial, MotorCmd& cmd, CANController& motor)
+    SerialMotorControl(Stream& serial, MotorCmd& cmd, CANMotorMIT_Teensy& motor)
         : m_serial(serial),
           m_cmd(cmd),
           m_controller(motor)
@@ -14,7 +14,7 @@ private:
     Stream& m_serial;
     MotorCmd& m_cmd;
     String m_line;
-    CANController& m_controller;
+    CANMotorMIT_Teensy& m_controller;
 
     void handleLine(String line);
     void handleSetCommand(String line);

@@ -7,40 +7,42 @@
 
 // Here the Teensy will communicate with the Arduino through SPI as a temporary fix
 
+#include <cstdint>
+#include <cmath>
+
 #include <Arduino.h>
+
+
 #include "Board.h"
-#include "CANMotorMIT.h"
 #include "Encoder.h"
 #include "SerialProtocol.h"
 
-
-
 #if defined(PLATFORM_TEENSY41)
 
-// Teensy-only CAN includes
+#include "CANMotorMIT.h"
 #include "MotorConfig.h"
 #include "LoadCell.h"
 #include <ArduinoJson.h>
 
-
-
 #elif defined(PLATFORM_NORDIC)
 
-// Nano-only includes
 #include <ArduinoBLE.h>
 #include <ArduinoJson.h>
 
 #endif
 
 
-// TEENSY SPECIFIC CONFIGURATION
 
 
 
-// LOAD CELL CONFIGURATION
+
+
 constexpr uint8_t loadCellCount = 4;
 
 // Load Cell configuration in version up to (and including) 1.1.0 and past (but including) 1.1.1
+
+// ==================================== LOAD CELL CONFIGURATION =========================================
+
 #if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
 
 INA125UParams inaParams{};
@@ -138,8 +140,6 @@ LoadCellHandler_NanoBLE loadCellController(
 
 #if defined(PLATFORM_TEENSY41)
 
-using CANController = CANMotorMIT_Teensy;
-
 EncoderPositions positions;
 
 MotorCmd motor1Cmd {
@@ -156,7 +156,9 @@ Encoder encoders(true, false);
 constexpr byte MOTOR_ID = 0x02;
 
 CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+CANMotorMIT_Handler motorHandler(motor,nullptr);
 
+//TODO remove that later after Motor Handler class has been validated, but keep it for debugging in one leg setup
 #include "SerialMotorControl.h"
 SerialMotorControl serialControl(Serial, motor1Cmd, motor);
 
@@ -164,32 +166,11 @@ constexpr uint32_t TELEMETRY_PERIOD_US = 5000; // 20 ms = 50 Hz ; 5ms = 200Hz
 unsigned long now = millis();
 unsigned long previousSend = millis();
 
-void handleMotorCommand(
-    void* context,
-    const CommandPayload& command
-)
-{
-    auto* motor = static_cast<CANMotorMIT*>(context);
+UARTHandler_Teensy uart(Serial8,motorHandler);
 
-    if (motor != nullptr) {
-        motor->handleSerialCommand(command);
-    }
-}
-
-UARTHandler uart(
-    Serial8,
-    handleMotorCommand,
-    &motor
-);
 
 void setup()
 {
-    // encoder setup
-    pinMode(boardConfig.OE1, OUTPUT);
-    pinMode(boardConfig.OE2, OUTPUT);
-    digitalWrite(boardConfig.OE1,HIGH);
-    digitalWrite(boardConfig.OE2,HIGH);
-    delay(2000);
     uart.begin();
     Serial.println("Initializing UART communication with Nano");
     encoders.begin();
@@ -199,14 +180,7 @@ void setup()
 
     Serial8.begin(230400); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
-    motor.begin();
-    if(!motor.resetMotor()){
-        Serial.println("Failed to start motor");
-    }
-    else {
-        Serial.println("Successfully started motor");
-    }
-    Serial.println("Stopping motor for now");
+    motorHandler.begin();
     //motor.sendMessage(exitMotorMode);
      #if HW_VERSION_AT_MOST(1,1,0)
     Serial.println("Initializing Load Cell Controller (PCB version v1.1.0 and -)");
@@ -216,10 +190,9 @@ void setup()
         "Keep all load cells unloaded during calibration."
     );
 
-    //delay(1000);
-
-    //loadCellController.calibrateAllOffsets(100);
-    //Serial.println("Calibrated Load Cell offset");
+    loadCellController.calibrateAllOffsets(100);
+    delay(1000);
+    Serial.println("Calibrated Load Cell offset");
     #endif
 }
 
@@ -228,7 +201,7 @@ void loop()
     uart.update();
     motor.update();
     serialControl.update();
-    delay(10);
+    delay(10); //TODO try to remove that unless it blocks the motor control update. This will ensure our data rate is set by TELEMETRY_PERIOD_US
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
 
@@ -263,16 +236,13 @@ void loop()
         };
         #endif
 
-        //Serial.println((float)analogRead(boardConfig.LC_L_1_pin)*3.3f/4095.0f);
-        //Serial.println((float)analogRead(boardConfig.LC_R_2_pin)*3.3f/4095.0f);
-
         DataPayload payload {
             loadCells,
             positions,
             motor.m_reply,
         };
 
-        uart.sendTelemetryPacket(payload);
+        uart.send(payload);
 
     }
     #endif
@@ -280,13 +250,8 @@ void loop()
 }
 #elif defined(PLATFORM_NORDIC)
 
-// code for the Arduino Nano
 DataPayload payload {};
-
-UARTHandler uart(
-    Serial1,
-    payload
-);
+UARTHandler_Nano uart(Serial1,payload); //TODO ideally later on pass on reference to BLEHandler so it follows the same semantics as in UARTController uart(Serial8,motorHandler);
 
 BLEHandler ble(
     payload,

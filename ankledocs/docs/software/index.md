@@ -16,6 +16,18 @@ To run an environment (ex `myenv`) run in the same directory as `platormio.ini` 
 
 To monitor a specific device (`myport`) over the serial monitor run `pio device monitor --port myport`. To get the list of available ports run `ls /dev/cu*`
 
+#### Platformio setup 
+
+Platformio can be installed as a standalone application [`platformio cli`](https://docs.platformio.org/en/latest/core/index.html) which gives access to a command line interface for running direct commands. It is lightweight and does not rely on an overlaying IDE, however you must be familiar with CLI and know the commands to run for compiling/uploading/monitoring
+
+Platformio is also available as an integration into popular IDEs like VScode, CLion [`platformio-ide`](https://docs.platformio.org/en/latest/integration/ide/pioide.html#pioide). We recommend using VScode because the graphical interface is easy to navigate through. 
+
+To install platformio on vscode, locate the platformio plugin in the marketplace 
+
+![VScode installation of platformio](./images/pio-vscode.png)
+
+To install platformio on CLION, follow the instructions [here](https://www.jetbrains.com/help/clion/platformio.html#debug-prj)
+
 ### Setting up the Arduino IDE for compiling, uploading and monitoring the Teensy 4.1
 
 _For reference : https://www.pjrc.com/teensy/tutorial.html_

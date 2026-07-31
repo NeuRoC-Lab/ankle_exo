@@ -1,15 +1,21 @@
 #pragma once
+
+#include <cstdint>
+#include <cmath>
+
 #include <Arduino.h>
-#include "ProtocolTypes.h"
-#include "SerialProtocol.h"
+
+
 #include <ArduinoJson.h>
 
+#include "ProtocolTypes.h"
 
-float p_target = 10.0f;
-float v_target = 0.0f;
-float kp_target = 0.5f;
-float kd_target = 0.5f;
-float trq_target = 0.0f;
+
+inline float p_target = 10.0f;
+inline float v_target = 0.0f;
+inline float kp_target = 0.5f;
+inline float kd_target = 0.5f;
+inline float trq_target = 0.0f;
 
 typedef struct {
     float p_min,p_max;
@@ -61,9 +67,8 @@ static constexpr uint8_t neutralMITCommand[8] = {
 
 
 
+#if defined(PLATFORM_TEENSY41)
 
-#if !defined(PLATFORM_TEENSY41) && !(defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR))
-#else
 #include <ArduinoJSON.h>
 class CANMotorMIT {
 /*
@@ -72,12 +77,13 @@ One CANMotorMIT instance per CubeMars motor
 */
 public:
     CANMotorMIT(
-    byte canId,
+    const byte canId,
     const AK60Params* motorSettings,
     const AK60Params* motorSoftwareConstraints,
     const AK60Params* motorRunningConstraints,
     MotorCmd& cmd,
     uint32_t kPrintEvery = 20
+
 )
     : m_canId(canId),
       m_cmd(cmd),
@@ -90,14 +96,14 @@ public:
       m_kPrintEvery(kPrintEvery)
 {}
 
-    uint8_t m_canId;
-    MotorCmd& m_cmd;   // reference, not copy
     MotorReply m_reply;
     bool m_enabled;
+    MotorCmd& m_cmd;
     bool m_hardStopActive = false;
-    const AK60Params* m_motorSettings;
-    const AK60Params* m_motorSoftwareConstraints;
-    const AK60Params* m_motorRunningConstraints;
+	const byte m_canId;
+	const AK60Params* m_motorSettings {};
+    const AK60Params* m_motorSoftwareConstraints {};
+    const AK60Params* m_motorRunningConstraints {};
 
     enum class HardStopState : uint8_t
     {
@@ -148,7 +154,17 @@ public:
         {
             if(isOutsideSoftwareLimits()){
             //Serial.println("Reached software limits. Increasing damping factor to slow down the motor inertia");
-            m_cmd.kd = 2;
+            float closest = (std::abs(m_reply.position - m_motorSoftwareConstraints->p_min) <= std::abs(m_reply.position - m_motorSoftwareConstraints->p_max))
+                                  ? m_motorSoftwareConstraints->p_min
+                                  : m_motorSoftwareConstraints->p_max;
+            m_cmd.position = closest;
+            m_cmd.kp = 0.5;
+            m_cmd.torque = 0.0;
+            m_cmd.kd = 0.0;
+            //Serial.println("Setting damping");
+            }
+            else{
+            m_cmd.kp = 0.0;
             }
             updateHardStopState();
 
@@ -189,30 +205,14 @@ public:
         if (!sendMessage(tx_buf))
         {
             Serial.println("MIT command send failed");
+            sendMessage(neutralMITCommand);
+            sendMessage(enterMotorMode);
+            delay(100);
         }
     }
 
-// This can be placed outside the class, it does not depend on any instance parameter
-void print_can_msg(MotorReply reply){
-        Serial.print("  motor id: ");
-        Serial.print(reply.can_id);
 
-        Serial.print(" pos(rad): ");
-        Serial.print(reply.position, 4);
-
-        Serial.print(" vel(rad/s): ");
-        Serial.print(reply.velocity, 4);
-
-        Serial.print(" trq(N*m): ");
-        Serial.print(reply.torque, 4);
-
-        Serial.print(" temp(C): ");
-        Serial.print(reply.temperature);
-
-        Serial.print(" err: ");
-        Serial.println(reply.error);
-}
-
+/*
 void writeReplyToJson(JsonObject object) const
 {
     object[TelemetryKey::MotorId] = m_reply.can_id;
@@ -222,50 +222,8 @@ void writeReplyToJson(JsonObject object) const
     object[TelemetryKey::MotorTemp] = m_reply.temperature;
     object[TelemetryKey::MotorErr] = m_reply.error;
 }
+*/
 
-bool handleSerialCommand(const CommandPayload& command){
-    // handles a command
-    if (command.motorId != m_canId)
-        {
-        return false;
-        } // discard messages that do not match the motor's CAN ID
-
-        if (command.type == MotorCommandType::Stop)
-        {
-            const bool success = sendMessage(exitMotorMode);
-
-            if (success)
-            {
-                m_enabled = false;
-                m_hardStopActive = false;
-            }
-
-            return success;
-        }
-        else if (command.type == MotorCommandType::Start)
-        {
-            const bool success = sendMessage(enterMotorMode);
-
-            if (success)
-            {
-                m_enabled = true;
-                m_hardStopActive = false;
-            }
-
-            return success;
-        }
-        else if (command.type == MotorCommandType::Zero)
-        {
-            return sendMessage(setZeroPosition);
-        }
-        else if (command.type == MotorCommandType::Set)
-        {
-            m_cmd = command.cmd;
-            update();// call update to make sure the command is immediately packed and sent
-            return true;
-        }
-    return false;
-}
 
 bool isOutsideRunningLimits() const
 {
@@ -505,6 +463,10 @@ bool commandMovesTowardValidRegion() const
     return commandedTorque < -recoveryTorqueEpsilon;
 }
 
+virtual bool begin()= 0; // this function will call platform specific initialization
+virtual bool sendMessage(const uint8_t data[8]) = 0;
+virtual bool readMessages(MotorReply& reply)= 0; // will pop the element in the FIFO mailbox
+
 // to prevent one from calling these functions directly from the SuperClass
 protected:
     uint32_t m_printCounter;
@@ -672,9 +634,6 @@ float constrain_float(float x, float x_min, float x_max)
     }
 
 virtual ~CANMotorMIT() = default;
-virtual void begin(); // this function will call platform specific initialization
-virtual bool sendMessage(const uint8_t data[8]);
-virtual bool readMessages(MotorReply& reply); // will pop the element in the FIFO mailbox
 };
 
 // subclasses for UNOR4 and Teensy implementations (their libraries differ)
@@ -682,7 +641,7 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
 #if defined(PLATFORM_TEENSY41)
     #include <FlexCAN_T4.h>
     //using PlatformCanBus = CanBus_Teensy41;
-    FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TeensyCAN;
+    inline FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TeensyCAN;
     // Teensy 4.1 CAN1:
     // RX = pin 23
     // TX = pin 22
@@ -693,7 +652,7 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
         : CANMotorMIT(canId, motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
         {}
 
-            virtual void begin(){
+             bool begin() override{
             // initializes the CAN controller on the Teensy 41
 
                 Serial.println("Now initializing CAN communication");
@@ -701,6 +660,7 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
                 TeensyCAN.setBaudRate(1000000);//TeensyCAN.setBaudRate(1000000);
                 TeensyCAN.setMaxMB(16);
                 TeensyCAN.enableFIFO();
+                return true;
                 //TeensyCAN.enableFIFOInterrupt();
         }
 
@@ -730,60 +690,130 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
         //
     };
 
-#elif defined(PLATFORM_RENESAS_RA)
-    #include <Arduino_CAN.h>
+#else
+#endif
 
-    class CANMotorMIT_Renesas : public CANMotorMIT {
-    //using PlatformCanBus = CanBus_RenesasRA;
-    public:
-        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings,const AK60Params* motorSoftwareConstraints,const AK60Params* motorRunningConstraints,MotorCmd& cmd,uint32_t kPrintEvery=20)
-        : CANMotorMIT(canId,motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
-        {}
+class CANMotorMIT_Handler {
 
-            virtual void begin(){
-            // initializes the CAN controller on the Teensy 41
-            Serial.println("Now initializing CAN communication");
-            if (!CAN.begin(CanBitRate::BR_1000k)) // 1M baudrate
-            {
-                Serial.println("CAN.begin(...) failed.");
-                    for (;;) {}
-            }
-            Serial.println("Successfully started CAN Communication. Entering motor mode");
-            delay(1000);
-            if(!resetMotor()){
-                Serial.println("Failed to start motor. Please check the Motor power supply is ON and the Motor is connected to the CAN bus");
-            }
-            else {
-                Serial.println("Successfully started motor");
-            }
+public :
 
-        }
-    virtual bool sendMessage(const uint8_t data[8]){
-        CanMsg const out_msg(CanStandardId(m_canId), 8, data); //sizeof(data)/sizeof(data[0]) why does that not evaluate to 8 properly ??? Because in CPP, data[8] is transformed into a pointer so sizeof(data) = size of the pointer, not the array
-        return CAN.write(out_msg) > 0;
+    CANMotorMIT_Handler(CANMotorMIT& leftMotor,CANMotorMIT* rightMotor = nullptr,uint32_t canRate=500000) // using a pointer to indicate that the right motor is not necessary for now
+        : m_leftMotor(leftMotor),
+          m_rightMotor(rightMotor),
+		  m_canRate(canRate)
+    {
     }
 
-    virtual bool readMessages(MotorReply& reply) override {
-        while (CAN.available())
-        {
-        CanMsg const rxMsg = CAN.read();
-        if (rxMsg.data_length != 8)
-        {
-        continue;
+
+	bool begin()
+{
+    if (!m_leftMotor.begin()) {
+        Serial.println(
+            "Failed to initialize left motor"
+        );
+        return false;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        !m_rightMotor->begin()
+    ) {
+        Serial.println(
+            "Failed to initialize right motor"
+        );
+        return false;
+    }
+
+    if (!m_leftMotor.resetMotor()) {
+        Serial.println(
+            "Failed to start left motor"
+        );
+        return false;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        !m_rightMotor->resetMotor()
+    ) {
+        Serial.println(
+            "Failed to start right motor"
+        );
+        return false;
+    }
+
+    return true;
+}
+CANMotorMIT* findMotor(uint8_t motorId)
+{
+    if (motorId == m_leftMotor.m_canId) {
+        return &m_leftMotor;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        motorId == m_rightMotor->m_canId
+    ) {
+        return m_rightMotor;
+    }
+
+    return nullptr;
+}
+
+bool handleSerialCommand(
+    const CommandPayload& command
+)
+{
+    CANMotorMIT* motor =
+        findMotor(command.motorId);
+
+    if (motor == nullptr) {
+        Serial.println("Unknown motor ID");
+        return false;
+    }
+
+    switch (command.type) {
+    case MotorCommandType::Stop:
+    {
+        const bool success =
+            motor->sendMessage(exitMotorMode);
+
+        if (success) {
+            motor->m_enabled = false;
+            motor->m_hardStopActive = false;
         }
-        reply = unpack_reply(rxMsg.data);
-        return true;   // popped one valid message
+
+        return success;
+    }
+
+    case MotorCommandType::Start:
+    {
+        const bool success =
+            motor->sendMessage(enterMotorMode);
+
+        if (success) {
+            motor->m_enabled = true;
+            motor->m_hardStopActive = false;
         }
-        return false;      // no valid message available right now
-       }
-    };
 
-#else
-    #error "No CAN platform selected. Make sure to use Arduino UNO R4 or Teensy 4.1"
-#endif
+        return success;
+    }
 
-#if !defined(PLATFORM_TEENSY41) && !defined(PLATFORM_RENESAS_RA)
-#error "No CAN platform selected. Define PLATFORM_TEENSY41 or PLATFORM_RENESAS_RA."
-#endif
+    case MotorCommandType::Zero:
+        return motor->sendMessage(
+            setZeroPosition
+        );
 
+    case MotorCommandType::Set:
+        motor->m_cmd = command.cmd;
+        motor->update();
+        return true;
+    }
+
+    return false;
+}
+private:
+    CANMotorMIT& m_leftMotor;
+    CANMotorMIT* m_rightMotor;
+    uint32_t m_canRate;
+};
 #endif

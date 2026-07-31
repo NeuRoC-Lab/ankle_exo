@@ -4,6 +4,18 @@
 
 #pragma once
 
+enum class MessageType : uint8_t
+{
+    Telemetry = 1,
+    Command   = 2
+};
+
+struct MessageHeader
+{
+    MessageType type;
+    uint8_t payloadSize;
+};
+
 typedef struct
 {
     float position;
@@ -40,6 +52,7 @@ struct LoadCellVoltages {
 struct DataPayload {
     // load cells
     // encoders
+    //MessageType cmd_type = MessageType::Telemetry; // telemetry header
     LoadCellVoltages loadCells {};
     EncoderPositions encoders {};
     MotorReply motorRep {}; // to account for the two motors
@@ -61,6 +74,7 @@ enum class MotorCommandType : uint8_t {
 
 // ONLY SUPPORTS ONE MOTOR PER PAYLOAD (command sent)
 struct CommandPayload {
+    //MessageType cmd_type = MessageType::Command; // command header
     MotorCommandType type; // set, zero, start, stop
     uint8_t motorId;
     MotorCmd cmd; // the main payload

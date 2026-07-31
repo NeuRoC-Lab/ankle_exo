@@ -1,7 +1,7 @@
 (kicad_sch
-	(version 20250114)
+	(version 20260306)
 	(generator "eeschema")
-	(generator_version "9.0")
+	(generator_version "10.0")
 	(uuid "3e3ff72e-d777-45cf-9299-e91389ff12dd")
 	(paper "A4")
 	(lib_symbols)
@@ -18,11 +18,13 @@
 			(type solid)
 		)
 		(fill
-			(color 0 0 0 0.0000)
+			(color 0 0 0 0)
 		)
 		(uuid "488ec729-0dfb-4444-ad76-08976c45f4bf")
 		(property "Sheetname" "MCUs"
 			(at 23.114 48.3104 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -32,6 +34,8 @@
 		)
 		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_1.kicad_sch"
 			(at 23.114 68.9106 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -42,7 +46,7 @@
 		(instances
 			(project "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo"
 				(path "/3e3ff72e-d777-45cf-9299-e91389ff12dd"
-					(page "1")
+					(page "10")
 				)
 			)
 		)
@@ -60,11 +64,13 @@
 			(type solid)
 		)
 		(fill
-			(color 0 0 0 0.0000)
+			(color 0 0 0 0)
 		)
 		(uuid "76f1db6b-86f9-4936-9afd-1ff77552b608")
 		(property "Sheetname" "Load cells"
 			(at 166.878 52.3744 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -74,6 +80,8 @@
 		)
 		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_4.kicad_sch"
 			(at 166.878 69.1646 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -102,11 +110,13 @@
 			(type solid)
 		)
 		(fill
-			(color 0 0 0 0.0000)
+			(color 0 0 0 0)
 		)
 		(uuid "ec3a94af-cbf2-4645-8611-15dc332be977")
 		(property "Sheetname" "CAN and peripherals."
 			(at 94.488 51.1044 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -116,6 +126,8 @@
 		)
 		(property "Sheetfile" "TMotor_Rev0_5_1_Mark_2_NAU_OpenExo_2.kicad_sch"
 			(at 94.488 68.6566 0)
+			(show_name no)
+			(do_not_autoplace no)
 			(effects
 				(font
 					(size 1.27 1.27)

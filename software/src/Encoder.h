@@ -67,6 +67,13 @@ public:
 
     void begin()
     {
+        // Enable the onboard voltage shifter (otherwise it holds lines in high impedance)
+
+        pinMode(boardConfig.OE1, OUTPUT);
+        pinMode(boardConfig.OE2, OUTPUT);
+        digitalWrite(boardConfig.OE1,HIGH);
+        digitalWrite(boardConfig.OE2,HIGH);
+
         pinMode(boardConfig.ENCODER_LEFT_CS, OUTPUT);
         pinMode(boardConfig.ENCODER_RIGHT_CS, OUTPUT);
 
