@@ -336,7 +336,7 @@ class PlotManager:
         self.time_data.append(current_time)
 
         self.ankle_pos_data.append(snapshot.ankle_angle)
-        self.ankle_vel_data.append(0.0)  # Encoder velocity placeholder
+        self.ankle_vel_data.append(snapshot.ankle_velocity)
 
         self.loadcell1_data.append(snapshot.loadcell1)
         self.loadcell2_data.append(snapshot.loadcell2)

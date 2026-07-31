@@ -1,6 +1,7 @@
 """
-This code plots the data for the encoder, loadcells, and motor (MIT mode)
-integrated together on the two leg setup (bilateral ankle exoskeleton)
+This code plots the data for the encoder, load cells, and motor (MIT mode)
+integrated together on the bilateral ankle exoskeleton setup.
+
 Data is read through Bluetooth from Arduino Nano.
 
 The code is separated into:
@@ -15,9 +16,8 @@ plotting_csv.py
     Real-time plotting and CSV logging
 
 Run:
-python software/src/python-scripts/TwoLegs/main-bluetooth.py
+python software/src/python-scripts/BilateralAnkleExo/main-bluetooth.py
 """
-#TODO ADD SECOND MOTOR COMMAND, MORE PLOTS (A SECOND WINDOW IDEALLY), ADD 2 LOAD CELLS, ADD 1 ENCODER
 
 import threading
 import time
@@ -26,7 +26,7 @@ from bluetooth import BluetoothManager
 
 from sensors import (
     Motor_ID,
-    Encoder,
+    Encoders,
     LoadCells,
     Motor,
     MotorCommand,
@@ -45,36 +45,51 @@ from plottingCSV import (
 # This is defined before the Bluetooth thread starts.
 
 start_time = time.perf_counter()
-MOTOR_ID = 2
 
 # Sensor setup
 
 def setup_sensors(): # create objects for sensors
-    encoder = Encoder()
-    loadcells = LoadCells()
-    motor = Motor()
+    left_encoder = Encoders()
+    right_encoder = Encoders()
+
+    left_loadcells = LoadCells()
+    right_loadcells = LoadCells()
+
+    left_motor = Motor()
+    right_motor = Motor()
 
     return (
-        encoder,
-        loadcells,
-        motor,
+        left_encoder,
+        right_encoder,
+
+        left_loadcells,
+        right_loadcells,
+
+        left_motor,
+        right_motor
     )
 
 
 # Connect to Arduino Nano Bluetooth
 
 def connect_to_arduino(
-        encoder,
-        loadcells,
-        motor,
-        stop_event,
+        left_encoder,
+        right_encoder,
+        left_loadcells,
+        right_loadcells,
+        left_motor,
+        right_motor,
+        stop_event
 ):
 
     print("Creating BluetoothManager...")
     bluetooth = BluetoothManager(
-        encoder=encoder,
-        loadcells=loadcells,
-        motor=motor,
+        left_encoder=left_encoder,
+        right_encoder=right_encoder,
+        left_loadcells=left_loadcells,
+        right_loadcells=right_loadcells,
+        left_motor=left_motor,
+        right_motor=right_motor,
         stop_event=stop_event,
     )
 
@@ -88,7 +103,7 @@ def connect_to_arduino(
 
 def setup_csv():
     csv_logger = CSVLogger(
-        "../../SingleLegData_BLE_Test.csv"
+        "../../BilateralAnleExo_Test.csv"
     )
 
     csv_logger.open()
@@ -124,7 +139,7 @@ def start_motor(
     bluetooth.queue_motor_command(
         MotorCommand(
             command_type=MotorCommandType.START,
-            motor_id=MOTOR_ID,
+            motor_id=Motor_ID,
         )
     )
 
@@ -136,7 +151,7 @@ def stop_motor(
     bluetooth.queue_motor_command(
         MotorCommand(
             command_type=MotorCommandType.STOP,
-            motor_id=MOTOR_ID,
+            motor_id=Motor_ID,
         )
     )
 
@@ -339,16 +354,22 @@ def main():
     stop_event = threading.Event() # to stop safely bluetooth and plotting
 
     (
-        encoder,
-        loadcells,
-        motor,
+        left_encoder,
+        right_encoder,
+        left_loadcells,
+        right_loadcells,
+        left_motor,
+        right_motor
     ) = setup_sensors()
 
     # start bluetooth communication
     bluetooth = connect_to_arduino(
-        encoder,
-        loadcells,
-        motor,
+        left_encoder,
+        right_encoder,
+        left_loadcells,
+        right_loadcells,
+        left_motor,
+        right_motor,
         stop_event,
     )
 

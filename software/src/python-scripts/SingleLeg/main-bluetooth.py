@@ -45,7 +45,6 @@ from plottingCSV import (
 # This is defined before the Bluetooth thread starts.
 
 start_time = time.perf_counter()
-MOTOR_ID = 2
 
 # Sensor setup
 
@@ -124,7 +123,7 @@ def start_motor(
     bluetooth.queue_motor_command(
         MotorCommand(
             command_type=MotorCommandType.START,
-            motor_id=MOTOR_ID,
+            motor_id=Motor_ID,
         )
     )
 
@@ -136,7 +135,7 @@ def stop_motor(
     bluetooth.queue_motor_command(
         MotorCommand(
             command_type=MotorCommandType.STOP,
-            motor_id=MOTOR_ID,
+            motor_id=Motor_ID,
         )
     )
 
