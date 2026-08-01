@@ -4650,9 +4650,22 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "ADD A SOLDER JUMPER HERE?"
+	(arc
+		(start 48.26 162.56)
+		(mid 55.3539 158.1337)
+		(end 63.5 160.02)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "f5291755-2a41-4137-864e-2f843aa95871")
+	)
+	(text "Is there going to be a problem \nif both Teensy and Nano power the 3.3V line \nsimultaneously???"
 		(exclude_from_sim no)
-		(at 39.37 160.02 0)
+		(at 34.544 166.878 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4756,6 +4769,10 @@
 		(uuid "0af2d5cf-adbb-4c77-a5f6-6a345babbae7")
 	)
 	(no_connect
+		(at 64.77 161.29)
+		(uuid "13786163-1337-4630-a6ca-5c5401bfa692")
+	)
+	(no_connect
 		(at 223.52 127)
 		(uuid "14f8b767-ea04-4e47-a43b-797d76dd5876")
 	)
@@ -4798,10 +4815,6 @@
 	(no_connect
 		(at 82.55 53.34)
 		(uuid "40aea856-5f3b-4481-be40-d5cda3c0db08")
-	)
-	(no_connect
-		(at 64.77 161.29)
-		(uuid "4824c307-7516-4738-920c-6fe4f29197d1")
 	)
 	(no_connect
 		(at 151.13 53.34)

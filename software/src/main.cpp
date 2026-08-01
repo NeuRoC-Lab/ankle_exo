@@ -14,11 +14,11 @@
 
 
 #include "Board.h"
-#include "Encoder.h"
 #include "SerialProtocol.h"
 
 #if defined(PLATFORM_TEENSY41)
 
+#include "Encoder.h"
 #include "CANMotorMIT.h"
 #include "MotorConfig.h"
 #include "LoadCell.h"
@@ -32,93 +32,43 @@
 #endif
 
 
-
-
-
-
-
-constexpr uint8_t loadCellCount = 4;
-
 // Load Cell configuration in version up to (and including) 1.1.0 and past (but including) 1.1.1
 
 // ==================================== LOAD CELL CONFIGURATION =========================================
-
+#include "LoadCell.h"
 #if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
 
-INA125UParams inaParams{};
-LoadCellParams loadCellParams{};
+using LoadCellObj = LoadCell_Teensy41;
+using LoadCellHandlerObj = LoadCellHandler_Teensy41;
 
-LoadCell_Teensy41 LC_L_1(
-    inaParams,
-    loadCellParams,
-    boardConfig.LC_L_1_pin
-);
-
-LoadCell_Teensy41 LC_L_2(
-    inaParams,
-    loadCellParams,
-    boardConfig.LC_L_2_pin
-);
-
-LoadCell_Teensy41 LC_R_1(
-    inaParams,
-    loadCellParams,
-    boardConfig.LC_R_1_pin
-);
-
-LoadCell_Teensy41 LC_R_2(
-    inaParams,
-    loadCellParams,
-    boardConfig.LC_R_2_pin
-);
-
-LoadCell* loadCells[loadCellCount] = {
-    &LC_L_1,
-    &LC_L_2,
-    &LC_R_1,
-    &LC_R_2
-};
-
-float forceBuffer[loadCellCount]{};
-
-LoadCellHandler_Teensy41 loadCellController(
-    loadCells,
-    loadCellCount,
-    forceBuffer
-);
 
 #elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1,1,1)
 #pragma message "Enabling Arduino Nano ADC"
-#include "LoadCell.h"
-INA125UParams inaParams{};
+
+using LoadCellObj = LoadCell_NanoBLE;
+using LoadCellHandlerObj = LoadCellHandler_NanoBLE;
+#endif
+#if defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1,1,1) || defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
 LoadCellParams loadCellParams{};
 
-LoadCell_NanoBLE LC_L_1(
-    inaParams,
+LoadCellObj LC_L_1(
     loadCellParams,
-    LoadCellId::Left1,
-    0
+    LoadCellId::Left1
 );
 
-LoadCell_NanoBLE LC_L_2(
-    inaParams,
+LoadCellObj LC_L_2(
     loadCellParams,
-    LoadCellId::Left2,
-    1
+    LoadCellId::Left2
 );
 
-LoadCell_NanoBLE LC_R_1(
-    inaParams,
+LoadCellObj LC_R_1(
     loadCellParams,
-    LoadCellId::Right1,
-    2
+    LoadCellId::Right1
 );
 
-LoadCell_NanoBLE LC_R_2(
-    inaParams,
+LoadCellObj LC_R_2(
     loadCellParams,
-    LoadCellId::Right2,
-    3
+    LoadCellId::Right2
 );
 
 LoadCell* loadCells[loadCellCount] = {
@@ -130,13 +80,13 @@ LoadCell* loadCells[loadCellCount] = {
 
 float forceBuffer[loadCellCount]{};
 
-LoadCellHandler_NanoBLE loadCellController(
+LoadCellHandlerObj loadCellController(
     loadCells,
     loadCellCount,
     forceBuffer
 );
-
 #endif
+
 
 #if defined(PLATFORM_TEENSY41)
 
