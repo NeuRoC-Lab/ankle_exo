@@ -105,7 +105,7 @@ Encoder encoders(true, false);
 
 constexpr byte MOTOR_ID = 0x02;
 
-CANMotorMIT_Teensy motor(MOTOR_ID, &motorParams,&motorSoftwareConstraints,&motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+CANMotorMIT_Teensy motor(MOTOR_ID, motorParams,motorSoftwareConstraints,motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
 CANMotorMIT_Handler motorHandler(motor,nullptr);
 
 //TODO remove that later after Motor Handler class has been validated, but keep it for debugging in one leg setup

@@ -8,11 +8,14 @@ nav:
       - Overview: electrical/index.md
       - PCB: electrical/pcb.md
       - Wiring: electrical/wiring.md
+      - CAN Testing : electrical/CANtesting.md
       - Power: electrical/power.md
       - Encoder debug : electrical/encoder_debug.md
       - Encoder wiring : electrical/encoder_wiring.md
   - Software:
       - Overview: software/index.md
+      - C++ coding guidelines: software/cppguidelines.md
+      - Motor control system: software/MotorControl.md
       - CAN Motor Interfaces: software/CANMotor.md
       - CAN Motor API : software/CAN Motor API.md
       - API: software/api.md
