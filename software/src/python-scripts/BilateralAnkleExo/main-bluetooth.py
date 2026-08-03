@@ -292,7 +292,7 @@ def run_plotting_loop(
         if newest_snapshot is not None:
             pending_plot_snapshot = newest_snapshot
 
-
+        print(pending_plot_snapshot)
         # Plot only at the chosen visual refresh rate.
         #
         # This keeps Matplotlib from redrawing for every BLE packet.
@@ -317,6 +317,8 @@ def run_plotting_loop(
 
             pending_plot_snapshot = None
             last_plot_time = now
+
+
 
 
         # Keep GUI responsive without forcing a full graph redraw.

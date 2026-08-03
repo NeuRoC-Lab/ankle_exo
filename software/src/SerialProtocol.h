@@ -6,6 +6,7 @@
 #include <cstring>
 #include <type_traits>
 #include <variant>
+#include <cmath>
 
 #include <Arduino.h>
 
@@ -279,15 +280,63 @@ public:
         const auto* telemetry =
             std::get_if<DataPayload>(&message);
 
-        if (telemetry == nullptr) {
+        if (telemetry == nullptr)
+        {
             return;
         }
 
-        m_dataBuffer = *telemetry;
+        // Start with the newly received payload.
+        DataPayload validatedTelemetry = *telemetry;
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.LeftLoadCell1,
+            m_dataBuffer.loadCells.LeftLoadCell1
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.LeftLoadCell2,
+            m_dataBuffer.loadCells.LeftLoadCell2
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.RightLoadCell1,
+            m_dataBuffer.loadCells.RightLoadCell1
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.RightLoadCell2,
+            m_dataBuffer.loadCells.RightLoadCell2
+        );
+
+        // Motor and encoder data are updated normally.
+        // Invalid load-cell values have been replaced with old values.
+        m_dataBuffer = validatedTelemetry;
     }
 
 private:
     DataPayload& m_dataBuffer;
+
+    static constexpr float minimumValidForce = -500.0f;
+    static constexpr float maximumValidForce = 500.0f;
+
+    static bool isValidForce(float force)
+    {
+        return std::isfinite(force)
+            && force >= minimumValidForce
+            && force <= maximumValidForce;
+    }
+
+    static void keepOldIfInvalid(
+        float& receivedForce,
+        float previousForce
+    )
+    {
+        if (!isValidForce(receivedForce))
+        {
+            receivedForce = previousForce;
+        }
+    }
+
 };
 
 #endif

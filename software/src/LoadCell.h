@@ -23,6 +23,7 @@ struct NanoLoadCellPins
 
 // The use of a pointer-based array for ordering the load cells into the array gives us some extra flexibility : the order given into LoadCellHandler will be propagated to functions using it without ensuring that it follows a specific sequence.
 
+
 class LoadCell
 {
 public:
@@ -39,6 +40,25 @@ public:
 
     virtual float getDiffVoltage() = 0;
 
+    float maxMeasurableTension() const
+    {
+        const float denominator =
+            inaParams.ampGain
+            * m_loadCellParams.sensitivity
+            * inaParams.Vexc;
+
+        if (denominator <= 0.0f)
+        {
+            return 0.0f;
+        }
+
+        const float availableVoltage =
+            inaParams.IAref; // tension drives output from IAREF(=2.5V) toward 0 V
+
+        return availableVoltage
+             * m_loadCellParams.ratedN
+             / denominator;
+    }
     float sampleForce()
     {
         const float correctedVoltage =
@@ -54,10 +74,11 @@ public:
             return 0.0f;
         }
 
-        return correctedVoltage
+        return std::clamp(correctedVoltage
              * m_loadCellParams.ratedN
-             / fullScaleDifferentialVoltage;
+             / fullScaleDifferentialVoltage, -maxMeasurableTension(), maxMeasurableTension());
     }
+    // clamped to only valid values which we know will never be exceeded because the INA125U is physically limited to those ranges
 
     void calibrateOffset(
         uint16_t sampleCount = 100,

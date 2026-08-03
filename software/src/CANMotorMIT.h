@@ -74,10 +74,25 @@ enum class MotorState : uint8_t
     HardStopped
     };
 
+// a helper function to print a stringed text for the current state
+constexpr std::string_view toString(MotorState state)
+{
+    switch (state) {
+        case MotorState::Stopped: return "Stopped";
+        case MotorState::Running: return "Running";
+        case MotorState::Recovery: return "Recovery";
+        case MotorState::HardStopped: return "HardStopped";
+    }
+
+    return "Unknown";
+}
+
 
 #if defined(PLATFORM_TEENSY41)
 
 #include <ArduinoJSON.h>
+
+unsigned long lastUpdate {};
 class CANMotorMIT {
 /*
 One CANMotorMIT instance per CubeMars motor
@@ -140,9 +155,55 @@ public:
      return true;
     }
 
+    float limitTorqueCommand(float requestedTorque) const
+    {
+        constexpr float brakingDistance = 0.25f;
+
+        const float p = m_reply.position;
+        const float pMin = m_motorSoftwareConstraints.p_min;
+        const float pMax = m_motorSoftwareConstraints.p_max;
+
+        // Positive torque is assumed to increase position.
+        if (requestedTorque > 0.0f) {
+            const float distanceToUpperLimit = pMax - p;
+
+            const float scale = std::clamp(
+                distanceToUpperLimit / brakingDistance,
+                0.0f,
+                1.0f
+            );
+
+            return requestedTorque * scale;
+        }
+
+        // Negative torque is assumed to decrease position.
+        if (requestedTorque < 0.0f) {
+            const float distanceToLowerLimit = p - pMin;
+
+            const float scale = std::clamp(
+                distanceToLowerLimit / brakingDistance,
+                0.0f,
+                1.0f
+            );
+
+            return requestedTorque * scale;
+        }
+
+        return 0.0f;
+    }
 
     void update()
     {
+        if(millis() - lastUpdate > 1000){
+            Serial.print("Current motor status : ");
+            Serial.print(toString(m_state).data());
+            Serial.print("  Enabled ? ");
+            Serial.print(m_enabled);
+            Serial.print("  Position ? ");
+            Serial.println(m_reply.position);
+            lastUpdate = millis();
+        }
+
         if (!m_enabled)
         {
             return;
@@ -150,6 +211,10 @@ public:
 
         while (readMessages(m_reply))
         {
+        #if defined(NO_LIMITS)
+        #pragma message("WARNING: motor limits are DISABLED")
+            m_state = MotorState::Running;
+        #else
            if(isOutsideRunningLimits())
            {
               m_state = MotorState::HardStopped;
@@ -161,6 +226,7 @@ public:
           else{
               m_state = MotorState::Running;
             }
+        #endif
             // telemetry rate control
             if (++m_printCounter >= m_kPrintEvery)
             {
@@ -169,26 +235,42 @@ public:
             // handle the current state to determine motor's behaviour
             switch (m_state)
             {
-              case MotorState::Recovery:
-                    commandToSend.position = std::clamp(
-                        m_reply.position,
-                        m_motorSoftwareConstraints.p_min,
-                        m_motorSoftwareConstraints.p_max
-                    );
-                    commandToSend.velocity = 0.0f;
-                    commandToSend.kp = 1.0f;
-                    commandToSend.kd = 1.0f;
-                    commandToSend.torque = 0.0f;
-                    //TODO determine if we need to set a negative kp/kd to make sure the motor performs NEGATIVE work i.e brings the ankle exoskeleton back to within the software limits
-                    break;
+               case MotorState::Recovery:
+               {
+                   constexpr float recoveryMargin = 0.5f;
 
-              case MotorState::Running:
-                    // reset to torque control only
-                    commandToSend = m_cmd; // if its running then we simply forward the user commands
-                    commandToSend.kp = 0.0f;
-                    commandToSend.kd = 0.0f;
-                    break;
+                   if (m_reply.position > m_motorSoftwareConstraints.p_max) {
+                       commandToSend.position =
+                           m_motorSoftwareConstraints.p_max - recoveryMargin;
+                   }
+                   else if (m_reply.position < m_motorSoftwareConstraints.p_min) {
+                       commandToSend.position =
+                           m_motorSoftwareConstraints.p_min + recoveryMargin;
+                   }
 
+                   commandToSend.velocity = 0.0f;
+
+                   // Start gently and increase gradually.
+                   commandToSend.kp = 2.0f;
+                   commandToSend.kd = 0.5f;
+
+                   // Remove the user's outward feedforward torque.
+                   commandToSend.torque = 0.0f;
+                   break;
+               }
+               case MotorState::Running:
+               {
+                   commandToSend = m_cmd;
+
+                   commandToSend.kp = 0.0f;
+                   commandToSend.kd = 0.0f;
+
+                    #if !defined(NO_LIMITS)
+                   commandToSend.torque =
+                       limitTorqueCommand(m_cmd.torque);
+                    #endif
+                   break;
+               }
                case MotorState::HardStopped:
                     sendMessage(neutralMITCommand);
                     sendMessage(exitMotorMode);
@@ -202,7 +284,7 @@ public:
         }
         if (m_enabled && !updateMIT()) // m_enabled
         {
-            Serial.println("Failed to send MIT command");
+            //Serial.println("Failed to send MIT command");
             sendMessage(neutralMITCommand);
         }
 }
@@ -450,19 +532,32 @@ virtual ~CANMotorMIT() = default;
                 return rc > 0;
             }
 
-            virtual bool readMessages(MotorReply& reply) override {
-                    CAN_message_t rxMsg;
-                    while (TeensyCAN.read(rxMsg)) {
-                    if (rxMsg.len != 8) {
-                            continue;
-                    }
+        bool readMessages(MotorReply& reply) override
+        {
+            CAN_message_t rxMsg;
 
-                    reply = unpack_reply(rxMsg.buf);
-                    return true;   // popped one valid message
-                    }
+            while (TeensyCAN.read(rxMsg)) {
+                if (rxMsg.len != 8) {
+                    continue;
+                }
 
-                    return false;      // no valid message available right now
+                // Adapt this check to the actual reply CAN ID used by your motor.
+                if (rxMsg.id != m_canId) {
+                    continue;
+                }
+
+                MotorReply candidate = unpack_reply(rxMsg.buf);
+
+                if (candidate.can_id != m_canId) {
+                    continue;
+                }
+
+                reply = candidate;
+                return true;
             }
+
+            return false;
+        }
     };
 
 #else

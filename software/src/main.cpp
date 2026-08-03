@@ -176,6 +176,9 @@ void loop()
             forces[2],
             forces[3],
         };
+        if(forces[0]>80.0f || forces[1]>80.0f || forces[2]>80.0f || forces[3]>80.0f){
+            Serial.println("INVALID LOAD CELL DATA");
+        }
         #else
         // versions above (and including) v1.1.1 : leave it up to the Arduino Nano to populate the load cell voltages
         LoadCellVoltages loadCells {
@@ -245,6 +248,19 @@ void loop(){
     */
     // Read one complete payload from the Teensy.
     uart.update();
+    /*
+    if(payload.loadCells.LeftLoadCell1>80.0f || payload.loadCells.LeftLoadCell2>80.0f || payload.loadCells.RightLoadCell1>80.0f || payload.loadCells.RightLoadCell2>80.0f){
+        Serial.print("INVALID LOAD CELL DATA  : ");
+        Serial.print(payload.loadCells.LeftLoadCell1);
+        Serial.print("   ");
+        Serial.print(payload.loadCells.LeftLoadCell2);
+        Serial.print("   ");
+        Serial.print(payload.loadCells.RightLoadCell1);
+        Serial.print("   ");
+        Serial.println(payload.loadCells.RightLoadCell2);
+    }
+    */
+
     #if HW_VERSION_AT_LEAST(1,1,1)
     // version v1.1.1 and onwards : the Arduino Nano is the one sampling the load cell voltages so it directly modifies the payload object sent from the Teensy before posting it on BLE
     const float* forces = loadCellController.sampleAll();
