@@ -12,13 +12,7 @@ struct LoadCellParams
     static constexpr float ratedN = 1000.0f;
 };
 
-enum class LoadCellId : uint8_t
-{
-    Left1,
-    Left2,
-    Right1,
-    Right2
-};
+
 
 
 struct NanoLoadCellPins
@@ -29,15 +23,14 @@ struct NanoLoadCellPins
 
 // The use of a pointer-based array for ordering the load cells into the array gives us some extra flexibility : the order given into LoadCellHandler will be propagated to functions using it without ensuring that it follows a specific sequence.
 
+
 class LoadCell
 {
 public:
     LoadCell(
-        const INA125UParams& inaParams,
         const LoadCellParams& loadCellParams
     )
-        : m_loadCellParams(loadCellParams),
-          m_inaParams(inaParams)
+        : m_loadCellParams(loadCellParams)
     {
     }
 
@@ -47,25 +40,45 @@ public:
 
     virtual float getDiffVoltage() = 0;
 
+    float maxMeasurableTension() const
+    {
+        const float denominator =
+            inaParams.ampGain
+            * m_loadCellParams.sensitivity
+            * inaParams.Vexc;
+
+        if (denominator <= 0.0f)
+        {
+            return 0.0f;
+        }
+
+        const float availableVoltage =
+            inaParams.IAref; // tension drives output from IAREF(=2.5V) toward 0 V
+
+        return availableVoltage
+             * m_loadCellParams.ratedN
+             / denominator;
+    }
     float sampleForce()
     {
         const float correctedVoltage =
             getDiffVoltage() - m_zeroOffsetVoltage;
 
         const float fullScaleDifferentialVoltage =
-            m_inaParams.ampGain
+            inaParams.ampGain
             * m_loadCellParams.sensitivity
-            * m_inaParams.Vexc;
+            * inaParams.Vexc;
 
         if (fullScaleDifferentialVoltage == 0.0f)
         {
             return 0.0f;
         }
 
-        return correctedVoltage
+        return std::clamp(correctedVoltage
              * m_loadCellParams.ratedN
-             / fullScaleDifferentialVoltage;
+             / fullScaleDifferentialVoltage, -maxMeasurableTension(), maxMeasurableTension());
     }
+    // clamped to only valid values which we know will never be exceeded because the INA125U is physically limited to those ranges
 
     void calibrateOffset(
         uint16_t sampleCount = 100,
@@ -100,7 +113,6 @@ public:
 
 protected:
     LoadCellParams m_loadCellParams;
-    INA125UParams m_inaParams;
 
     float m_zeroOffsetVoltage = 0.0f;
 };
@@ -172,7 +184,7 @@ class LoadCell_Teensy41 final : public LoadCell
 {
 public:
 
-    LoadCell_Teensy41(INA125UParams inaParams,LoadCellParams loadCellParams,int VoPin) : LoadCell(inaParams, loadCellParams), m_VoPin(VoPin) {}
+    LoadCell_Teensy41(LoadCellParams loadCellParams,LoadCellId id) : LoadCell(loadCellParams), m_VoPin(board::teensy41::pins.loadCells.outputs[static_cast<std::size_t>(id)]) {}
 
     void begin() override {
         // initialize the array
@@ -181,11 +193,11 @@ public:
 
     float getDiffVoltage() {
         // gets the RAW differential voltage. It does so by substracting the preset IAREF voltage from the voltage read at pin Vo
-        return analogRead(m_VoPin)*voltage_scale/ static_cast<float>(adc_max_value) - m_inaParams.IAref;
+        return analogRead(m_VoPin)*voltage_scale/ static_cast<float>(adc_max_value) - inaParams.IAref;
         }
 
 private:
-    int m_VoPin;
+    Pin m_VoPin;
 };
 
 class LoadCellHandler_Teensy41 : public LoadCellHandler
@@ -233,7 +245,7 @@ public:
     }
 };
 
-#elif defined(PLATFORM_NORDIC)
+#elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1, 1, 1)
 
 // ============================================================
 // Arduino Nano 33 BLE Rev2 / nRF52840
@@ -301,14 +313,12 @@ class LoadCell_NanoBLE final : public LoadCell
 {
 public:
     LoadCell_NanoBLE(
-        const INA125UParams& inaParams,
-        const LoadCellParams& loadCellParams,
-        LoadCellId loadCellId,
-        uint8_t channelIndex
-    )
-        : LoadCell(inaParams, loadCellParams),
-          m_loadCellId(loadCellId),
-          m_channelIndex(channelIndex)
+    const LoadCellParams& loadCellParams,
+    LoadCellId id
+)
+    : LoadCell(loadCellParams),
+      m_loadCellId(id),
+      m_channelIndex(static_cast<std::uint8_t>(id))
     {
     }
 
@@ -407,40 +417,16 @@ public:
 
 private:
     static NanoLoadCellPins pinsForLoadCell(
-        LoadCellId loadCellId
+    LoadCellId id
     )
     {
-        switch (loadCellId)
-        {
-            case LoadCellId::Left1:
-                return {
-                    boardConfig.LC_L_1_Vo,
-                    boardConfig.LC_L_1_Exc
-                };
+        const std::size_t index =
+            static_cast<std::size_t>(id);
 
-            case LoadCellId::Left2:
-                return {
-                    boardConfig.LC_L_2_Vo,
-                    boardConfig.LC_L_2_Exc
-                };
-
-            case LoadCellId::Right1:
-                return {
-                    boardConfig.LC_R_1_Vo,
-                    boardConfig.LC_R_1_Exc
-                };
-
-            case LoadCellId::Right2:
-                return {
-                    boardConfig.LC_R_2_Vo,
-                    boardConfig.LC_R_2_Exc
-                };
-        }
-
-        /*
-         * Defensive fallback. All enum cases are already handled.
-         */
-        return {-1, -1};
+        return {
+            board::nano::pins.loadCells.outputs[index],
+            board::nano::pins.excitationPins.outputs[index]
+        };
     }
 
     static nrf_saadc_input_t arduinoPinToSaadcInput(
@@ -865,17 +851,19 @@ private:
 
 #elif defined(PLATFORM_TEENSY41) && HW_VERSION_AT_LEAST(1,1,1)
 #pragma message "WARNING : not linking anything from LoadCell.h since using version v1.1.1+ on the Teensy"
+#elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_MOST(1, 1, 0)
+#pragma message "WARNING : not linking anything from LoadCell.h since using version v1.1.0- on the Nano"
 #else
 
     #error "No supported load-cell platform selected"
 
 #endif
 
-
+//TODO FIX THAT
 // ============================================================
 // Compile-time analog-range checks
 // ============================================================
-
+/*
 inline constexpr float fullScaleBridgeVoltage =
     LoadCellParams::sensitivity
     * INA125UParams::Vexc;
@@ -899,14 +887,14 @@ static_assert(
 
 #if defined(PLATFORM_NORDIC)
 
-/*
+
  * Internal reference = 0.6 V
  * SAADC gain = 1/5
  *
  * Differential full scale:
  *
  *     0.6 / (1/5) = 3.0 V
- */
+
 inline constexpr float nanoDifferentialFullScale = 3.0f;
 
 /*
@@ -914,7 +902,7 @@ static_assert(
     fullScaleOutputSpan <= nanoDifferentialFullScale,
     "INA125 differential output span exceeds the Nano BLE SAADC range"
 );
-*/
+
 #else
 
 static_assert(
@@ -923,3 +911,4 @@ static_assert(
 );
 
 #endif
+*/

@@ -57,7 +57,7 @@ class BluetoothManager:
 
     def __init__(
             self,
-            encoder: Encoder,
+            encoder: Encoders,
             loadcells: LoadCells,
             motor: Motor,
             stop_event,

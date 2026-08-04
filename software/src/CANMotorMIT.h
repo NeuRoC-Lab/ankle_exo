@@ -1,15 +1,22 @@
 #pragma once
+
+#include <cstdint>
+#include <cmath>
+#include <algorithm>
+
 #include <Arduino.h>
-#include "ProtocolTypes.h"
-#include "SerialProtocol.h"
+
+
 #include <ArduinoJson.h>
 
+#include "ProtocolTypes.h"
 
-float p_target = 10.0f;
-float v_target = 0.0f;
-float kp_target = 0.5f;
-float kd_target = 0.5f;
-float trq_target = 0.0f;
+
+inline float p_target = 10.0f;
+inline float v_target = 0.0f;
+inline float kp_target = 0.5f;
+inline float kd_target = 0.5f;
+inline float trq_target = 0.0f;
 
 typedef struct {
     float p_min,p_max;
@@ -59,104 +66,142 @@ static constexpr uint8_t neutralMITCommand[8] = {
 
 //TODO determine if MotorCmd should be motor-agnostic or not i.e should it include the target motor's CAN ID?
 
+enum class MotorState : uint8_t
+{
+    Stopped,
+    Running,
+    Recovery,
+    HardStopped
+    };
+
+// a helper function to print a stringed text for the current state
+constexpr std::string_view toString(MotorState state)
+{
+    switch (state) {
+        case MotorState::Stopped: return "Stopped";
+        case MotorState::Running: return "Running";
+        case MotorState::Recovery: return "Recovery";
+        case MotorState::HardStopped: return "HardStopped";
+    }
+
+    return "Unknown";
+}
 
 
+#if defined(PLATFORM_TEENSY41)
 
-#if !defined(PLATFORM_TEENSY41) && !(defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR))
-#else
 #include <ArduinoJSON.h>
+
+unsigned long lastUpdate {};
 class CANMotorMIT {
 /*
-Generic methods shared between the two CAN implementations (i.e Teensy 4.1 and Arduino UNO R4)
 One CANMotorMIT instance per CubeMars motor
 */
 public:
     CANMotorMIT(
-    byte canId,
-    const AK60Params* motorSettings,
-    const AK60Params* motorSoftwareConstraints,
-    const AK60Params* motorRunningConstraints,
+    const byte canId,
+    const AK60Params& motorSettings, // motor settings which decodes/encoders the ranges for MIT
+    const AK60Params& motorSoftwareConstraints, // motor software constraints (which clamp the user's commanded values)
+    const AK60Params& motorRunningConstraints, // motor "absolute" / running constraints.
     MotorCmd& cmd,
     uint32_t kPrintEvery = 20
+
 )
     : m_canId(canId),
       m_cmd(cmd),
+      commandToSend(cmd), // initialize commandTosend here
       m_reply{},
-      m_enabled(false),
+      m_enabled(false), // to control the motor externally from the function? //TODO remove that if deemed unecessary
       m_motorSettings(motorSettings),
       m_motorSoftwareConstraints(motorSoftwareConstraints),
       m_motorRunningConstraints(motorRunningConstraints),
       m_printCounter(0),
-      m_kPrintEvery(kPrintEvery)
+      m_kPrintEvery(kPrintEvery),
+      m_state(MotorState::Stopped)
 {}
 
-    uint8_t m_canId;
-    MotorCmd& m_cmd;   // reference, not copy
     MotorReply m_reply;
+    MotorCmd& m_cmd;
+    MotorCmd commandToSend; // actual command being sent
     bool m_enabled;
-    bool m_hardStopActive = false;
-    const AK60Params* m_motorSettings;
-    const AK60Params* m_motorSoftwareConstraints;
-    const AK60Params* m_motorRunningConstraints;
-
-    enum class HardStopState : uint8_t
-    {
-        Normal,
-        RecoveringFromLowerPosition,
-        RecoveringFromUpperPosition
-    };
-
-    HardStopState m_hardStopState = HardStopState::Normal;
+    MotorState m_state; // state
+	const byte m_canId;
+	const AK60Params& m_motorSettings {};
+    const AK60Params& m_motorSoftwareConstraints {};
+    const AK60Params& m_motorRunningConstraints {};
 
 
     bool resetMotor()
     {
-        m_enabled = false;
-        m_hardStopActive = false;
-
-        Serial.println("Exiting MIT motor mode...");
-
-        if (!sendMessage(exitMotorMode))
-        {
-            return false;
-        }
-
-        delay(500);
-
-        Serial.println("Entering MIT motor mode...");
-
-        if (!sendMessage(enterMotorMode))
-        {
-            return false;
-        }
-
-        delay(100);
-
-        if (!sendMessage(neutralMITCommand))
-        {
-            return false;
-        }
-
-        m_enabled = true;
-        return true;
+    Serial.println("Exiting MIT motor mode...");
+    if (!sendMessage(exitMotorMode))
+    {
+     return false;
     }
 
+    delay(500);
+    Serial.println("Entering MIT motor mode...");
+
+    if (!sendMessage(enterMotorMode))
+    {
+     return false;
+    }
+    delay(100);
+
+    if (!sendMessage(neutralMITCommand))
+    {
+       return false;
+    }
+     return true;
+    }
+
+    float limitTorqueCommand(float requestedTorque) const
+    {
+        constexpr float brakingDistance = 0.25f;
+
+        const float p = m_reply.position;
+        const float pMin = m_motorSoftwareConstraints.p_min;
+        const float pMax = m_motorSoftwareConstraints.p_max;
+
+        // Positive torque is assumed to increase position.
+        if (requestedTorque > 0.0f) {
+            const float distanceToUpperLimit = pMax - p;
+
+            const float scale = std::clamp(
+                distanceToUpperLimit / brakingDistance,
+                0.0f,
+                1.0f
+            );
+
+            return requestedTorque * scale;
+        }
+
+        // Negative torque is assumed to decrease position.
+        if (requestedTorque < 0.0f) {
+            const float distanceToLowerLimit = p - pMin;
+
+            const float scale = std::clamp(
+                distanceToLowerLimit / brakingDistance,
+                0.0f,
+                1.0f
+            );
+
+            return requestedTorque * scale;
+        }
+
+        return 0.0f;
+    }
 
     void update()
     {
-        while (readMessages(m_reply))
-        {
-            if(isOutsideSoftwareLimits()){
-            //Serial.println("Reached software limits. Increasing damping factor to slow down the motor inertia");
-            m_cmd.kd = 2;
-            }
-            updateHardStopState();
-
-            if (++m_printCounter >= m_kPrintEvery)
-            {
-                // print_can_msg(m_reply);
-                m_printCounter = 0;
-            }
+        if(millis() - lastUpdate > 1000){
+            Serial.print("Current motor status : ");
+            Serial.print(toString(m_state).data());
+            Serial.print("  Enabled ? ");
+            Serial.print(m_enabled);
+            Serial.print("  Position ? ");
+            Serial.println(m_reply.position);
+            lastUpdate = millis();
         }
 
         if (!m_enabled)
@@ -164,300 +209,129 @@ public:
             return;
         }
 
-        uint8_t tx_buf[8];
-
-        if (commandAllowedByHardStop())
+        while (readMessages(m_reply))
         {
-            pack_cmd(
-                tx_buf,
-                m_cmd.position,
-                m_cmd.velocity,
-                m_cmd.kp,
-                m_cmd.kd,
-                m_cmd.torque
-            );
-        }
-        else
-        {
-            memcpy(
-                tx_buf,
-                neutralMITCommand,
-                sizeof(tx_buf)
-            );
-        }
-
-        if (!sendMessage(tx_buf))
-        {
-            Serial.println("MIT command send failed");
-        }
-    }
-
-// This can be placed outside the class, it does not depend on any instance parameter
-void print_can_msg(MotorReply reply){
-        Serial.print("  motor id: ");
-        Serial.print(reply.can_id);
-
-        Serial.print(" pos(rad): ");
-        Serial.print(reply.position, 4);
-
-        Serial.print(" vel(rad/s): ");
-        Serial.print(reply.velocity, 4);
-
-        Serial.print(" trq(N*m): ");
-        Serial.print(reply.torque, 4);
-
-        Serial.print(" temp(C): ");
-        Serial.print(reply.temperature);
-
-        Serial.print(" err: ");
-        Serial.println(reply.error);
-}
-
-void writeReplyToJson(JsonObject object) const
-{
-    object[TelemetryKey::MotorId] = m_reply.can_id;
-    object[TelemetryKey::MotorPos] = m_reply.position;
-    object[TelemetryKey::MotorVel] = m_reply.velocity;
-    object[TelemetryKey::MotorTrq] = m_reply.torque;
-    object[TelemetryKey::MotorTemp] = m_reply.temperature;
-    object[TelemetryKey::MotorErr] = m_reply.error;
-}
-
-bool handleSerialCommand(const CommandPayload& command){
-    // handles a command
-    if (command.motorId != m_canId)
-        {
-        return false;
-        } // discard messages that do not match the motor's CAN ID
-
-        if (command.type == MotorCommandType::Stop)
-        {
-            const bool success = sendMessage(exitMotorMode);
-
-            if (success)
-            {
-                m_enabled = false;
-                m_hardStopActive = false;
+        #if defined(NO_LIMITS)
+        #pragma message("WARNING: motor limits are DISABLED")
+            m_state = MotorState::Running;
+        #else
+           if(isOutsideRunningLimits())
+           {
+              m_state = MotorState::HardStopped;
+           }
+          else if(isOutsideSoftwareLimits())
+           {
+              m_state = MotorState::Recovery;
+           }
+          else{
+              m_state = MotorState::Running;
             }
-
-            return success;
-        }
-        else if (command.type == MotorCommandType::Start)
-        {
-            const bool success = sendMessage(enterMotorMode);
-
-            if (success)
+        #endif
+            // telemetry rate control
+            if (++m_printCounter >= m_kPrintEvery)
             {
-                m_enabled = true;
-                m_hardStopActive = false;
+                m_printCounter = 0;
             }
+            // handle the current state to determine motor's behaviour
+            switch (m_state)
+            {
+               case MotorState::Recovery:
+               {
+                   constexpr float recoveryMargin = 0.5f;
 
-            return success;
+                   if (m_reply.position > m_motorSoftwareConstraints.p_max) {
+                       commandToSend.position =
+                           m_motorSoftwareConstraints.p_max - recoveryMargin;
+                   }
+                   else if (m_reply.position < m_motorSoftwareConstraints.p_min) {
+                       commandToSend.position =
+                           m_motorSoftwareConstraints.p_min + recoveryMargin;
+                   }
+
+                   commandToSend.velocity = 0.0f;
+
+                   // Start gently and increase gradually.
+                   commandToSend.kp = 2.0f;
+                   commandToSend.kd = 0.5f;
+
+                   // Remove the user's outward feedforward torque.
+                   commandToSend.torque = 0.0f;
+                   break;
+               }
+               case MotorState::Running:
+               {
+                   commandToSend = m_cmd;
+
+                   commandToSend.kp = 0.0f;
+                   commandToSend.kd = 0.0f;
+
+                    #if !defined(NO_LIMITS)
+                   commandToSend.torque =
+                       limitTorqueCommand(m_cmd.torque);
+                    #endif
+                   break;
+               }
+               case MotorState::HardStopped:
+                    sendMessage(neutralMITCommand);
+                    sendMessage(exitMotorMode);
+                    m_enabled = false;
+                    m_state = MotorState::Stopped;
+                    return;
+
+               case MotorState::Stopped:
+                    break;
+            }
         }
-        else if (command.type == MotorCommandType::Zero)
+        if (m_enabled && !updateMIT()) // m_enabled
         {
-            return sendMessage(setZeroPosition);
+            //Serial.println("Failed to send MIT command");
+            sendMessage(neutralMITCommand);
         }
-        else if (command.type == MotorCommandType::Set)
-        {
-            m_cmd = command.cmd;
-            update();// call update to make sure the command is immediately packed and sent
-            return true;
-        }
-    return false;
 }
 
+        bool updateMIT()
+        // updates the motor with the most recent command buffer (internal state variables)
+        {
+        uint8_t tx_buf[8]; // create a local array to store the command
+        pack_cmd(
+                tx_buf,
+                commandToSend.position,
+                commandToSend.velocity,
+                commandToSend.kp,
+                commandToSend.kd,
+                commandToSend.torque
+            );
+        return sendMessage(tx_buf);
+        }
 bool isOutsideRunningLimits() const
 {
     return
-        m_reply.position < m_motorRunningConstraints->p_min ||
-        m_reply.position > m_motorRunningConstraints->p_max ||
+        m_reply.position < m_motorRunningConstraints.p_min ||
+        m_reply.position > m_motorRunningConstraints.p_max ;//||
 
-        m_reply.velocity < m_motorRunningConstraints->v_min ||
-        m_reply.velocity > m_motorRunningConstraints->v_max ||
+        //m_reply.velocity < m_motorRunningConstraints.v_min ||
+        //m_reply.velocity > m_motorRunningConstraints.v_max ||
 
-        m_reply.torque < m_motorRunningConstraints->trq_min ||
-        m_reply.torque > m_motorRunningConstraints->trq_max;
+        //m_reply.torque < m_motorRunningConstraints.trq_min ||
+        //m_reply.torque > m_motorRunningConstraints.trq_max;
 }
 
     bool isOutsideSoftwareLimits() const
     {
         return
-            m_reply.position < m_motorSoftwareConstraints->p_min ||
-            m_reply.position > m_motorSoftwareConstraints->p_max ||
+            m_reply.position < m_motorSoftwareConstraints.p_min ||
+            m_reply.position > m_motorSoftwareConstraints.p_max ; // ||
 
-            m_reply.velocity < m_motorSoftwareConstraints->v_min ||
-            m_reply.velocity > m_motorSoftwareConstraints->v_max ||
+            //m_reply.velocity < m_motorSoftwareConstraints.v_min ||
+            //m_reply.velocity > m_motorSoftwareConstraints.v_max ||
 
-            m_reply.torque < m_motorSoftwareConstraints->trq_min ||
-            m_reply.torque > m_motorSoftwareConstraints->trq_max;
+            //m_reply.torque < m_motorSoftwareConstraints.trq_min ||
+            //m_reply.torque > m_motorSoftwareConstraints.trq_max;
     }
 
 
-void updateHardStopState()
-{
-    switch (m_hardStopState)
-    {
-        case HardStopState::Normal:
-        {
-            // Running constraints are the outer hard-stop limits.
-            if (m_reply.position <= m_motorRunningConstraints->p_min)
-            {
-                Serial.println(
-                    "Lower position hard stop reached. "
-                    "Only positive recovery commands are allowed."
-                );
 
-                m_hardStopState =
-                    HardStopState::RecoveringFromLowerPosition;
-
-                sendMessage(neutralMITCommand);
-            }
-            else if (
-                m_reply.position >=
-                m_motorRunningConstraints->p_max
-            )
-            {
-                Serial.println(
-                    "Upper position hard stop reached. "
-                    "Only negative recovery commands are allowed."
-                );
-
-                m_hardStopState =
-                    HardStopState::RecoveringFromUpperPosition;
-
-                sendMessage(neutralMITCommand);
-            }
-
-            break;
-        }
-
-        case HardStopState::RecoveringFromLowerPosition:
-        {
-            /*
-             * Remain in recovery mode until the motor enters the
-             * normal software-constrained operating region.
-             */
-            if (
-                m_reply.position >=
-                m_motorSoftwareConstraints->p_min
-            )
-            {
-                Serial.println(
-                    "Motor recovered past lower software limit."
-                );
-
-                m_hardStopState = HardStopState::Normal;
-            }
-
-            break;
-        }
-
-        case HardStopState::RecoveringFromUpperPosition:
-        {
-            if (
-                m_reply.position <=
-                m_motorSoftwareConstraints->p_max
-            )
-            {
-                Serial.println(
-                    "Motor recovered past upper software limit."
-                );
-
-                m_hardStopState = HardStopState::Normal;
-            }
-
-            break;
-        }
-    }
-}
-
-
-/*
- * Return:
- *
- *   +1: recovery requires increasing motor position / positive torque
- *   -1: recovery requires decreasing motor position / negative torque
- *    0: no violation
- *    2: conflicting violations; no unambiguous recovery direction
- */
-int8_t requiredRecoveryDirection() const
-{
-    bool requiresPositive = false;
-    bool requiresNegative = false;
-
-    // Position hard stop.
-    if (m_reply.position < m_motorRunningConstraints->p_min)
-    {
-        requiresPositive = true;
-    }
-    else if (m_reply.position > m_motorRunningConstraints->p_max)
-    {
-        requiresNegative = true;
-    }
-
-    // Velocity hard stop.
-    if (m_reply.velocity < m_motorRunningConstraints->v_min)
-    {
-        requiresPositive = true;
-    }
-    else if (m_reply.velocity > m_motorRunningConstraints->v_max)
-    {
-        requiresNegative = true;
-    }
-
-    // Torque hard stop.
-    if (m_reply.torque < m_motorRunningConstraints->trq_min)
-    {
-        requiresPositive = true;
-    }
-    else if (m_reply.torque > m_motorRunningConstraints->trq_max)
-    {
-        requiresNegative = true;
-    }
-
-    if (requiresPositive && requiresNegative)
-    {
-        return 2;
-    }
-
-    if (requiresPositive)
-    {
-        return +1;
-    }
-
-    if (requiresNegative)
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
-    bool commandAllowedByHardStop() const
-    {
-        constexpr float torqueEpsilon = 0.01f;
-
-        const float estimatedTorque =
-            estimatedCommandedTorque();
-
-        switch (m_hardStopState)
-        {
-            case HardStopState::Normal:
-                return true;
-
-            case HardStopState::RecoveringFromLowerPosition:
-                // Positive torque should increase position.
-                return estimatedTorque > torqueEpsilon;
-
-            case HardStopState::RecoveringFromUpperPosition:
-                // Negative torque should decrease position.
-                return estimatedTorque < -torqueEpsilon;
-        }
-
-        return false;
-    }
-
+// What does this do ???
     float estimatedCommandedTorque() const
     {
         const float positionContribution =
@@ -474,36 +348,10 @@ int8_t requiredRecoveryDirection() const
     }
 
 
-bool commandMovesTowardValidRegion() const
-{
-    const int8_t requiredDirection = requiredRecoveryDirection();
 
-    if (requiredDirection == 0)
-    {
-        return true;
-    }
-
-    if (requiredDirection == 2)
-    {
-        // Conflicting violations: remain neutral.
-        return false;
-    }
-
-    const float commandedTorque = estimatedCommandedTorque();
-
-    /*
-     * Avoid accepting tiny numerical values as intentional recovery commands.
-     * Adjust this threshold for your motor if necessary.
-     */
-    constexpr float recoveryTorqueEpsilon = 0.01f;
-
-    if (requiredDirection > 0)
-    {
-        return commandedTorque > recoveryTorqueEpsilon;
-    }
-
-    return commandedTorque < -recoveryTorqueEpsilon;
-}
+virtual bool begin()= 0; // this function will call platform specific initialization
+virtual bool sendMessage(const uint8_t data[8]) = 0;
+virtual bool readMessages(MotorReply& reply)= 0; // will pop the element in the FIFO mailbox
 
 // to prevent one from calling these functions directly from the SuperClass
 protected:
@@ -520,57 +368,57 @@ protected:
     )
     {
         uint16_t position = float_to_uint(
-            constrain_float(
+            std::clamp(
                 p_in,
-                m_motorSoftwareConstraints->p_min,
-                m_motorSoftwareConstraints->p_max
+                m_motorSoftwareConstraints.p_min,
+                m_motorSoftwareConstraints.p_max
             ),
-            m_motorSettings->p_min,
-            m_motorSettings->p_max,
+            m_motorSettings.p_min,
+            m_motorSettings.p_max,
             16
         );
     
         uint16_t velocity = float_to_uint(
-            constrain_float(
+            std::clamp(
                 v_in,
-                m_motorSoftwareConstraints->v_min,
-                m_motorSoftwareConstraints->v_max
+                m_motorSoftwareConstraints.v_min,
+                m_motorSoftwareConstraints.v_max
             ),
-            m_motorSettings->v_min,
-            m_motorSettings->v_max,
+            m_motorSettings.v_min,
+            m_motorSettings.v_max,
             12
         );
     
         uint16_t kp = float_to_uint(
-            constrain_float(
+            std::clamp(
                 kp_in,
-                m_motorSoftwareConstraints->kp_min,
-                m_motorSoftwareConstraints->kp_max
+                m_motorSoftwareConstraints.kp_min,
+                m_motorSoftwareConstraints.kp_max
             ),
-            m_motorSettings->kp_min,
-            m_motorSettings->kp_max,
+            m_motorSettings.kp_min,
+            m_motorSettings.kp_max,
             12
         );
     
         uint16_t kd = float_to_uint(
-            constrain_float(
+            std::clamp(
                 kd_in,
-                m_motorSoftwareConstraints->kd_min,
-                m_motorSoftwareConstraints->kd_max
+                m_motorSoftwareConstraints.kd_min,
+                m_motorSoftwareConstraints.kd_max
             ),
-            m_motorSettings->kd_min,
-            m_motorSettings->kd_max,
+            m_motorSettings.kd_min,
+            m_motorSettings.kd_max,
             12
         );
     
         uint16_t trq = float_to_uint(
-            constrain_float(
+            std::clamp(
                 trq_in,
-                m_motorSoftwareConstraints->trq_min,
-                m_motorSoftwareConstraints->trq_max
+                m_motorSoftwareConstraints.trq_min,
+                m_motorSoftwareConstraints.trq_max
             ),
-            m_motorSettings->trq_min,
-            m_motorSettings->trq_max,
+            m_motorSettings.trq_min,
+            m_motorSettings.trq_max,
             12
         );
     
@@ -643,38 +491,13 @@ float uint_to_float(uint16_t code, float x_min, float x_max, int bits)
 
 uint16_t float_to_uint(float x, float x_min, float x_max, int bits)
     {
-    x = constrain_float(x,x_min,x_max);
+    x = std::clamp(x,x_min,x_max);
     float span = x_max - x_min;
     float max_int = (float)(((unsigned long)1 << bits) -1);
     return (uint16_t)((x-x_min)* max_int / span);
     }
-float constrain_float(float x, float x_min, float x_max)
-    {
-    if (x < x_min)
-    {
-        Serial.print("Note : capping value ");
-        Serial.print(x);
-        Serial.print(" to ");
-        Serial.println(x_min);
-        return x_min;
-    }
-
-    if (x > x_max)
-    {
-        Serial.print("Note : capping value ");
-        Serial.print(x);
-        Serial.print(" to ");
-        Serial.println(x_max);
-        return x_max;
-    }
-
-    return x;
-    }
 
 virtual ~CANMotorMIT() = default;
-virtual void begin(); // this function will call platform specific initialization
-virtual bool sendMessage(const uint8_t data[8]);
-virtual bool readMessages(MotorReply& reply); // will pop the element in the FIFO mailbox
 };
 
 // subclasses for UNOR4 and Teensy implementations (their libraries differ)
@@ -682,108 +505,191 @@ virtual bool readMessages(MotorReply& reply); // will pop the element in the FIF
 #if defined(PLATFORM_TEENSY41)
     #include <FlexCAN_T4.h>
     //using PlatformCanBus = CanBus_Teensy41;
-    FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TeensyCAN;
+    inline FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> TeensyCAN;
     // Teensy 4.1 CAN1:
     // RX = pin 23
     // TX = pin 22
     class CANMotorMIT_Teensy : public CANMotorMIT {
 
     public:
-        CANMotorMIT_Teensy(byte canId,const AK60Params* motorSettings,const AK60Params* motorSoftwareConstraints,const AK60Params* motorRunningConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        CANMotorMIT_Teensy(byte canId,const AK60Params& motorSettings,const AK60Params& motorSoftwareConstraints,const AK60Params& motorRunningConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
         : CANMotorMIT(canId, motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
         {}
 
-            virtual void begin(){
-            // initializes the CAN controller on the Teensy 41
+             bool begin() override{
+                return true;
 
-                Serial.println("Now initializing CAN communication");
-                TeensyCAN.begin();
-                TeensyCAN.setBaudRate(1000000);//TeensyCAN.setBaudRate(1000000);
-                TeensyCAN.setMaxMB(16);
-                TeensyCAN.enableFIFO();
-                //TeensyCAN.enableFIFOInterrupt();
         }
 
             virtual bool sendMessage(const uint8_t data[8]) override {
-            CAN_message_t msg;
-            msg.id = m_canId;
-            msg.len = 8;
-            msg.flags.extended = 0; // MIT mode uses standard CAN ID
-            memcpy(msg.buf, data, 8);
-            int rc = TeensyCAN.write(msg);
-            return rc > 0;
+
+                CAN_message_t msg;
+                msg.id = m_canId;
+                msg.len = 8;
+                msg.flags.extended = 0; // MIT mode uses standard CAN ID
+                memcpy(msg.buf, data, 8);
+                int rc = TeensyCAN.write(msg);
+                return rc > 0;
             }
 
-            virtual bool readMessages(MotorReply& reply) override {
-                CAN_message_t rxMsg;
-                while (TeensyCAN.read(rxMsg)) {
+        bool readMessages(MotorReply& reply) override
+        {
+            CAN_message_t rxMsg;
+
+            while (TeensyCAN.read(rxMsg)) {
                 if (rxMsg.len != 8) {
-                        continue;
+                    continue;
                 }
 
-                reply = unpack_reply(rxMsg.buf);
-                return true;   // popped one valid message
+                // Adapt this check to the actual reply CAN ID used by your motor.
+                if (rxMsg.id != m_canId) {
+                    continue;
                 }
 
-                return false;      // no valid message available right now
-            }
-        //
-    };
+                MotorReply candidate = unpack_reply(rxMsg.buf);
 
-#elif defined(PLATFORM_RENESAS_RA)
-    #include <Arduino_CAN.h>
+                if (candidate.can_id != m_canId) {
+                    continue;
+                }
 
-    class CANMotorMIT_Renesas : public CANMotorMIT {
-    //using PlatformCanBus = CanBus_RenesasRA;
-    public:
-        CANMotorMIT_Renesas(byte canId,const AK60Params* motorSettings,const AK60Params* motorSoftwareConstraints,const AK60Params* motorRunningConstraints,MotorCmd& cmd,uint32_t kPrintEvery=20)
-        : CANMotorMIT(canId,motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
-        {}
-
-            virtual void begin(){
-            // initializes the CAN controller on the Teensy 41
-            Serial.println("Now initializing CAN communication");
-            if (!CAN.begin(CanBitRate::BR_1000k)) // 1M baudrate
-            {
-                Serial.println("CAN.begin(...) failed.");
-                    for (;;) {}
-            }
-            Serial.println("Successfully started CAN Communication. Entering motor mode");
-            delay(1000);
-            if(!resetMotor()){
-                Serial.println("Failed to start motor. Please check the Motor power supply is ON and the Motor is connected to the CAN bus");
-            }
-            else {
-                Serial.println("Successfully started motor");
+                reply = candidate;
+                return true;
             }
 
+            return false;
         }
-    virtual bool sendMessage(const uint8_t data[8]){
-        CanMsg const out_msg(CanStandardId(m_canId), 8, data); //sizeof(data)/sizeof(data[0]) why does that not evaluate to 8 properly ??? Because in CPP, data[8] is transformed into a pointer so sizeof(data) = size of the pointer, not the array
-        return CAN.write(out_msg) > 0;
-    }
-
-    virtual bool readMessages(MotorReply& reply) override {
-        while (CAN.available())
-        {
-        CanMsg const rxMsg = CAN.read();
-        if (rxMsg.data_length != 8)
-        {
-        continue;
-        }
-        reply = unpack_reply(rxMsg.data);
-        return true;   // popped one valid message
-        }
-        return false;      // no valid message available right now
-       }
     };
 
 #else
-    #error "No CAN platform selected. Make sure to use Arduino UNO R4 or Teensy 4.1"
 #endif
 
-#if !defined(PLATFORM_TEENSY41) && !defined(PLATFORM_RENESAS_RA)
-#error "No CAN platform selected. Define PLATFORM_TEENSY41 or PLATFORM_RENESAS_RA."
-#endif
+class CANMotorMIT_Handler {
 
+public :
+
+    CANMotorMIT_Handler(CANMotorMIT& leftMotor,CANMotorMIT* rightMotor = nullptr,uint32_t canRate=board::teensy41::motorCanBaud) // using a pointer to indicate that the right motor is not necessary for now
+        : m_leftMotor(leftMotor),
+          m_rightMotor(rightMotor),
+		  m_canRate(canRate)
+    {
+    }
+
+
+	bool begin()
+{
+    Serial.println("Initializing CAN Bus");
+    TeensyCAN.begin(); // this seems to be a void function, so how can we check if the CAN is properly initialized ?
+    TeensyCAN.setBaudRate(m_canRate);
+    TeensyCAN.setMaxMB(16);
+    TeensyCAN.enableFIFO();
+    //TeensyCAN.enableFIFOInterrupt();
+
+    if (!m_leftMotor.begin()) {
+        Serial.println(
+            "Failed to initialize left motor"
+        );
+        return false;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        !m_rightMotor->begin()
+    ) {
+        Serial.println(
+            "Failed to initialize right motor"
+        );
+        return false;
+    }
+
+    if (!m_leftMotor.resetMotor()) {
+        Serial.println(
+            "Failed to start left motor"
+        );
+        return false;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        !m_rightMotor->resetMotor()
+    ) {
+        Serial.println(
+            "Failed to start right motor"
+        );
+        return false;
+    }
+
+    return true;
+}
+CANMotorMIT* findMotor(uint8_t motorId)
+{
+    if (motorId == m_leftMotor.m_canId) {
+        return &m_leftMotor;
+    }
+
+    if (
+        m_rightMotor != nullptr &&
+        motorId == m_rightMotor->m_canId
+    ) {
+        return m_rightMotor;
+    }
+
+    return nullptr;
+}
+
+bool handleSerialCommand(
+    const CommandPayload& command
+)
+{
+    CANMotorMIT* motor =
+        findMotor(command.motorId);
+
+    if (motor == nullptr) {
+        Serial.println("Unknown motor ID");
+        return false;
+    }
+
+    switch (command.type) {
+    case MotorCommandType::Stop:
+    {
+        const bool success =
+            motor->sendMessage(exitMotorMode);
+
+        if (success) {
+            motor->m_enabled = false;
+        }
+
+        return success;
+    }
+
+    case MotorCommandType::Start:
+    {
+        const bool success =
+            motor->sendMessage(enterMotorMode);
+
+        if (success) {
+            motor->m_enabled = true;
+
+        }
+
+        return success;
+    }
+
+    case MotorCommandType::Zero:
+        return motor->sendMessage(
+            setZeroPosition
+        );
+
+    case MotorCommandType::Set:
+        motor->m_cmd = command.cmd;
+        motor->update();
+        return true;
+    }
+
+    return false;
+}
+private:
+    CANMotorMIT& m_leftMotor;
+    CANMotorMIT* m_rightMotor;
+    uint32_t m_canRate;
+};
 #endif

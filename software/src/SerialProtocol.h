@@ -1,55 +1,55 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <type_traits>
+#include <variant>
+#include <cmath>
+
 #include <Arduino.h>
+
+
 #include <PacketSerial.h>
-#include <ArduinoJson.h>
 #include "ProtocolTypes.h"
-#include "SerialConfig.h"
+
+#if defined(PLATFORM_TEENSY41)
+#include "CANMotorMIT.h"
+#endif
+
+#if defined(PLATFORM_NORDIC)
+#include <ArduinoBLE.h>
+#endif
+
+using Message =
+    std::variant<DataPayload, CommandPayload>;
+// std::variant was introduced in C++ 2017 and is a great way to combine DataPayload and CommandPayload into one entity
 
 class UARTHandler
 {
 public:
-    using CommandHandler = void (*)(
-        void* context,
-        const CommandPayload& command
-    );
-
-#if defined(PLATFORM_TEENSY41)
-
-    UARTHandler(
-        HardwareSerial& serial,
-        CommandHandler commandHandler,
-        void* commandContext
-    )
-        : m_serial(serial),
-          m_commandHandler(commandHandler),
-          m_commandContext(commandContext)
+    explicit UARTHandler(HardwareSerial& serial)
+        : m_serial(serial)
     {
-        s_instance = this;
+        if (s_instance == nullptr) {
+            s_instance = this;
+        }
     }
 
-#elif defined(PLATFORM_NORDIC)
-
-
-
-    explicit UARTHandler(
-        HardwareSerial& serial,
-        DataPayload& payload
-    )
-    : m_serial(serial),
-      m_payload(payload)
+    virtual ~UARTHandler()
     {
-        s_instance = this;
+        if (s_instance == this) {
+            s_instance = nullptr;
+        }
     }
-
-#else
-#error "Unsupported platform"
-#endif
 
     void begin()
     {
         m_packetSerial.setStream(&m_serial);
-        m_packetSerial.setPacketHandler(packetReceivedCallback);
+        m_packetSerial.setPacketHandler(
+            packetReceivedCallback
+        );
     }
 
     void update()
@@ -57,30 +57,140 @@ public:
         m_packetSerial.update();
     }
 
-#if defined(PLATFORM_TEENSY41)
+    virtual void onReceive(const Message& message) = 0;
 
-    void sendTelemetryPacket(const DataPayload& payload)
+    template<typename Payload>
+    void send(const Payload& payload)
     {
-        m_packetSerial.send(
-            reinterpret_cast<const uint8_t*>(&payload),
+        static_assert(
+            std::is_same_v<Payload, DataPayload> ||
+            std::is_same_v<Payload, CommandPayload>,
+            "Unsupported UART payload type"
+        );
+
+        static_assert(
+            std::is_trivially_copyable_v<Payload>,
+            "Payload must be trivially copyable"
+        );
+
+        constexpr MessageType messageType =
+            getMessageType<Payload>();
+
+        constexpr size_t packetSize =
+            sizeof(MessageHeader) +
+            sizeof(Payload);
+
+        std::array<uint8_t, packetSize> packet {};
+
+        const MessageHeader header {
+            .type = messageType,
+            .payloadSize =
+                static_cast<uint16_t>(sizeof(Payload))
+        };
+
+        std::memcpy(
+            packet.data(),
+            &header,
+            sizeof(header)
+        );
+         // copy header into memory address
+
+        std::memcpy(
+            packet.data() + sizeof(header),
+            &payload,
             sizeof(payload)
         );
-    }
+        // copy payload into memory address adjacent to header
 
-#elif defined(PLATFORM_NORDIC)
-
-    void sendCommandPacket(const CommandPayload& command)
-    {
         m_packetSerial.send(
-            reinterpret_cast<const uint8_t*>(&command),
-            sizeof(command)
+            packet.data(),
+            packet.size()
         );
     }
 
-#endif
+protected:
+    bool decodeMessage(
+        const uint8_t* buffer,
+        size_t size,
+        Message& message
+    )
+    {
+        if (buffer == nullptr || size < sizeof(MessageHeader)) {
+            return false;
+        }
+
+        MessageHeader header {};
+
+        std::memcpy(
+            &header,
+            buffer,
+            sizeof(header)
+        );
+
+        const uint8_t* payloadBuffer =
+            buffer + sizeof(MessageHeader);
+
+        const size_t payloadSize =
+            size - sizeof(MessageHeader);
+
+        if (header.payloadSize != payloadSize) {
+            return false;
+        }
+
+        switch (header.type) {
+
+        case MessageType::Telemetry:
+        {
+            if (payloadSize != sizeof(DataPayload)) {
+                return false;
+            }
+
+            DataPayload payload {};
+
+            std::memcpy(
+                &payload,
+                payloadBuffer,
+                sizeof(payload)
+            );
+
+            message = payload;
+            return true;
+        }
+
+        case MessageType::Command:
+        {
+            if (payloadSize != sizeof(CommandPayload)) {
+                return false;
+            }
+
+            CommandPayload payload {};
+
+            std::memcpy(
+                &payload,
+                payloadBuffer,
+                sizeof(payload)
+            );
+
+            message = payload;
+            return true;
+        }
+
+        default:
+            return false;
+        }
+    }
 
 private:
-    inline static UARTHandler* s_instance = nullptr;
+    template<typename Payload>
+    static constexpr MessageType getMessageType()
+    {
+        if constexpr (std::is_same_v<Payload, DataPayload>) {
+            return MessageType::Telemetry;
+        }
+        else {
+            return MessageType::Command;
+        }
+    }
 
     static void packetReceivedCallback(
         const uint8_t* buffer,
@@ -88,137 +198,150 @@ private:
     )
     {
         if (s_instance != nullptr) {
-            s_instance->handlePacketReceived(buffer, size);
+            s_instance->onPacketReceived(
+                buffer,
+                size
+            );
         }
     }
 
-    void handlePacketReceived(
+    void onPacketReceived(
         const uint8_t* buffer,
         size_t size
     )
     {
-#if defined(PLATFORM_TEENSY41)
+        Message message {};
 
-        if (size != sizeof(CommandPayload)) {
+        if (!decodeMessage(buffer, size, message)) {
             return;
         }
 
-        CommandPayload command {};
-
-        memcpy(
-            &command,
-            buffer,
-            sizeof(command)
-        );
-
-        if (m_commandHandler != nullptr) {
-            m_commandHandler(
-                m_commandContext,
-                command
-            );
-        }
-
-#elif defined(PLATFORM_NORDIC)
-
-        if (size != sizeof(DataPayload)) {
-            return;
-        }
-
-        memcpy(
-            &m_payload,
-            buffer,
-            sizeof(m_payload)
-        );
-
-#endif
+        onReceive(message);
     }
+
+    inline static UARTHandler* s_instance = nullptr;
 
     HardwareSerial& m_serial;
     PacketSerial m_packetSerial;
-
-#if defined(PLATFORM_NORDIC)
-    DataPayload& m_payload;
-#endif
-
-#if defined(PLATFORM_TEENSY41)
-    CommandHandler m_commandHandler = nullptr;
-    void* m_commandContext = nullptr;
-#endif
 };
 
+#if defined(PLATFORM_TEENSY41)
+
+class UARTHandler_Teensy : public UARTHandler
+{
+public:
+    UARTHandler_Teensy(
+        HardwareSerial& serial,
+        CANMotorMIT_Handler& motorHandler
+    )
+        : UARTHandler(serial),
+          m_motorHandler(motorHandler)
+    {
+    }
+
+    void onReceive(
+        const Message& message
+    ) override
+    {
+        const auto* command =
+            std::get_if<CommandPayload>(&message);
+
+        if (command == nullptr) {
+            return;
+        }
+
+        m_motorHandler.handleSerialCommand(
+            *command
+        );
+    }
+
+private:
+    CANMotorMIT_Handler& m_motorHandler;
+};
+
+#elif defined(PLATFORM_NORDIC)
+
+class UARTHandler_Nano : public UARTHandler
+{
+public:
+    UARTHandler_Nano(
+        HardwareSerial& serial,
+        DataPayload& dataBuffer
+    )
+        : UARTHandler(serial),
+          m_dataBuffer(dataBuffer)
+    {
+    }
+
+    void onReceive(
+        const Message& message
+    ) override
+    {
+        const auto* telemetry =
+            std::get_if<DataPayload>(&message);
+
+        if (telemetry == nullptr)
+        {
+            return;
+        }
+
+        // Start with the newly received payload.
+        DataPayload validatedTelemetry = *telemetry;
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.LeftLoadCell1,
+            m_dataBuffer.loadCells.LeftLoadCell1
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.LeftLoadCell2,
+            m_dataBuffer.loadCells.LeftLoadCell2
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.RightLoadCell1,
+            m_dataBuffer.loadCells.RightLoadCell1
+        );
+
+        keepOldIfInvalid(
+            validatedTelemetry.loadCells.RightLoadCell2,
+            m_dataBuffer.loadCells.RightLoadCell2
+        );
+
+        // Motor and encoder data are updated normally.
+        // Invalid load-cell values have been replaced with old values.
+        m_dataBuffer = validatedTelemetry;
+    }
+
+private:
+    DataPayload& m_dataBuffer;
+
+    static constexpr float minimumValidForce = -500.0f;
+    static constexpr float maximumValidForce = 500.0f;
+
+    static bool isValidForce(float force)
+    {
+        return std::isfinite(force)
+            && force >= minimumValidForce
+            && force <= maximumValidForce;
+    }
+
+    static void keepOldIfInvalid(
+        float& receivedForce,
+        float previousForce
+    )
+    {
+        if (!isValidForce(receivedForce))
+        {
+            receivedForce = previousForce;
+        }
+    }
+
+};
+
+#endif
 
 #if defined(PLATFORM_NORDIC)
-#include <ArduinoBLE.h>
-
-JsonDocument createTelemetryPacket(const DataPayload& payload) {
-    JsonDocument doc;
-
-    doc[TelemetryKey::LeftLoadCell1] = payload.loadCells.LeftLoadCell1;
-    doc[TelemetryKey::LeftLoadCell2] = payload.loadCells.LeftLoadCell2;
-    doc[TelemetryKey::RightLoadCell1] = payload.loadCells.RightLoadCell1;
-    doc[TelemetryKey::RightLoadCell2] = payload.loadCells.RightLoadCell2;
-
-    doc[TelemetryKey::LeftEncoder] = payload.encoders.left_position;
-    doc[TelemetryKey::RightEncoder] = payload.encoders.right_position;
-
-    JsonArray motors =
-        doc[TelemetryKey::Motors].to<JsonArray>();
-
-    JsonObject motor1Object = motors.add<JsonObject>();
-    motor1Object[TelemetryKey::MotorId] = payload.motorRep.can_id;
-    motor1Object[TelemetryKey::MotorPos] = payload.motorRep.position;
-    motor1Object[TelemetryKey::MotorVel] = payload.motorRep.velocity;
-    motor1Object[TelemetryKey::MotorTrq] = payload.motorRep.torque;
-    motor1Object[TelemetryKey::MotorTemp] = payload.motorRep.temperature;
-    motor1Object[TelemetryKey::MotorErr] = payload.motorRep.error;
-
-    return doc;
-}
-void printPayload(const DataPayload& payload)
-{
-    Serial.println("----- DataPayload -----");
-
-    Serial.println("Load cells:");
-    Serial.print("  Left 1:  ");
-    Serial.println(payload.loadCells.LeftLoadCell1, 6);
-
-    Serial.print("  Left 2:  ");
-    Serial.println(payload.loadCells.LeftLoadCell2, 6);
-
-    Serial.print("  Right 1: ");
-    Serial.println(payload.loadCells.RightLoadCell1, 6);
-
-    Serial.print("  Right 2: ");
-    Serial.println(payload.loadCells.RightLoadCell2, 6);
-
-    Serial.println("Encoders:");
-    Serial.print("  Left position:  ");
-    Serial.println(payload.encoders.left_position);
-
-    Serial.print("  Right position: ");
-    Serial.println(payload.encoders.right_position);
-
-    Serial.println("Motor:");
-    Serial.print("  CAN ID:      ");
-    Serial.println(payload.motorRep.can_id);
-
-    Serial.print("  Position:    ");
-    Serial.println(payload.motorRep.position, 6);
-
-    Serial.print("  Velocity:    ");
-    Serial.println(payload.motorRep.velocity, 6);
-
-    Serial.print("  Torque:      ");
-    Serial.println(payload.motorRep.torque, 6);
-
-    Serial.print("  Temperature: ");
-    Serial.println(payload.motorRep.temperature);
-
-    Serial.print("  Error:       ");
-    Serial.println(payload.motorRep.error);
-
-    Serial.println("-----------------------");
-}
 
 // This is a Arduino Nano-specific method for forwarding byte-for-byte commands sent from the BLE Central.
 
@@ -244,6 +367,7 @@ void blePeripheralDisconnectHandler(BLEDevice central) {
     Serial.print("Disconnected event, central: ");
     Serial.println(central.address());
 }
+
 
 class BLEHandler
 {
@@ -400,7 +524,7 @@ private:
             return;
         }
 
-        m_uart.sendCommandPacket(command);
+        m_uart.send(command);
 
         Serial.println("Command forwarded to Teensy");
     }

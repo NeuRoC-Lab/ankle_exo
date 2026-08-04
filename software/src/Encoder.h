@@ -23,16 +23,15 @@
 
 #define ENCODER_SPI_PORT SPI1
 
-#elif defined(PLATFORM_RENESAS_RA) || defined(PLATFORM_ATMEL_AVR) || defined(PLATFORM_NORDIC)
-
-#define ENCODER_SPI_PORT SPI
-
 #else
 
 #error "Encoder.h: No supported SPI platform selected"
 
 #endif
 
+#if defined(PLATFORM_NORDIC)
+#define ENCODER_SPI_PORT SPI
+#endif
 
 class Encoder
 {
@@ -67,15 +66,22 @@ public:
 
     void begin()
     {
-        pinMode(boardConfig.ENCODER_LEFT_CS, OUTPUT);
-        pinMode(boardConfig.ENCODER_RIGHT_CS, OUTPUT);
+        // Enable the onboard voltage shifter (otherwise it holds lines in high impedance)
+
+        pinMode(board::teensy41::pins.levelShifters.oe1, OUTPUT);
+        pinMode(board::teensy41::pins.levelShifters.oe2, OUTPUT);
+        digitalWrite(board::teensy41::pins.levelShifters.oe1,HIGH);
+        digitalWrite(board::teensy41::pins.levelShifters.oe2,HIGH);
+
+        pinMode(board::teensy41::pins.encoders.leftChipSelect, OUTPUT);
+        pinMode(board::teensy41::pins.encoders.rightChipSelect, OUTPUT);
 
         /*
          * Both encoders must remain deselected while the SPI
          * peripheral is initialized.
          */
-        digitalWrite(boardConfig.ENCODER_LEFT_CS, HIGH);
-        digitalWrite(boardConfig.ENCODER_RIGHT_CS, HIGH);
+        digitalWrite(board::teensy41::pins.encoders.leftChipSelect, HIGH);
+        digitalWrite(board::teensy41::pins.encoders.rightChipSelect, HIGH);
 
         ENCODER_SPI_PORT.begin();
 
@@ -284,19 +290,19 @@ private:
     uint8_t getChipSelectPin(bool isLeft) const
     {
         return isLeft
-            ? boardConfig.ENCODER_LEFT_CS
-            : boardConfig.ENCODER_RIGHT_CS;
+            ? board::teensy41::pins.encoders.leftChipSelect
+            : board::teensy41::pins.encoders.rightChipSelect;
     }
 
     void deselectBothEncoders()
     {
         digitalWrite(
-            boardConfig.ENCODER_LEFT_CS,
+            board::teensy41::pins.encoders.leftChipSelect,
             HIGH
         );
 
         digitalWrite(
-            boardConfig.ENCODER_RIGHT_CS,
+            board::teensy41::pins.encoders.rightChipSelect,
             HIGH
         );
     }
