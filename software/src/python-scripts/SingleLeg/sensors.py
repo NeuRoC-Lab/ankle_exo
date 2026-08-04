@@ -128,7 +128,7 @@ class LoadCells:
     ):
         with self.lock:
             self.left1 = clamp(left1)
-            self.lef2 = clamp(left2)
+            self.left2 = clamp(left2)
             self.right1 = clamp(right1)
             self.right2 = clamp(right2)
 
