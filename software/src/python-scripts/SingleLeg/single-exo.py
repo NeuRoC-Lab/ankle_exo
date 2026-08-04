@@ -1,6 +1,7 @@
 """
 High level python API for controlling the one leg exoskeleton setup
-main-bluetooth is used as the main plotting program, while this interfaces the exo directly (?)
+
+Serves as library for the exoskeleton
 """
 
 import threading
