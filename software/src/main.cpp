@@ -28,6 +28,8 @@
 #include "MotorConfig.h"
 #include "LoadCell.h"
 #include <ArduinoJson.h>
+//TODO TESTING ONLY REMOVE LATER
+#include "TransparentMode.h"
 
 #elif defined(PLATFORM_NORDIC)
 
@@ -95,6 +97,7 @@ LoadCellHandlerObj loadCellController(
 
 #if defined(PLATFORM_TEENSY41)
 
+
 EncoderPositions positions;
 
 MotorCmd motor1Cmd {
@@ -123,6 +126,10 @@ unsigned long previousSend = millis();
 
 UARTHandler_Teensy uart(Serial8,motorHandler);
 
+//TODO REMOVE LATER AS WE ARE DOING THIS FOR DEBUG HERE
+
+PDControl transparentController(motorHandler,loadCellController,1.0f,1.0f,100UL);
+
 
 void setup()
 {
@@ -136,6 +143,7 @@ void setup()
     Serial8.begin(230400); // using Serial 8 here, not serial 1
     Serial.println("Initializing the motor in MIT mode");
     motorHandler.begin();
+	delay(10);
     //motor.sendMessage(exitMotorMode);
      #if HW_VERSION_AT_MOST(1,1,0)
     Serial.println("Initializing Load Cell Controller (PCB version v1.1.0 and -)");
@@ -149,14 +157,18 @@ void setup()
     delay(1000);
     Serial.println("Calibrated Load Cell offset");
     #endif
+	//TODO DEBUG ONLY remove later
+	transparentController.begin();
+	Serial.println("Started Transparent Mode controller");
 }
 
 void loop()
 {
-    uart.update();
+	transparentController.update();
+    //uart.update();
     motor.update();
     serialControl.update();
-    delay(10); //TODO try to remove that unless it blocks the motor control update. This will ensure our data rate is set by TELEMETRY_PERIOD_US
+    //delay(10); //TODO try to remove that unless it blocks the motor control update. This will ensure our data rate is set by TELEMETRY_PERIOD_US
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
 

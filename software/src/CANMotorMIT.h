@@ -192,7 +192,7 @@ public:
     }
 
     void update()
-    {
+    {	/*
         if(millis() - lastUpdate > 1000){
             Serial.print("Current motor status : ");
             Serial.print(toString(m_state).data());
@@ -202,6 +202,7 @@ public:
             Serial.println(m_reply.position);
             lastUpdate = millis();
         }
+		*/
 
         if (!m_enabled)
         {
