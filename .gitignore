@@ -1,0 +1,5 @@
+software/src/build/*
+__pycache__/
+*.py[cod]
+.gitignore\]
+*.pyc

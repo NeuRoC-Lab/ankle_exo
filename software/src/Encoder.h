@@ -23,15 +23,6 @@
 
 #define ENCODER_SPI_PORT SPI1
 
-#else
-
-#error "Encoder.h: No supported SPI platform selected"
-
-#endif
-
-#if defined(PLATFORM_NORDIC)
-#define ENCODER_SPI_PORT SPI
-#endif
 
 class Encoder
 {
@@ -340,3 +331,5 @@ private:
         return receivedByte;
     }
 };
+#else
+#endif

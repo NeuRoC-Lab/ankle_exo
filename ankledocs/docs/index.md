@@ -8,7 +8,7 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
 ## Installation
 
-* Mkdocs can be installed using python's package manager (pip) with `pip install mkdocs`. 
+* Mkdocs can be installed using python's package manager (pip) with `pip install mkdocs pymdown-extensions`. 
 Note : you might have to create and activate a virtual environment (`python3 -m venv yourenv`) if the previous command returns an error related to `externally managed environments`
 
 ## Project layout

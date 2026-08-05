@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <Arduino.h>
 
 enum class MessageType : uint8_t
 {

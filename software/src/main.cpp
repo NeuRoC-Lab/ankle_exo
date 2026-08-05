@@ -16,6 +16,11 @@
 #include "Board.h"
 #include "SerialProtocol.h"
 
+// very important check to avoid problems. Code should be compiled separately for the Teensy and the Nano.
+#if defined(PLATFORM_TEENSY41) && defined(PLATFORM_NORDIC)
+#error "You specified both PLATFORM_TEENSY41 and PLATFORM_NORDIC. Please select ONLY ONE platform to compile"
+#endif
+
 #if defined(PLATFORM_TEENSY41)
 
 #include "Encoder.h"

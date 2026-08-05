@@ -3,12 +3,11 @@
 #include <cstdint>
 #include <cmath>
 #include <algorithm>
+#include <string_view>
 
 #include <Arduino.h>
-
-
 #include <ArduinoJson.h>
-
+#include "Board.h"
 #include "ProtocolTypes.h"
 
 
@@ -239,6 +238,7 @@ public:
                {
                    constexpr float recoveryMargin = 0.5f;
 
+					// VIRTUAL SPRING
                    if (m_reply.position > m_motorSoftwareConstraints.p_max) {
                        commandToSend.position =
                            m_motorSoftwareConstraints.p_max - recoveryMargin;
@@ -251,8 +251,8 @@ public:
                    commandToSend.velocity = 0.0f;
 
                    // Start gently and increase gradually.
-                   commandToSend.kp = 2.0f;
-                   commandToSend.kd = 0.5f;
+                   commandToSend.kp = 4.0f;
+                   commandToSend.kd = 1.2f; // velocity
 
                    // Remove the user's outward feedforward torque.
                    commandToSend.torque = 0.0f;
@@ -355,8 +355,8 @@ virtual bool readMessages(MotorReply& reply)= 0; // will pop the element in the 
 
 // to prevent one from calling these functions directly from the SuperClass
 protected:
-    uint32_t m_printCounter;
-    uint32_t m_kPrintEvery;
+    uint32_t m_printCounter {};
+    uint32_t m_kPrintEvery {};
 
     void pack_cmd(
         uint8_t tx_buf[8],

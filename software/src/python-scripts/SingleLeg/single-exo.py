@@ -259,7 +259,7 @@ class Exoskeleton:
         if not self.connected:
             raise RuntimeError("Exoskeleton not connected, need to call exo.connect() first")
 
-    # not sure what below is used for but ai uses it
+    # handle context manager
 
     def __enter__(self):
         self.connect()

@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+#include <Arduino.h>
 #include <SPI.h>
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -38,8 +40,10 @@ HW_VERSION_ENCODE(HW_VERSION_MAJOR, HW_VERSION_MINOR, HW_VERSION_PATCH)
 #define HW_VERSION_EQUALS(major, minor, patch) \
 (HARDWARE_VERSION == HW_VERSION_ENCODE(major, minor, patch))
 
-#include <cstdint>
-#include <Arduino.h>
+#if defined(PLATFORM_TEENSY41) && defined(PLATFORM_NORDIC)
+#error "You specified both PLATFORM_TEENSY41 and PLATFORM_NORDIC. Please select ONLY ONE platform to compile"
+#endif
+
 
 constexpr uint8_t loadCellCount = 4;
 

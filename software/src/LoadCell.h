@@ -4,6 +4,7 @@
 #include "Board.h"
 
 
+
 inline constexpr float voltage_scale = 3.3f;
 
 struct LoadCellParams

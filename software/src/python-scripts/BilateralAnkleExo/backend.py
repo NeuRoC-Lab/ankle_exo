@@ -38,7 +38,7 @@ class AnkleExoBackend:
         self.stop_event = threading.Event()
 
         self.left_encoder = Encoders()
-        self.right_encoder = None
+        self.right_encoder = None # one leg setup
 
         self.loadCells = LoadCells()
 
@@ -215,14 +215,13 @@ class AnkleExoBackend:
         return {
             "sample_time": snapshot.sample_time,
 
-            "left_encoder": snapshot.left_encoder,
-            "right_encoder": snapshot.right_encoder,
+            "left_encoder": snapshot.encoder,
+            "right_encoder": None, #snapshot.right_encoder,
 
-            "left_loadcells": snapshot.left_loadcells,
-            "right_loadcells": snapshot.right_loadcells,
+            "left_loadcells": snapshot.loadcell1,
+            "right_loadcells": snapshot.loadcell2,
 
-            "left_motor": snapshot.left_motor,
-            "right_motor": snapshot.right_motor,
+            "motor_position": snapshot.motor_position,
         }
 
     def wait_for_snapshot(
@@ -269,6 +268,8 @@ class AnkleExoBackend:
     def __enter__(self) -> "AnkleExoBackend":
         self.connect()
         return self
+        # enter = when you do `with AnkleExoBackend() as backend:` for example
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.disconnect()
+        # when you end the indented context manager (with)

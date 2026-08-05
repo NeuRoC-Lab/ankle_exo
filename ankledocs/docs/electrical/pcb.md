@@ -427,8 +427,32 @@ G\,S\,V_{\text{exc}}
 }
 \]
 
+## ADC constraint limitation 
 
+The teensy's ADC (for PCB versions v1.1.0 and earlier) and the Arduino Nano's ADC (for PCB versions v1.1.1 and above) can read analog voltages *from 0V to 3.3V* 
 
+Therefore \(0 \le V_o(F_{\text{applied}}) \le 3.3\)
+
+\[ \iff \frac{V_{\text{IAREF}}\cdot F_{\text{FS}}}{G\cdot S  \cdot V_{exc}} \ge F_{\text{applied}} \ge \frac{(V_{\text{IAREF}}-3.3)\cdot F_{FS}}{G\cdot S  \cdot V_{exc}}\]
+
+An example for the following configuration : 
+
+| Gain (G) | Maximum tensile force \(F_{\min}\) | Maximum compressive force \(F_{\max}\) |
+| -------: |-----------------------------------:|---------------------------------------:|
+|     6004 |              \(-83.28~\mathrm{N}\) |                  \(+26.65~\mathrm{N}\) |
+|     1204 |             \(-415.28~\mathrm{N}\) |                 \(+132.89~\mathrm{N}\) |
+
+Note that compression and tension are defined visually the following way. 
+
+Because the motor actively pulls on the load cells, the expected tensile-force range is greater than the expected compressive-force range. The INA125U reference voltage was therefore selected so that a larger portion of the ADC input range is allocated to tensile-force measurements.
+
+The value of \(V_{\mathrm{IAREF}}\) was set to \(2.5~\mathrm{V}\). With an ADC input range of \(0\text{–}3.3~\mathrm{V}\), this provides \(2.5~\mathrm{V}\) of output range below \(V_{\mathrm{IAREF}}\) and \(0.8~\mathrm{V}\) above it. This choice is appropriate if tensile loading causes the INA125U output voltage to decrease. If tensile loading instead causes the output voltage to increase, \(V_{\mathrm{IAREF}}=1.24~\mathrm{V}\) would provide greater tensile-force headroom.
+
+The higher-output range of the INA125U was not used because the amplifier output is not inherently limited to the ADC’s maximum allowable input voltage of \(3.3~\mathrm{V}\). An excessive load could therefore overdrive, and potentially damage, the ADC input unless an additional clamping or protection circuit is used.
+
+ 
+
+![load cell CAD](./images/loadcells_CAD.png)
 ## Pinout of the PCB 
 
 

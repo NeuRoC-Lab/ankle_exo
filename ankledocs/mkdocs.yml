@@ -22,6 +22,7 @@ nav:
       - Encoder testing: software/encoder.md
       - Sensors Plotting: software/plotting.md
       - Serial Communication Protocol: software/Serial communication.md
+      - Python Bluetooth API : software/Python-API.md
   - Mechanical:
       - Overview: mechanical/index.md
       - Parts: mechanical/parts.md

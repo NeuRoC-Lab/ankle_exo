@@ -380,5 +380,4 @@ public:
 
 
 #else
-    #error "No CAN platform selected for ServoCANMotor. Define PLATFORM_RENESAS_RA,or PLATFORM_TEENSY41"
 #endif

@@ -1,4 +1,8 @@
 #pragma once
+#include <Arduino.h>
+#include "CANMotorMIT.h"
+
+#if defined(PLATFORM_TEENSY41)
 
 class SerialMotorControl  {
 public:
@@ -59,7 +63,7 @@ void SerialMotorControl::handleLine(String line) {
 
 #if defined(MIT_MODE)
     if (line.startsWith("stop")) {
-        motor.m_enabled = false;
+        m_controller.m_enabled = false;
         delay(100);
         m_controller.sendMessage(exitMotorMode);
         m_serial.println("Stopping MIT mode");
@@ -68,7 +72,7 @@ void SerialMotorControl::handleLine(String line) {
 
     if (line.startsWith("start")) {
         m_serial.println("Starting MIT mode");
-        motor.m_enabled = true;
+        m_controller.m_enabled = true;
         delay(100);
         m_controller.sendMessage(enterMotorMode);
         return;
@@ -377,5 +381,6 @@ void SerialMotorControl::printServoCommand() {
 
     m_serial.println();
 }
-
 #endif  // defined(SERVO_MODE)
+#else
+#endif
