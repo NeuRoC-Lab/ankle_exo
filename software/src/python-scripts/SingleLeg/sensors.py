@@ -148,7 +148,7 @@ class LoadCells:
 """
 MOTOR
 """
-Motor_ID = 0x02 # current motor id set as 2, modify as needed
+Motor_ID = 0x03 # current motor id set as 2, modify as needed
 
 class MotorCommandType(IntEnum): # assign integer to each motor command
     START = 0

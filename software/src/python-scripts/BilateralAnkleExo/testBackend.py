@@ -63,10 +63,11 @@ with AnkleExoBackend() as my_exo:
                 l1 = my_exo.get_sensor_values()["left_loadcells"]
                 l2 = my_exo.get_sensor_values()["right_loadcells"]
                 # implementing a very simple PD control loop here
-                torque_error = l1 - l2 - 18
-                clamped_torque = symmetric_sigmoid(torque_error)
-                fix_torque = controller.update(clamped_torque)
-                my_exo.set_motor_command(2,0.0,0.0,0.0,0.0,-clamped_torque)
+                torque_error = l1 - l2
+                #clamped_torque = symmetric_sigmoid(torque_error)
+                #fix_torque = controller.update(clamped_torque)
+                #my_exo.set_motor_command(2,0.0,0.0,0.0,0.0,-clamped_torque)
+                print(torque_error)
                 #print(torque_error)
                 time.sleep(0.01)
                 #my_exo.set_motor_command(2,0.0,0.0,0.0,0.0,.0)

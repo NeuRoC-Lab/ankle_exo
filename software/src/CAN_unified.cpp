@@ -2,6 +2,7 @@
 // Created by Oscar Tesniere on 23/06/2026.
 //
 #include <Arduino.h>
+#include  <ArduinoJson.h>
 
 unsigned long debug_update = millis();
 

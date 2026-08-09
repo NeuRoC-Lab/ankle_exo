@@ -9,6 +9,9 @@
 #include <ArduinoJson.h>
 #include "Board.h"
 #include "ProtocolTypes.h"
+#include "MotorSafety.h"
+#include "MotorConfig.h"
+#include "Encoder.h"
 
 
 inline float p_target = 10.0f;
@@ -17,24 +20,7 @@ inline float kp_target = 0.5f;
 inline float kd_target = 0.5f;
 inline float trq_target = 0.0f;
 
-typedef struct {
-    float p_min,p_max;
-    float v_min,v_max;
-    float kp_min,kp_max;
-    float kd_min,kd_max;
-    float trq_min,trq_max;
 
-} AK60Params;
-
-constexpr AK60Params motorParams = {
-    // these are the nominal min/max values specified for the AK60 KV140 V1.1 when issuing a user command to the motor
-    // These are not meant to clip the user commands ; altering these values will make the motor misbehave
-    -12.5f, 12.5f,   // position (rad)
-    -45.0f,  45.0f,   // velocity
-      0.0f, 500.0f,   // kp
-      0.0f,   5.0f,   // kd
-    -15.0f,  15.0f    // torque
-};
 
 
 //extern const AK60Params motorSoftwareConstraints;
@@ -65,13 +51,7 @@ static constexpr uint8_t neutralMITCommand[8] = {
 
 //TODO determine if MotorCmd should be motor-agnostic or not i.e should it include the target motor's CAN ID?
 
-enum class MotorState : uint8_t
-{
-    Stopped,
-    Running,
-    Recovery,
-    HardStopped
-    };
+
 
 // a helper function to print a stringed text for the current state
 constexpr std::string_view toString(MotorState state)
@@ -102,6 +82,7 @@ public:
     const AK60Params& motorSettings, // motor settings which decodes/encoders the ranges for MIT
     const AK60Params& motorSoftwareConstraints, // motor software constraints (which clamp the user's commanded values)
     const AK60Params& motorRunningConstraints, // motor "absolute" / running constraints.
+    const DataPayload& payload,
     MotorCmd& cmd,
     uint32_t kPrintEvery = 20
 
@@ -114,6 +95,7 @@ public:
       m_motorSettings(motorSettings),
       m_motorSoftwareConstraints(motorSoftwareConstraints),
       m_motorRunningConstraints(motorRunningConstraints),
+	  m_safetyController(motorSoftwareConstraints,motorRunningConstraints,payload), // initialize the internal safety controller to apply position limit control
       m_printCounter(0),
       m_kPrintEvery(kPrintEvery),
       m_state(MotorState::Stopped)
@@ -128,6 +110,7 @@ public:
 	const AK60Params& m_motorSettings {};
     const AK60Params& m_motorSoftwareConstraints {};
     const AK60Params& m_motorRunningConstraints {};
+    MotorSafetyController m_safetyController;
 
 
     bool resetMotor()
@@ -154,141 +137,49 @@ public:
      return true;
     }
 
-    float limitTorqueCommand(float requestedTorque) const
-    {
-        constexpr float brakingDistance = 0.25f;
-
-        const float p = m_reply.position;
-        const float pMin = m_motorSoftwareConstraints.p_min;
-        const float pMax = m_motorSoftwareConstraints.p_max;
-
-        // Positive torque is assumed to increase position.
-        if (requestedTorque > 0.0f) {
-            const float distanceToUpperLimit = pMax - p;
-
-            const float scale = std::clamp(
-                distanceToUpperLimit / brakingDistance,
-                0.0f,
-                1.0f
-            );
-
-            return requestedTorque * scale;
-        }
-
-        // Negative torque is assumed to decrease position.
-        if (requestedTorque < 0.0f) {
-            const float distanceToLowerLimit = p - pMin;
-
-            const float scale = std::clamp(
-                distanceToLowerLimit / brakingDistance,
-                0.0f,
-                1.0f
-            );
-
-            return requestedTorque * scale;
-        }
-
-        return 0.0f;
-    }
 
     void update()
-    {	/*
-        if(millis() - lastUpdate > 1000){
-            Serial.print("Current motor status : ");
-            Serial.print(toString(m_state).data());
-            Serial.print("  Enabled ? ");
-            Serial.print(m_enabled);
-            Serial.print("  Position ? ");
-            Serial.println(m_reply.position);
-            lastUpdate = millis();
-        }
-		*/
+	{
+    	if (!m_enabled) {
+		// if motor is not enabled :
+        	return;
+    	}
 
-        if (!m_enabled)
-        {
-            return;
-        }
+    	while (readMessages(m_reply)) {
+			// enable hard stop / software stop control. Disable it if needed
+			#if defined(NO_LIMITS)
+        		commandToSend = m_cmd;
+        		m_state = MotorState::Running;
+			#else
+        	const SafetyResult result =
+            	m_safetyController.evaluate(
+                m_reply,
+                m_cmd
+            );
 
-        while (readMessages(m_reply))
-        {
-        #if defined(NO_LIMITS)
-        #pragma message("WARNING: motor limits are DISABLED")
-            m_state = MotorState::Running;
-        #else
-           if(isOutsideRunningLimits())
-           {
-              m_state = MotorState::HardStopped;
-           }
-          else if(isOutsideSoftwareLimits())
-           {
-              m_state = MotorState::Recovery;
-           }
-          else{
-              m_state = MotorState::Running;
-            }
-        #endif
-            // telemetry rate control
-            if (++m_printCounter >= m_kPrintEvery)
-            {
-                m_printCounter = 0;
-            }
-            // handle the current state to determine motor's behaviour
-            switch (m_state)
-            {
-               case MotorState::Recovery:
-               {
-                   constexpr float recoveryMargin = 0.5f;
+        	m_state = result.state;
 
-					// VIRTUAL SPRING
-                   if (m_reply.position > m_motorSoftwareConstraints.p_max) {
-                       commandToSend.position =
-                           m_motorSoftwareConstraints.p_max - recoveryMargin;
-                   }
-                   else if (m_reply.position < m_motorSoftwareConstraints.p_min) {
-                       commandToSend.position =
-                           m_motorSoftwareConstraints.p_min + recoveryMargin;
-                   }
+        	switch (result.action) {
+        		case SafetyAction::None:
+            		break;
 
-                   commandToSend.velocity = 0.0f;
+        		case SafetyAction::SendCommand:
+            		commandToSend = result.command;
+            		break;
 
-                   // Start gently and increase gradually.
-                   commandToSend.kp = 4.0f;
-                   commandToSend.kd = 1.2f; // velocity
-
-                   // Remove the user's outward feedforward torque.
-                   commandToSend.torque = 0.0f;
-                   break;
-               }
-               case MotorState::Running:
-               {
-                   commandToSend = m_cmd;
-
-                   commandToSend.kp = 0.0f;
-                   commandToSend.kd = 0.0f;
-
-                    #if !defined(NO_LIMITS)
-                   commandToSend.torque =
-                       limitTorqueCommand(m_cmd.torque);
-                    #endif
-                   break;
-               }
-               case MotorState::HardStopped:
-                    sendMessage(neutralMITCommand);
+        		case SafetyAction::DisableMotor:
+            		//executeEmergencyStop();
                     sendMessage(exitMotorMode);
                     m_enabled = false;
-                    m_state = MotorState::Stopped;
-                    return;
+            		return;
+        	}
+			#endif
+    	}
 
-               case MotorState::Stopped:
-                    break;
-            }
-        }
-        if (m_enabled && !updateMIT()) // m_enabled
-        {
-            //Serial.println("Failed to send MIT command");
-            sendMessage(neutralMITCommand);
-        }
-}
+    	if (m_enabled && !updateMIT()) {
+        	sendMessage(neutralMITCommand);
+    	}
+	}
 
         bool updateMIT()
         // updates the motor with the most recent command buffer (internal state variables)
@@ -513,8 +404,8 @@ virtual ~CANMotorMIT() = default;
     class CANMotorMIT_Teensy : public CANMotorMIT {
 
     public:
-        CANMotorMIT_Teensy(byte canId,const AK60Params& motorSettings,const AK60Params& motorSoftwareConstraints,const AK60Params& motorRunningConstraints ,MotorCmd& cmd,uint32_t kPrintEvery=20)
-        : CANMotorMIT(canId, motorSettings,motorSoftwareConstraints,motorRunningConstraints,cmd,kPrintEvery)
+        CANMotorMIT_Teensy(byte canId,const AK60Params& motorSettings,const AK60Params& motorSoftwareConstraints,const AK60Params& motorRunningConstraints,const DataPayload& payload,MotorCmd& cmd,uint32_t kPrintEvery=20)
+        : CANMotorMIT(canId, motorSettings,motorSoftwareConstraints,motorRunningConstraints,payload,cmd,kPrintEvery)
         {}
 
              bool begin() override{
@@ -646,6 +537,7 @@ bool handleSerialCommand(
 
     if (motor == nullptr) {
         Serial.println("Unknown motor ID");
+        //todo be more specific about this error
         return false;
     }
 

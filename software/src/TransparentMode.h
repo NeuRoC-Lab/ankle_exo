@@ -9,6 +9,19 @@
 #include "LoadCell.h"
 #include "CANMotorMIT.h"
 
+#if defined(PLATFORM_TEENSY41) && HW_VERSION_AT_MOST(1,1,0)
+
+using LoadCellObj = LoadCell_Teensy41;
+using LoadCellHandlerObj = LoadCellHandler_Teensy41;
+
+
+#elif defined(PLATFORM_NORDIC) && HW_VERSION_AT_LEAST(1,1,1)
+#pragma message "Enabling Arduino Nano ADC"
+
+using LoadCellObj = LoadCell_NanoBLE;
+using LoadCellHandlerObj = LoadCellHandler_NanoBLE;
+#endif
+
 #if defined(PLATFORM_TEENSY41)
 
 /**
@@ -29,7 +42,7 @@ class PDControl
 public:
     PDControl(
         CANMotorMIT_Handler& motorHandler,
-        LoadCellHandler_Teensy41& loadCellHandler,
+        LoadCellHandlerObj& loadCellHandler,
         float kp = 1.0f,
         float kd = 0.0f,
         float maxTorque = 0.5f,
@@ -208,7 +221,7 @@ private:
 #endif
 
     CANMotorMIT_Handler& m_motorHandler;
-    LoadCellHandler_Teensy41& m_loadCellHandler;
+    LoadCellHandlerObj& m_loadCellHandler;
 
     CommandPayload m_command{};
 

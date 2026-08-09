@@ -5,6 +5,11 @@
 #include "ProtocolTypes.h"
 #include <SPI.h>
 
+static constexpr uint32_t MIN_UPDATE_PERIOD_US = 48;
+
+uint32_t m_lastUpdateUs = 0;
+bool m_hasValidSample = false;
+
 /*
  * AMT20 / AMT203 SPI encoder interface.
  *
@@ -182,17 +187,31 @@ public:
         return position;
     }
 
-    EncoderPositions getPositions()
+    const EncoderPositions& getPositions()
     {
+        const uint32_t nowUs = micros();
+
+        if (
+            m_hasValidSample &&
+            static_cast<uint32_t>(nowUs - m_lastUpdateUs) <
+                MIN_UPDATE_PERIOD_US
+        ) {
+            return m_encoders;
+        }
+
+        m_lastUpdateUs = nowUs;
+
         if (m_usingLeft)
         {
-            m_encoders.left_position =
-                readEncoder(true);
+            const uint16_t position = readEncoder(true);
+
+            if (isValidPosition(position)) {
+                m_encoders.left_position = position;
+            }
         }
         else
         {
-            m_encoders.left_position =
-                INVALID_POSITION;
+            m_encoders.left_position = INVALID_POSITION;
         }
 
         if (m_usingLeft && m_usingRight)
@@ -204,14 +223,18 @@ public:
 
         if (m_usingRight)
         {
-            m_encoders.right_position =
-                readEncoder(false);
+            const uint16_t position = readEncoder(false);
+
+            if (isValidPosition(position)) {
+                m_encoders.right_position = position;
+            }
         }
         else
         {
-            m_encoders.right_position =
-                INVALID_POSITION;
+            m_encoders.right_position = INVALID_POSITION;
         }
+
+        m_hasValidSample = true;
 
         return m_encoders;
     }
@@ -272,11 +295,14 @@ public:
         return position != INVALID_POSITION;
     }
 
-private:
-    bool m_usingLeft;
-    bool m_usingRight;
+   private:
+        bool m_usingLeft;
+        bool m_usingRight;
 
-    EncoderPositions m_encoders;
+        EncoderPositions m_encoders;
+
+        uint32_t m_lastUpdateUs = 0;
+        bool m_hasValidSample = false;
 
     uint8_t getChipSelectPin(bool isLeft) const
     {

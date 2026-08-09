@@ -21,7 +21,7 @@ from sensors import (
 
 class Exoskeleton:
     def __init__(self):
-        self.stop_event = threading.event
+        self.stop_event = threading.Event()
 
         self.encoder = Encoder()
         self.loadcells = LoadCells()
@@ -59,7 +59,7 @@ class Exoskeleton:
 
         print("Exoskeleton connected")
 
-    def disconnect(selfs):
+    def disconnect(self):
 
         if not self.connected:
             return
@@ -219,7 +219,7 @@ class Exoskeleton:
             "l1": left1,
             "r1": right1,
             "l2": left2,
-            "r2":rigt2
+            "r2":right2
         }
 
     def get_cable_tension(self):

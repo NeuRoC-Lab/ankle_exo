@@ -29,7 +29,7 @@
 #include "LoadCell.h"
 #include <ArduinoJson.h>
 //TODO TESTING ONLY REMOVE LATER
-#include "TransparentMode.h"
+//#include "TransparentMode.h"
 
 #elif defined(PLATFORM_NORDIC)
 
@@ -97,9 +97,6 @@ LoadCellHandlerObj loadCellController(
 
 #if defined(PLATFORM_TEENSY41)
 
-
-EncoderPositions positions;
-
 MotorCmd motor1Cmd {
     .position = 0.0f,
     .velocity = 0.0f,
@@ -111,9 +108,10 @@ MotorCmd motor1Cmd {
 
 Encoder encoders(true, false);
 
-constexpr byte MOTOR_ID = 0x02;
+constexpr byte MOTOR_ID = 0x03;
 
-CANMotorMIT_Teensy motor(MOTOR_ID, motorParams,motorSoftwareConstraints,motorRunningConstraints,motor1Cmd,5);//NO_MOTOR_UPDATE);
+DataPayload payload {};
+CANMotorMIT_Teensy motor(MOTOR_ID, motorParams,motorSoftwareConstraints,motorRunningConstraints,payload,motor1Cmd,5);//NO_MOTOR_UPDATE);
 CANMotorMIT_Handler motorHandler(motor,nullptr);
 
 //TODO remove that later after Motor Handler class has been validated, but keep it for debugging in one leg setup
@@ -128,8 +126,8 @@ UARTHandler_Teensy uart(Serial8,motorHandler);
 
 //TODO REMOVE LATER AS WE ARE DOING THIS FOR DEBUG HERE
 
-PDControl transparentController(motorHandler,loadCellController,1.0f,1.0f,100UL);
-
+//PDControl transparentController(motorHandler,loadCellController,1.0f,1.0f,100UL);
+EncoderPositions positions;
 
 void setup()
 {
@@ -158,19 +156,23 @@ void setup()
     Serial.println("Calibrated Load Cell offset");
     #endif
 	//TODO DEBUG ONLY remove later
-	transparentController.begin();
-	Serial.println("Started Transparent Mode controller");
+	//transparentController.begin();
+	//Serial.println("Started Transparent Mode controller");
 }
+
+uint32_t previousUpdate = micros();
 
 void loop()
 {
-	transparentController.update();
-    //uart.update();
+	//transparentController.update();
+    uart.update();
     motor.update();
     serialControl.update();
     //delay(10); //TODO try to remove that unless it blocks the motor control update. This will ensure our data rate is set by TELEMETRY_PERIOD_US
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
+    positions = encoders.getPositions();
+    Serial.println(positions.right_position);
 
     // to debug : the Teensy will stream data to your laptop through USB Serial, using ArduinoJSON for ease of unpacking
     #if defined(DEBUG)
@@ -180,9 +182,7 @@ void loop()
     Serial.write('\n');
     #else
     if (now - previousSend >= TELEMETRY_PERIOD_US) {
-        previousSend = now;
-
-        EncoderPositions positions = encoders.getPositions();
+        previousSend = micros();
 
         #if HW_VERSION_AT_MOST(1,1,0)
         // versions before and up to v1.1.0 : sample the load cells from the Teensy
@@ -206,7 +206,7 @@ void loop()
         };
         #endif
 
-        DataPayload payload {
+         payload = {
             loadCells,
             positions,
             motor.m_reply,

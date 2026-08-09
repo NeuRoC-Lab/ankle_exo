@@ -1,10 +1,44 @@
 //
 // Created by Oscar Tesniere on 17/07/2026.
 //
+#pragma once
 #include <Arduino.h>
-#include "CANMotorMIT.h"
 // define SOFT stop amd HARD stop values here
 // compile-time verifications are performed to ensure values are not out of range
+
+typedef struct {
+    float p_min,p_max;
+} PositionLimits;
+
+constexpr PositionLimits EncoderSoftConstraints =
+{
+-30.0,30.0
+};
+
+constexpr PositionLimits EncoderAbsConstraints =
+{
+-45.0,45.0
+};
+
+
+typedef struct {
+    float p_min,p_max;
+    float v_min,v_max;
+    float kp_min,kp_max;
+    float kd_min,kd_max;
+    float trq_min,trq_max;
+
+} AK60Params;
+
+constexpr AK60Params motorParams = {
+    // these are the nominal min/max values specified for the AK60 KV140 V1.1 when issuing a user command to the motor
+    // These are not meant to clip the user commands ; altering these values will make the motor misbehave
+    -12.5f, 12.5f,   // position (rad)
+    -45.0f,  45.0f,   // velocity
+      0.0f, 500.0f,   // kp
+      0.0f,   5.0f,   // kd
+    -15.0f,  15.0f    // torque
+};
 
 constexpr bool constraintsInside(
     const AK60Params& inner,
@@ -54,4 +88,12 @@ static_assert(
     ),
     "Software constraints must be inside running constraints"
 );
+
+enum class MotorState : uint8_t
+{
+    Stopped,
+    Running,
+    Recovery,
+    HardStopped
+    };
 

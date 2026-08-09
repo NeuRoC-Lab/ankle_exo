@@ -84,13 +84,10 @@ def connect_to_arduino(
 
     print("Creating BluetoothManager...")
     bluetooth = BluetoothManager(
-        left_encoder=left_encoder,
-        right_encoder=right_encoder,
-        left_loadcells=left_loadcells,
-        right_loadcells=right_loadcells,
-        left_motor=left_motor,
-        right_motor=right_motor,
-        stop_event=stop_event,
+        encoder=right_encoder,
+        loadcells = right_loadcells,
+        motor = right_motor,
+        stop_event=stop_event
     )
 
     bluetooth.connect()

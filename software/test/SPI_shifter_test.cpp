@@ -21,7 +21,8 @@ constexpr uint32_t SPI_CLOCK_HZ = 500000;
 #if defined(PLATFORM_TEENSY41)
 #include "Board.h"
 // Change this if boardConfig.ENCODER_LEFT_CS is not connected to the UNO's SS pin.
-const uint8_t csPin = boardConfig.ENCODER_LEFT_CS;
+const uint8_t csPin = board::teensy41::pins.encoders.leftChipSelect; //CS2
+
 
 uint8_t byteToSend = 0;
 uint8_t previousByteSent = 0;
@@ -31,16 +32,16 @@ void setup()
 {
     Serial.begin(SERIAL_BAUD_RATE);
 
-    pinMode(boardConfig.OE1, OUTPUT);
-    pinMode(boardConfig.OE2, OUTPUT);
+    pinMode(board::teensy41::pins.levelShifters.oe1, OUTPUT);
+    pinMode(board::teensy41::pins.levelShifters.oe2, OUTPUT);
     pinMode(csPin, OUTPUT);
 
     // Keep the peripheral deselected initially.
     digitalWrite(csPin, HIGH);
 
     // Enable the voltage shifter.
-    digitalWrite(boardConfig.OE1, HIGH);
-    digitalWrite(boardConfig.OE2, HIGH);
+    digitalWrite(board::teensy41::pins.levelShifters.oe1, HIGH);
+    digitalWrite(board::teensy41::pins.levelShifters.oe2, HIGH);
 
     SPI1.begin();
 
@@ -52,6 +53,12 @@ void setup()
 
 void loop()
 {
+/*
+digitalWrite(csPin,HIGH);
+delay(1000);
+digitalWrite(csPin,LOW);
+delay(1000);
+*/
     SPI1.beginTransaction(
         SPISettings(
             SPI_CLOCK_HZ,
@@ -115,7 +122,6 @@ void loop()
 
     delay(500);
 }
-
 #elif defined(PLATFORM_ATMELAVR)
 
 #include <avr/interrupt.h>

@@ -68,7 +68,7 @@ enum class LoadCellId : std::uint8_t
 // these are now FIXED
 
 struct INA125UParams {
- static constexpr float gainR = 10.0f;
+ static constexpr float gainR = 50.0f; // used to be 10 Ohms on V1.1.0, now 50Ohms on V1.1.1
  static constexpr float ampGain = 4.0f + 60000.0f / gainR;
 
  static constexpr float IAref = 2.5f;
@@ -127,6 +127,8 @@ namespace board::teensy41
  // CAN configurations
  //inline FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> motorCan;
  inline constexpr std::uint32_t motorCanBaud = 1'000'000U;
+// Encoder SPI baudrate
+ inline constexpr std::uint32_t encoderSPIBaud = 1'000'000U;
 }
 
 // ============== Arduino Nano definitions  ==============
