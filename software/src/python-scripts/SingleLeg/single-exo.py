@@ -25,10 +25,12 @@ class Exoskeleton:
     def __init__(self):
         self.stop_event = threading.Event()
 
+        # sensors and motor
         self.encoder = Encoder()
         self.loadcells = LoadCells()
         self.motor = Motor()
 
+        # arduino nano connection
         self.bluetooth = BluetoothManager(
             encoder=self.encoder,
             loadcells=self.loadcells,
@@ -38,6 +40,7 @@ class Exoskeleton:
 
         self.connected = False
 
+        # motor commands
         self.command_position = 0.0
         self.command_velocity = 0.0
         self.command_torque = 0.0
@@ -91,6 +94,7 @@ class Exoskeleton:
     def start_motor(self, motor_id=Motor_ID):
         self._check_connection()
         self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.ENTER_MOTOR_MODE))
+        
     def zero_motor(self, motor_id=Motor_ID):
         self._check_connection()
         self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.SET_ZERO))

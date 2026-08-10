@@ -18,6 +18,7 @@ def clamp(value, minimum=-1000.0, maximum=1000.0):
     return max(minimum, min(value, maximum))
 
 
+# Encoder 12 bit absolute position count
 max_count = 4096
 half_count = max_count // 2
 
@@ -80,8 +81,7 @@ class Encoder:
 
             else:
                 self.filtered_vel = (
-                    self.alpha * self.raw_vel
-                    + (1 - self.alpha) * self.filtered_vel
+                    self.alpha * self.raw_vel + (1 - self.alpha) * self.filtered_vel
                 )
 
             self.ankle_velocity = self.filtered_vel
@@ -119,7 +119,7 @@ class LoadCells:
 
         self.lock = threading.Lock()
 
-    def update( # add left2 and right1 later when they are being used
+    def update( # first leg setup uses left1 and right2
             self,
             left1,
             left2,
@@ -148,7 +148,7 @@ class LoadCells:
 """
 MOTOR
 """
-Motor_ID = 0x03 # current motor id set as 2, modify as needed
+Motor_ID = 0x03 # current motor id, modify as needed
 
 
 COMMAND_PACKET_FORMAT = "<5f" # 5 floats
