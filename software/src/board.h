@@ -128,7 +128,7 @@ namespace board::teensy41
  //inline FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> motorCan;
  inline constexpr std::uint32_t motorCanBaud = 1'000'000U;
 // Encoder SPI baudrate
- inline constexpr std::uint32_t encoderSPIBaud = 1'000'000U;
+ inline constexpr std::uint32_t encoderSPIBaud = 500'000U;
 }
 
 // ============== Arduino Nano definitions  ==============

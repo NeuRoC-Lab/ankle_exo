@@ -13,7 +13,6 @@ constexpr uint8_t LoadCellCount = 4;
 
 using Pin = int; // defining a type for pins to make intent clearer
 
-
 struct SingleEndedLoadCellPins
 {
     std::array<Pin, 4> outputs; // these are the Vo pins referenced to GND (array of 4)
@@ -32,12 +31,12 @@ enum class LoadCellId : std::uint8_t
 // these are now FIXED
 
 struct INA125UParams {
- static constexpr float gainR = 50.0f; // used to be 10 Ohms on V1.1.0, now 50Ohms on V1.1.1
+ static constexpr float gainR = 50.0f; // used to be 10 Ohms on V1.1.0, now 50 Ohms on V1.1.1
  static constexpr float ampGain = 4.0f + 60000.0f / gainR;
 
- static constexpr float IAref = 2.5f;
- static constexpr float Vexc  = 5.0f;
- // change Vexc to equal 5.0f or 3.3f if using an external excitation voltage (coming for example from the regulated 5V/3.3V on the PCB)
+ static constexpr float IAref = 2.5f; // the internal reference which shifts the output voltage
+ static constexpr float Vexc  = 5.0f; // the excitation voltage used for the load cells
+
 } inaParams;
 
 // ============== Teensy definitions  ==============
@@ -46,13 +45,13 @@ struct INA125UParams {
 namespace board::teensy41
 {
 
- struct LevelShifterPins
+ struct LevelShifterPins // enable pins for the level shifters
  {
   Pin oe1;
   Pin oe2;
  };
 
- struct EncoderPins
+ struct EncoderPins // chip select pins for the encoders
  {
   Pin leftChipSelect;
   Pin rightChipSelect;
@@ -75,7 +74,7 @@ namespace board::teensy41
    .oe2 = 3
 },
  };
- inline SPIClass& nanoSpi = SPI;
+ //inline SPIClass& nanoSpi = SPI;
  inline HardwareSerial& nanoUart = Serial8;
  // CAN configurations
  //inline FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> motorCan;
@@ -92,7 +91,7 @@ namespace board::nano
  {
   std::array<Pin, 4> outputs;
  };
-// excitationloadcell pins are only used in version 1.1.1+
+
 struct NanoPins {
 // in a struct order matters for in-place initialization so put the latest hardware revisions at the end
  ExcitationLoadCellPins excitationPins;
@@ -109,7 +108,6 @@ struct NanoPins {
   }
 
  };
-
 
  inline SPIClass& teensySpi = SPI;
 

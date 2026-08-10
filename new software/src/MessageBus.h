@@ -76,18 +76,19 @@ struct EndpointTraits<
     using Payload = MotorCmd;
 };
 
-template<>
-struct EndpointTraits<
-    EndpointId::RightMotorCommand>
-{
-    using Payload = MotorCmd;
-};
 
 template<>
 struct EndpointTraits<
     EndpointId::Ina232Snapshot>
 {
     using Payload = PowerReadings;
+};
+
+template<>
+struct EndpointTraits<
+    EndpointId::LeftMotorMetaCommand>
+{
+    using Payload = MotorMetaCommand;
 };
 
 
@@ -100,7 +101,7 @@ public:
     void publish(const T& value)
     {
         m_value = value;
-        ++m_sequence;
+        ++m_sequence; // version coujnter for checking if value updated
         m_valid = true;
     }
 
@@ -154,8 +155,7 @@ public:
         return Id;
     }
 
-    bool receive(
-        const BusMessage& message) override
+    bool receive(const BusMessage& message) override
     {
         static_assert(
             std::is_trivially_copyable_v<
@@ -164,9 +164,7 @@ public:
             "Payload must be trivially copyable"
         );
 
-        if (message.header.topic != Id ||
-            message.payloadSize !=
-                sizeof(Payload))
+        if (message.header.topic != Id || message.payloadSize != sizeof(Payload))
         {
             return false;
         }
@@ -188,15 +186,12 @@ private:
     Topic<Payload>& m_topic;
 };
 
-using PlatformMask = uint8_t;
+using PlatformMask = uint8_t; // a mask for indicating if a topic belongs to teensy or nano
 
 constexpr PlatformMask platformBit(
     PlatformId platform)
 {
-    return static_cast<PlatformMask>(
-        1U <<
-        static_cast<uint8_t>(platform)
-    );
+    return static_cast<PlatformMask>(1U << static_cast<uint8_t>(platform));
 }
 
 struct TopicRoute
@@ -204,10 +199,7 @@ struct TopicRoute
     PlatformMask subscribers{0};
 };
 
-inline constexpr std::array<
-    TopicRoute,
-    EndpointCount
-> TopicRoutes = []()
+inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
 {
     std::array<
         TopicRoute,
@@ -251,18 +243,18 @@ inline constexpr std::array<
 
     routes[
         static_cast<size_t>(
-            EndpointId::RightMotorCommand
-        )
-    ].subscribers =
-        platformBit(PlatformId::Teensy);
-
-    routes[
-        static_cast<size_t>(
             EndpointId::Ina232Snapshot
         )
     ].subscribers =
         platformBit(PlatformId::Teensy) |
         platformBit(PlatformId::Nano);
+
+    routes[
+        static_cast<size_t>(
+            EndpointId::LeftMotorMetaCommand
+        )
+    ].subscribers =
+        platformBit(PlatformId::Teensy);
 
     return routes;
 }();
@@ -354,40 +346,27 @@ public:
     }
 
     template<EndpointId Id>
-    bool publish(
-        const typename
-            EndpointTraits<Id>::Payload&
-                value)
+    bool publish(const typename EndpointTraits<Id>::Payload& value)
     {
         using Payload =
-            typename EndpointTraits<
-                Id
-            >::Payload;
+            typename EndpointTraits<Id>::Payload;
 
         static_assert(
-            std::is_trivially_copyable_v<
-                Payload
-            >
+            std::is_trivially_copyable_v<Payload>
         );
 
         static_assert(
-            sizeof(Payload) <=
-            MaxPayloadSize
+            sizeof(Payload) <= MaxPayloadSize
         );
 
         BusMessage message{};
 
         message.header.topic = Id;
-        message.header.origin =
-            LocalPlatform;
+        message.header.origin = LocalPlatform;
 
-        message.header.sequence =
-            ++m_sequences[
-                static_cast<size_t>(Id)
-            ];
+        message.header.sequence =++m_sequences[static_cast<size_t>(Id)];
 
-        message.payloadSize =
-            sizeof(Payload);
+        message.payloadSize =sizeof(Payload);
 
         std::memcpy(
             message.payload.data(),
@@ -395,7 +374,7 @@ public:
             sizeof(Payload)
         );
 
-        dispatchLocal(message);
+        dispatchLocal(message); // local dispatching (i.e on teensy if this code runs on teensy)
 
         if (remoteNeeds(Id))
         {
@@ -443,14 +422,8 @@ private:
             ];
 
         return
-            (
-                route.subscribers &
-                platformBit(
-                    remotePlatform()
-                )
-            )
-            != 0;
-    }
+            (route.subscribers & platformBit(remotePlatform())) != 0;
+        }
 
     void dispatchLocal(
         const BusMessage& message)
@@ -460,14 +433,12 @@ private:
                 message.header.topic
             );
 
-        if (index >=
-            m_topics.size())
+        if (index >= m_topics.size())
         {
             return;
         }
 
-        IRoutedTopic* topic =
-            m_topics[index];
+        IRoutedTopic* topic = m_topics[index];
 
         if (topic != nullptr)
         {
@@ -475,11 +446,9 @@ private:
         }
     }
 
-    void receiveRemote(
-        const BusMessage& message)
+    void receiveRemote(const BusMessage& message)
     {
-        if (message.header.origin ==
-            LocalPlatform)
+        if (message.header.origin ==LocalPlatform)
         {
             return;
         }
@@ -490,27 +459,14 @@ private:
 private:
     UARTHandler& m_uart;
 
-    std::array<
-        IRoutedTopic*,
-        EndpointCount
-    > m_topics{};
+    std::array<IRoutedTopic*,EndpointCount> m_topics{};
 
-    std::array<
-        uint16_t,
-        EndpointCount
-    > m_sequences{};
+    std::array<uint16_t,EndpointCount> m_sequences{};
 
-    FixedQueue<
-        BusMessage,
-        16
-    > m_rxQueue;
+    FixedQueue<BusMessage,16> m_rxQueue; // could have used std::queue but that container is unbounded which is risky for out embedded platforms
 };
 
-template<
-    typename DriverT,
-    EndpointId Id,
-    uint32_t PeriodUs
->
+template<typename DriverT,EndpointId Id,uint32_t PeriodUs>
 class PollingPublisher final :
     public ITask
 {

@@ -15,8 +15,10 @@ from sensors import (
     LoadCells,
     Motor,
     MotorCommand,
-    MotorCommandType,
-    parse_motor_command,
+    MotorControl,
+    MotorMetaCommand,
+    #MotorCommandType,
+    #parse_motor_command,
 )
 
 class Exoskeleton:
@@ -87,31 +89,15 @@ class Exoskeleton:
             print("Exoskeleton disconnected")
 
     def start_motor(self, motor_id=Motor_ID):
-        self._check_connction()
-        self.bluetooth.queue_motor_command(
-            MotorCommand(
-                command_type=MotorCommandType.START,
-                motor_id=motor_id
-            )
-        )
-    def zero_motor(selfSelf, motor_id=Motor_ID):
         self._check_connection()
-        self.bluetooth.queue_motor_command(
-            MotorCommand(
-                command_type=MotorCommandType.ZERO,
-                motor_id=motor_id
-            )
-        )
+        self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.ENTER_MOTOR_MODE))
+    def zero_motor(self, motor_id=Motor_ID):
+        self._check_connection()
+        self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.SET_ZERO))
 
     def stop_motor(self, motor_id=Motor_ID):
-        if not self.connected:
-            return
-        self.bluetooth.queue_motor_command(
-            MotorCommand(
-                command_type=MotorCommandType.STOP,
-                motor_id=motor_id
-            )
-        )
+        self._check_connection()
+        self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.EXIT_MOTOR_MODE))
 
     def zero_encoder(self):
         self.encoder.set_zero()
@@ -122,8 +108,6 @@ class Exoskeleton:
         self._check_connection()
         self.bluetooth.queue_motor_command(
             MotorCommand(
-                command_type=MotorCommandType.SET,
-                motor_id=motor_id,
                 position=self.command_position,
                 velocity=self.command_velocity,
                 torque=self.command_torque,

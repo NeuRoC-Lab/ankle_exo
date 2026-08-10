@@ -12,6 +12,7 @@
 #include <FlexCAN_T4.h>
 #endif
 
+// ====== Definitions =====
 struct MotorReply
 {
     uint8_t can_id{0};
@@ -20,6 +21,13 @@ struct MotorReply
     float torque{0.0f};
     uint8_t temperature{0};
     uint8_t error{0};
+};
+
+enum class MotorMetaCommand : uint8_t
+{
+    EnterMotorMode,
+    ExitMotorMode,
+    SetZero
 };
 
 struct MotorCmd
@@ -95,8 +103,8 @@ class CanBus
 public:
     bool begin()
     {
-        if (m_isInitialized) {
-            return true;
+        if (isReady()) {
+            return true; // prevents the CAN controller from being initialized more than once
         }
 
         m_can.begin();
@@ -163,6 +171,7 @@ private:
     bool m_isInitialized{false};
 };
 
+// Cubemars protocol interface
 class CubeMarsMotor
 {
 public:
@@ -199,7 +208,6 @@ public:
 
     bool begin()
     {
-
         return true;
     }
 

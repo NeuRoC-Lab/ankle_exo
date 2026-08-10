@@ -22,6 +22,7 @@ from sensors import (
     LoadCells,
     Motor,
     MotorCommand,
+    MotorControl,
 )
 
 
@@ -31,9 +32,10 @@ DEVICE_NAME = "AnkleExo"
 SERVICE_UUID = "CF45813E-4358-4903-B961-09996BB081FB"
 
 LOAD_CELL_UUID = "CA87289F-102B-4078-AD8C-8F53063547A6"
-MOTOR_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E"
+MOTOR_FEEDBACK_UUID = "81DC2896-1B27-4195-A391-99A637FA50A4" #CHANGED
 ENCODER_UUID = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB"
-COMMAND_UUID = "C94B7403-6BFB-4A06-BA12-6394765C328E"
+MOTOR_COMMAND_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E" #CHANGED
+MOTOR_CONTROL_UUID = "99F02A66-065C-41BE-B05E-4BE2B9035A8B" # NEW
 
 
 @dataclass(frozen=True)
@@ -74,6 +76,7 @@ class BluetoothManager:
         # Motor commands entered in the plot window are placed here.
         # The BLE thread sends them without blocking Matplotlib.
         self.command_queue = queue.Queue()
+        self.control_queue = queue.Queue()
 
         # Writable BLE command characteristic detected after connecting.
         self.command_characteristic_uuid = None
@@ -103,8 +106,14 @@ class BluetoothManager:
     def queue_motor_command(self, command: MotorCommand):
         self.command_queue.put(command)
 
+    def queue_motor_control(self, command: MotorCommand):
+        self.control_queue.put(command)
+
     def has_pending_commands(self):
-        return not self.command_queue.empty()
+        return (
+                not self.command_queue.empty()
+                or not self.control_queue.empty()
+        )
 
 
     # Bluetooth data queue
@@ -216,7 +225,7 @@ class BluetoothManager:
 
         try:
             values = struct.unpack(
-                "<4f",
+                "<4f", # < for little endian, 4f meaning a struct of 4 floats
                 data
             )
 
@@ -274,13 +283,13 @@ class BluetoothManager:
         """
         Find a writable GATT characteristic in the AnkleExo service.
 
-        Telemetry characteristics are excluded first. If MOTOR_UUID itself is
+        Telemetry characteristics are excluded first. If MOTOR_FEEDBACK_UUID itself is
         writable, it is accepted as a fallback.
         """
 
         telemetry_uuids = {
             LOAD_CELL_UUID.lower(),
-            MOTOR_UUID.lower(),
+            MOTOR_FEEDBACK_UUID.lower(),
             ENCODER_UUID.lower(),
         }
 
@@ -298,15 +307,15 @@ class BluetoothManager:
                 }
 
                 can_write = (
-                    "write" in properties
-                    or
-                    "write-without-response" in properties
+                        "write" in properties
+                        or
+                        "write-without-response" in properties
                 )
 
                 if not can_write:
                     continue
 
-                if characteristic.uuid.lower() == MOTOR_UUID.lower():
+                if characteristic.uuid.lower() == MOTOR_FEEDBACK_UUID.lower():
                     motor_fallback = characteristic.uuid
                     continue
 
@@ -332,7 +341,7 @@ class BluetoothManager:
         if motor_fallback is not None:
             print(
                 "No separate command characteristic found; "
-                "using MOTOR_UUID because it is writable."
+                "using MOTOR_FEEDBACK_UUID because it is writable."
             )
 
             return motor_fallback
@@ -342,22 +351,20 @@ class BluetoothManager:
 
     # Bluetooth motor command sending
 
-    async def _send_pending_commands(self, client: BleakClient):
-        """
-        Send all queued binary CommandPayload packets.
-        """
-
-        command_uuid = self.command_characteristic_uuid
-
-        if command_uuid is None:
-            return
-
-        characteristic = client.services.get_characteristic(
-            command_uuid
+    async def _send_pending_motor_commands(
+            self,
+            client: BleakClient
+    ):
+        characteristic = (
+            client.services.get_characteristic(
+                MOTOR_COMMAND_UUID
+            )
         )
 
         if characteristic is None:
-            print("BLE command characteristic not found")
+            print(
+                "Motor command characteristic not found"
+            )
             return
 
         properties = {
@@ -365,11 +372,15 @@ class BluetoothManager:
             for prop in characteristic.properties
         }
 
-        use_response = "write" in properties
+        use_response = (
+                "write" in properties
+        )
 
         while True:
             try:
-                command = self.command_queue.get_nowait()
+                command = (
+                    self.command_queue.get_nowait()
+                )
 
             except queue.Empty:
                 break
@@ -379,8 +390,10 @@ class BluetoothManager:
 
                 if len(packet) != COMMAND_PACKET_SIZE:
                     raise RuntimeError(
-                        f"Incorrect command size: {len(packet)}, "
-                        f"expected {COMMAND_PACKET_SIZE}"
+                        f"Incorrect MotorCommand size: "
+                        f"{len(packet)}, "
+                        f"expected "
+                        f"{COMMAND_PACKET_SIZE}"
                     )
 
                 await client.write_gatt_char(
@@ -390,17 +403,77 @@ class BluetoothManager:
                 )
 
                 print(
-                    "BLE command sent:",
-                    command.command_type.name,
-                    f"id={command.motor_id}",
+                    "Motor command sent:",
                     f"size={len(packet)}",
                 )
 
             except Exception as exc:
-                print("Could not send BLE command:", exc)
+                print(
+                    "Could not send motor command:",
+                    exc
+                )
+    async def _send_pending_motor_controls(
+            self,
+            client: BleakClient
+    ):
+        characteristic = (
+            client.services.get_characteristic(
+                MOTOR_CONTROL_UUID
+            )
+        )
 
+        if characteristic is None:
+            print(
+                "Motor control characteristic not found"
+            )
+            return
 
-    # Bluetooth connection
+        properties = {
+            prop.lower()
+            for prop in characteristic.properties
+        }
+
+        use_response = (
+                "write" in properties
+        )
+
+        while True:
+            try:
+                command = (
+                    self.control_queue.get_nowait()
+                )
+
+            except queue.Empty:
+                break
+
+            try:
+                packet = command.to_bytes()
+
+                # Your MotorControl packet is one byte.
+                if len(packet) != 1:
+                    raise RuntimeError(
+                        f"Incorrect MotorControl size: "
+                        f"{len(packet)}, expected 1"
+                    )
+
+                await client.write_gatt_char(
+                    characteristic,
+                    packet,
+                    response=use_response,
+                )
+
+                print(
+                    "Motor control sent:",
+                    command.command.name,
+                    f"size={len(packet)}",
+                )
+
+            except Exception as exc:
+                print(
+                    "Could not send motor control:",
+                    exc
+                )
+        # Bluetooth connection
 
     async def _bluetooth_connection(self):
         print("Searching for Bluetooth device... (15s timeout)")
@@ -419,7 +492,7 @@ class BluetoothManager:
             print("Connected to Bluetooth")
 
             await client.start_notify(
-                MOTOR_UUID,
+                MOTOR_FEEDBACK_UUID,
                 self._motor_callback
             )
 
@@ -457,7 +530,14 @@ class BluetoothManager:
             print("Receiving Bluetooth data...")
 
             while not self.stop_event.is_set():
-                await self._send_pending_commands(client)
+
+                await self._send_pending_motor_commands(
+                    client
+                )
+
+                await self._send_pending_motor_controls(
+                    client
+                )
 
                 # Small sleep keeps command latency low while allowing
                 # BLE notification callbacks to run normally.

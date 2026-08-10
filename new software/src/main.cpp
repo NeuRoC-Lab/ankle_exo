@@ -1,8 +1,10 @@
-#include <Arduino.h>
 
+
+#include <Arduino.h>
 #include "board.h"
 #include "MessageBus.h"
 #include "Driver.h"
+#include "BLE.h"
 
 template<size_t MaxTasks>
 class Scheduler
@@ -48,6 +50,8 @@ Topic<LoadCellForces> loadCellTopic;
 Topic<MotorReply> leftMotorTopic;
 Topic<PowerReadings> ina232Topic;
 //Topic<MotorReply> rightMotorTopic;
+Topic<MotorCmd> leftMotorCommandTopic;
+Topic<MotorMetaCommand> leftMotorMetaCommandTopic;
 
 RoutedTopic<
     EndpointId::EncoderSnapshot
@@ -65,10 +69,18 @@ RoutedTopic<
     EndpointId::Ina232Snapshot
 > routedIna232Topic(ina232Topic);
 
+RoutedTopic<
+    EndpointId::LeftMotorCommand
+> routedLeftMotorCommandTopic(
+    leftMotorCommandTopic
+);
+
 /*RoutedTopic<
     EndpointId::RightMotorSnapshot
 > routedRightMotorTopic(rightMotorTopic);
 */
+
+RoutedTopic<EndpointId::LeftMotorMetaCommand> routedLeftMotorMetaCommandTopic(leftMotorMetaCommandTopic);
 
 EncoderDriver encoderDriver;
 
@@ -167,12 +179,15 @@ private:
     MessageBus& m_messageBus;
 };
 
-class MotorCommandTask : public ITask
+class MotorCommandTask :
+    public ITask
 {
 public:
-    explicit MotorCommandTask(
-        MotorDriver& motor)
-        : m_motor(motor)
+    MotorCommandTask(
+        MotorDriver& motor,
+        Topic<MotorCmd>& command)
+        : m_motor(motor),
+          m_command(command)
     {}
 
     void update(uint32_t nowUs) override
@@ -180,28 +195,53 @@ public:
         static constexpr uint32_t
             PERIOD_US = 10'000; // 100 Hz
 
-        if (nowUs - m_previousUs < PERIOD_US) {
+        if (
+            nowUs - m_previousUs <
+            PERIOD_US
+        ) {
             return;
         }
 
         m_previousUs += PERIOD_US;
 
-        MotorCmd cmd{};
+        /*
+         * No command has been received yet.
+         *
+         * Send the neutral MIT command so we
+         * can still obtain motor feedback.
+         */
+        if (!m_command.valid())
+        {
+            MotorCmd neutral{};
 
-        // Safest possible MIT command:
-        cmd.position = 0.0f;
-        cmd.velocity = 0.0f;
-        cmd.torque   = 0.0f;
-        cmd.kp       = 0.0f;
-        cmd.kd       = 0.0f;
+            neutral.position = 0.0f;
+            neutral.velocity = 0.0f;
+            neutral.torque   = 0.0f;
+            neutral.kp       = 0.0f;
+            neutral.kd       = 0.0f;
 
-        if (!m_motor.apply(cmd)) {
-            Serial.println("Motor TX failed");
+            m_motor.apply(neutral);
+
+            return;
         }
+
+        /*
+         * Re-send the latest desired command.
+         *
+         * This is intentional: the motor's MIT
+         * protocol expects regular commands,
+         * and each command gives us fresh
+         * feedback.
+         */
+        m_motor.apply(
+            m_command.latest()
+        );
     }
 
 private:
     MotorDriver& m_motor;
+    Topic<MotorCmd>& m_command;
+
     uint32_t m_previousUs{0};
 };
 
@@ -213,8 +253,67 @@ MotorCanReceiver motorReceiver(
 );
 
 MotorCommandTask leftMotorCommandTask(
-    leftMotor
+    leftMotor,
+    leftMotorCommandTopic
 );
+
+class MotorMetaCommandTask :
+    public ITask
+{
+public:
+    MotorMetaCommandTask(
+        MotorDriver& motor,
+        Topic<MotorMetaCommand>& command)
+        : m_motor(motor),
+          m_command(command)
+    {}
+
+    void update(uint32_t) override
+    {
+        if (!m_command.valid()) {
+            return;
+        }
+
+        if (m_command.sequence() ==
+            m_lastSequence)
+        {
+            return;
+        }
+
+        m_lastSequence =
+            m_command.sequence();
+
+        switch (m_command.latest())
+        {
+            case MotorMetaCommand::
+                EnterMotorMode:
+                m_motor.enterMotorMode();
+                break;
+
+            case MotorMetaCommand::
+                ExitMotorMode:
+                m_motor.exitMotorMode();
+                break;
+
+            case MotorMetaCommand::
+                SetZero:
+                m_motor.zeroMotor();
+                break;
+        }
+    }
+
+private:
+    MotorDriver& m_motor;
+    Topic<MotorMetaCommand>& m_command;
+
+    uint32_t m_lastSequence{0};
+};
+
+MotorMetaCommandTask
+    leftMotorMetaCommandTask(
+        leftMotor,
+        leftMotorMetaCommandTopic
+    );
 
 class DummyController final :
     public ITask
@@ -380,6 +479,8 @@ private:
     uint32_t m_previousPrintUs{0};
 };
 
+
+
 DummyController dummyController(
     encoderTopic,
     loadCellTopic,
@@ -445,6 +546,10 @@ void setup()
     */
 
     messageBus.addTopic(
+        routedLeftMotorMetaCommandTopic
+    );
+
+    messageBus.addTopic(
         routedEncoderTopic
     );
 
@@ -458,6 +563,10 @@ void setup()
 
     messageBus.addTopic(
         routedIna232Topic
+    );
+
+    messageBus.addTopic(
+        routedLeftMotorCommandTopic
     );
     /*
     messageBus.addTopic(
@@ -473,7 +582,7 @@ void setup()
     scheduler.add(motorReceiver);
     scheduler.add(dummyController);
     scheduler.add(leftMotorCommandTask);
-
+    scheduler.add(leftMotorMetaCommandTask);
     Serial.println("Teensy: ready");
 }
 
@@ -491,10 +600,28 @@ UARTHandler uart(
 MessageBus messageBus(uart);
 
 Topic<LoadCellForces> loadCellTopic;
+// make a virtual copy / "mirror" of the topics that are on the teensy to forward the communications to/from the BLE
+Topic<EncoderPositions> encoderTopic;
+Topic<MotorReply> leftMotorTopic;
+Topic<PowerReadings> ina232Topic;
+
+RoutedTopic<
+    EndpointId::EncoderSnapshot
+> routedEncoderTopic(encoderTopic);
 
 RoutedTopic<
     EndpointId::LoadCellSnapshot
 > routedLoadCellTopic(loadCellTopic);
+
+RoutedTopic<
+    EndpointId::LeftMotorSnapshot
+> routedLeftMotorTopic(leftMotorTopic);
+
+RoutedTopic<
+    EndpointId::Ina232Snapshot
+> routedPowerTopic(ina232Topic);
+
+
 
 LoadCellDriver loadCellDriver;
 
@@ -505,6 +632,14 @@ PollingPublisher<
 > loadCellPublisher(
     loadCellDriver,
     messageBus
+);
+
+BLEBridge bleBridge(
+    messageBus,
+    encoderTopic,
+    loadCellTopic,
+    leftMotorTopic,
+    ina232Topic
 );
 
 void setup()
@@ -520,14 +655,26 @@ void setup()
         while (true) {}
     }
 
-    messageBus.addTopic(
-        routedLoadCellTopic
-    );
+    messageBus.addTopic(routedEncoderTopic);
+    messageBus.addTopic(routedLoadCellTopic);
+    messageBus.addTopic(routedLeftMotorTopic);
+    messageBus.addTopic(routedPowerTopic);
+    messageBus.begin();
+
+    if (!bleBridge.begin())
+    {
+        Serial.println(
+            "BLE initialization failed"
+        );
+
+        while (true) {}
+    }
 
     messageBus.begin();
 
     scheduler.add(messageBus);
     scheduler.add(loadCellPublisher);
+    scheduler.add(bleBridge);
 }
 
 void loop()

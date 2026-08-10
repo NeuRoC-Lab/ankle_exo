@@ -172,7 +172,9 @@ void loop()
     static uint32_t previousSend = 0;
     const uint32_t now = micros();
     positions = encoders.getPositions();
-    Serial.println(positions.right_position);
+    Serial.print(positions.right_position);
+    Serial.print(" .  ");
+    Serial.println(positions.left_position);
 
     // to debug : the Teensy will stream data to your laptop through USB Serial, using ArduinoJSON for ease of unpacking
     #if defined(DEBUG)

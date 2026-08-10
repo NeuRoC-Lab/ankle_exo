@@ -21,10 +21,20 @@ public:
     virtual T sample() = 0;
 };
 
+
+struct PowerReadings
+{
+    float batteryVoltage;
+    float pcbCurrent;
+    float pcbPower;
+};
+
 #if defined(PLATFORM_TEENSY)
 
 #include <Wire.h>
 #include <INA_Series_Sensor.h>
+
+// Encoder ======
 
 class EncoderDriver :
     public Driver<EncoderPositions>
@@ -65,24 +75,39 @@ public:
 
     EncoderPositions sample() override
     {
-        return {
-            m_leftEncoder.getPosition(),
-            m_rightEncoder.getPosition()
-        };
+        EncoderPositions positions{};
+
+        positions.left =
+            m_leftEncoder.getPosition();
+
+        delayMicroseconds(20);
+
+        positions.right =
+            m_rightEncoder.getPosition();
+
+        if (positions.left == 1445) {
+            positions.left = m_lastValid.left;
+        } else {
+            m_lastValid.left = positions.left;
+        }
+
+        if (positions.right == 1445) {
+            positions.right = m_lastValid.right;
+        } else {
+            m_lastValid.right = positions.right;
+        }
+
+        return positions;
     }
 
 private:
     Encoder m_leftEncoder;
     Encoder m_rightEncoder;
+    EncoderPositions m_lastValid{};
 };
 
+// INA232 ======
 
-struct PowerReadings
-{
-    float batteryVoltage;
-    float pcbCurrent;
-    float pcbPower;
-};
 
 class INA232Driver :
     public Driver<PowerReadings>
@@ -92,7 +117,7 @@ public:
     {
         m_sensor.begin(18, 19);
 
-        m_sensor.setRshunt(0.015f);
+        m_sensor.setRshunt(0.015f); //TODO fine tune it
         m_sensor.setImax(10.0f);
 
         return true;

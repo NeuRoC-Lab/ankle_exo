@@ -1,4 +1,4 @@
-As explained in [the software/encoder page](/software/encoder), the two encoders will share one SPI bus
+As explained in [the software/encoder page](/old%20software/encoder), the two encoders will share one SPI bus
 
 The wiring of the two AMT-14C-0-036-1 cables to the main board was done as follows :
 

@@ -150,20 +150,12 @@ MOTOR
 """
 Motor_ID = 0x03 # current motor id set as 2, modify as needed
 
-class MotorCommandType(IntEnum): # assign integer to each motor command
-    START = 0
-    STOP = 1
-    ZERO = 2
-    SET = 3
 
-COMMAND_PACKET_FORMAT = "<BB2x5f"
+COMMAND_PACKET_FORMAT = "<5f" # 5 floats
 COMMAND_PACKET_SIZE = struct.calcsize(COMMAND_PACKET_FORMAT)
 
 @dataclass
 class MotorCommand:
-    command_type: MotorCommandType
-    motor_id: int = Motor_ID
-
     position: float = 0.0
     velocity: float = 0.0
     torque: float = 0.0
@@ -172,19 +164,44 @@ class MotorCommand:
 
     def to_bytes(self) -> bytes:
 
-        if not 0 <= self.motor_id <= 255:
-            raise ValueError("motor_id must be between 0 and 255")
+        #if not 0 <= self.motor_id <= 255:
+            #raise ValueError("motor_id must be between 0 and 255")
 
         return struct.pack(
             COMMAND_PACKET_FORMAT,
-            int(self.command_type),
-            self.motor_id,
+            #int(self.command_type),
+            #self.motor_id,
             self.position,
             self.velocity,
             self.torque,
             self.kp,
             self.kd,
         )
+
+from dataclasses import dataclass
+from enum import IntEnum
+import struct
+
+
+class MotorMetaCommand(IntEnum):
+    ENTER_MOTOR_MODE = 0
+    EXIT_MOTOR_MODE = 1
+    SET_ZERO = 2
+
+
+MOTOR_CONTROL_PACKET_FORMAT = "<B"
+
+
+@dataclass
+class MotorControl:
+    command: MotorMetaCommand
+
+    def to_bytes(self) -> bytes:
+        return struct.pack(
+            MOTOR_CONTROL_PACKET_FORMAT,
+            int(self.command),
+        )
+
 
 class Motor:
 
@@ -222,6 +239,7 @@ class Motor:
                 self.error,
             )
 
+"""
 def parse_motor_command(text): # convert user text into MotorCommand object
 
     tokens = text.strip().lower().split()
@@ -308,3 +326,4 @@ def parse_motor_command(text): # convert user text into MotorCommand object
         kp=float(values["kp"]),
         kd=float(values["kd"])
     )
+"""
