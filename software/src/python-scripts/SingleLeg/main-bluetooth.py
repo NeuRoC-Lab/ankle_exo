@@ -15,12 +15,19 @@ bluetooth.py
 plotting_csv.py
     Real-time plotting and CSV logging
 
+single-exo.py
+    Exoskeleton library
+
 Run:
 python software/src/python-scripts/SingleLeg/main-bluetooth.py
 """
 
+# Import necessary libraries
+
 import threading
 import time
+
+# Import other python files
 
 from bluetooth import BluetoothManager
 
@@ -220,7 +227,6 @@ def process_bluetooth_data(
     pending_plot_snapshot = None
 
     # Drain every Bluetooth update currently waiting.
-    #
     # Every queued update is written to CSV.
     # Only the newest update is kept for the next graph refresh.
 

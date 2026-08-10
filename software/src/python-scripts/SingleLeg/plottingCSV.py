@@ -20,7 +20,7 @@ from matplotlib.widgets import TextBox, Button
 
 # Plot configuration
 
-time_window = 10
+time_window = 10 # plot x-axis only displays the last 10 seconds of data
 MAX_POINTS = 500
 
 # Same visual refresh rate as the working UART code:
@@ -73,7 +73,7 @@ class CSVLogger:
             [
                 current_time,
                 snapshot.ankle_angle,
-                0.0, #placeholder until velocity filter is implemented
+                snapshot.ankle_velocity,
                 snapshot.loadcell1,
                 snapshot.loadcell2,
                 snapshot.motor_position,
