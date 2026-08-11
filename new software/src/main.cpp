@@ -81,8 +81,8 @@ PollingPublisher<
 
 CanBus canBus;
 
-constexpr uint8_t LEFT_MOTOR_CAN_ID = 0x03;
-constexpr uint8_t RIGHT_MOTOR_CAN_ID = 0x01;
+constexpr uint8_t LEFT_MOTOR_CAN_ID = 0x02;
+constexpr uint8_t RIGHT_MOTOR_CAN_ID = 0x02;
 
 // For compile testing, use the nominal limits.
 // Replace these with your real software limits later.
@@ -140,6 +140,14 @@ JointLimitController jointController(
     leftMotorTopic,
     leftMotorCommandTopic,
     leftMotorMetaCommandTopic
+);
+
+
+TransparentModeController transparentModeController(
+    encoderTopic,
+    loadCellTopic,
+    leftMotorTopic,
+    leftMotorCommandTopic
 );
 
 void setup()
@@ -223,6 +231,8 @@ void setup()
     scheduler.add(ina232Publisher);
     scheduler.add(motorReceiver);
     //scheduler.add(dummyController);
+    scheduler.add(transparentModeController);
+//since TransparentModeController publishes commands into leftMotorCommandTopic, and MotorCommandTask later reads that topic and sends the latest command to the motor, I’d schedule the transparent controller before leftMotorCommandTask:
     scheduler.add(jointController);
     scheduler.add(leftMotorCommandTask);
     scheduler.add(leftMotorMetaCommandTask);

@@ -10,13 +10,11 @@ started = False
 with Exoskeleton() as exo:
     #TODO to prevent commands from being discarded on startup make some async stuff to make sure the commands get sent once the BLE connection is properly established
     #exo.start_motor(3)
-    exo.start_motor(3)
+    exo.start_motor(2)
     while True:
-        exo.set_command(0,1,0,0,1,3)
-        time.sleep(1)
-        exo.set_command(0,4,0,0,1,3)
-        time.sleep(1)
+        print(exo.get_loadcells()["l2"] - exo.get_loadcells()["l1"])
         #print(exo.get_encoder_angle())
+        exo.set_command(0,0,0.2,0,0,2)
 
 
 

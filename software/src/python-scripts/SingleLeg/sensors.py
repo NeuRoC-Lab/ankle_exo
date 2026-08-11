@@ -145,7 +145,7 @@ class LoadCells:
 """
 MOTOR
 """
-Motor_ID = 0x03 # current motor id, modify as needed
+Motor_ID = 0x02 # current motor id, modify as needed
 
 
 COMMAND_PACKET_FORMAT = "<5f" # 5 floats
