@@ -1,10 +1,11 @@
 
-
+#include <functional>
 #include <Arduino.h>
 #include "board.h"
 #include "MessageBus.h"
 #include "Driver.h"
 #include "BLE.h"
+
 
 template<size_t MaxTasks>
 class Scheduler
@@ -53,34 +54,6 @@ Topic<PowerReadings> ina232Topic;
 Topic<MotorCmd> leftMotorCommandTopic;
 Topic<MotorMetaCommand> leftMotorMetaCommandTopic;
 
-RoutedTopic<
-    EndpointId::EncoderSnapshot
-> routedEncoderTopic(encoderTopic);
-
-RoutedTopic<
-    EndpointId::LoadCellSnapshot
-> routedLoadCellTopic(loadCellTopic);
-
-RoutedTopic<
-    EndpointId::LeftMotorSnapshot
-> routedLeftMotorTopic(leftMotorTopic);
-
-RoutedTopic<
-    EndpointId::Ina232Snapshot
-> routedIna232Topic(ina232Topic);
-
-RoutedTopic<
-    EndpointId::LeftMotorCommand
-> routedLeftMotorCommandTopic(
-    leftMotorCommandTopic
-);
-
-/*RoutedTopic<
-    EndpointId::RightMotorSnapshot
-> routedRightMotorTopic(rightMotorTopic);
-*/
-
-RoutedTopic<EndpointId::LeftMotorMetaCommand> routedLeftMotorMetaCommandTopic(leftMotorMetaCommandTopic);
 
 EncoderDriver encoderDriver;
 
@@ -545,29 +518,17 @@ void setup()
     }
     */
 
-    messageBus.addTopic(
-        routedLeftMotorMetaCommandTopic
-    );
+    messageBus.addTopic<EndpointId::LeftMotorCommand>(leftMotorCommandTopic);
 
-    messageBus.addTopic(
-        routedEncoderTopic
-    );
+    messageBus.addTopic<EndpointId::EncoderSnapshot>(encoderTopic);
 
-    messageBus.addTopic(
-        routedLoadCellTopic
-    );
+    messageBus.addTopic<EndpointId::LoadCellSnapshot>(loadCellTopic);
 
-    messageBus.addTopic(
-        routedLeftMotorTopic
-    );
+    messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
 
-    messageBus.addTopic(
-        routedIna232Topic
-    );
+    messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
 
-    messageBus.addTopic(
-        routedLeftMotorCommandTopic
-    );
+    messageBus.addTopic<EndpointId::LeftMotorCommand>(leftMotorCommandTopic);
     /*
     messageBus.addTopic(
         routedRightMotorTopic
@@ -605,23 +566,6 @@ Topic<EncoderPositions> encoderTopic;
 Topic<MotorReply> leftMotorTopic;
 Topic<PowerReadings> ina232Topic;
 
-RoutedTopic<
-    EndpointId::EncoderSnapshot
-> routedEncoderTopic(encoderTopic);
-
-RoutedTopic<
-    EndpointId::LoadCellSnapshot
-> routedLoadCellTopic(loadCellTopic);
-
-RoutedTopic<
-    EndpointId::LeftMotorSnapshot
-> routedLeftMotorTopic(leftMotorTopic);
-
-RoutedTopic<
-    EndpointId::Ina232Snapshot
-> routedPowerTopic(ina232Topic);
-
-
 
 LoadCellDriver loadCellDriver;
 
@@ -655,10 +599,10 @@ void setup()
         while (true) {}
     }
 
-    messageBus.addTopic(routedEncoderTopic);
-    messageBus.addTopic(routedLoadCellTopic);
-    messageBus.addTopic(routedLeftMotorTopic);
-    messageBus.addTopic(routedPowerTopic);
+    messageBus.addTopic<EndpointId::EncoderSnapshot>(encoderTopic);
+    messageBus.addTopic<EndpointId::LoadCellSnapshot>(loadCellTopic);
+    messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
+    messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
     messageBus.begin();
 
     if (!bleBridge.begin())

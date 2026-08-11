@@ -94,7 +94,7 @@ class Exoskeleton:
     def start_motor(self, motor_id=Motor_ID):
         self._check_connection()
         self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.ENTER_MOTOR_MODE))
-        
+
     def zero_motor(self, motor_id=Motor_ID):
         self._check_connection()
         self.bluetooth.queue_motor_control(MotorControl(MotorMetaCommand.SET_ZERO))

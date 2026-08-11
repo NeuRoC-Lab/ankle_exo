@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 
+#include <functional>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -126,65 +127,8 @@ private:
     bool m_valid{false};
 };
 
-class IRoutedTopic
-{
-public:
-    virtual ~IRoutedTopic() = default;
 
-    virtual EndpointId id() const = 0;
 
-    virtual bool receive(
-        const BusMessage& message) = 0;
-};
-
-template<EndpointId Id>
-class RoutedTopic final :
-    public IRoutedTopic
-{
-public:
-    using Payload =
-        typename EndpointTraits<Id>::Payload;
-
-    explicit RoutedTopic(
-        Topic<Payload>& topic)
-        : m_topic(topic)
-    {}
-
-    EndpointId id() const override
-    {
-        return Id;
-    }
-
-    bool receive(const BusMessage& message) override
-    {
-        static_assert(
-            std::is_trivially_copyable_v<
-                Payload
-            >,
-            "Payload must be trivially copyable"
-        );
-
-        if (message.header.topic != Id || message.payloadSize != sizeof(Payload))
-        {
-            return false;
-        }
-
-        Payload value{};
-
-        std::memcpy(
-            &value,
-            message.payload.data(),
-            sizeof(Payload)
-        );
-
-        m_topic.publish(value);
-
-        return true;
-    }
-
-private:
-    Topic<Payload>& m_topic;
-};
 
 using PlatformMask = uint8_t; // a mask for indicating if a topic belongs to teensy or nano
 
@@ -327,23 +271,61 @@ public:
         m_uart.begin();
     }
 
+    template<EndpointId Id>
     bool addTopic(
-        IRoutedTopic& topic)
-    {
-        const size_t index =
-            static_cast<size_t>(
-                topic.id()
+        Topic<
+            typename EndpointTraits<Id>::Payload
+        >& topic)
+        {
+            using Payload =
+                typename EndpointTraits<
+                    Id
+                >::Payload;
+
+            static_assert(
+                std::is_trivially_copyable_v<
+                    Payload
+                >,
+                "Payload must be trivially copyable"
             );
 
-        if (index >=
-            m_topics.size())
-        {
-            return false;
-        }
+            const size_t index =
+                static_cast<size_t>(Id);
 
-        m_topics[index] = &topic;
-        return true;
-    }
+            if (index >= m_handlers.size())
+            {
+                return false;
+            }
+
+            m_handlers[index] =
+                [&topic](
+                    const BusMessage& message)
+                {
+                    if (
+                        message.header.topic != Id
+                        ||
+                        message.payloadSize !=
+                            sizeof(Payload)
+                    )
+                    {
+                        return false;
+                    }
+
+                    Payload value{};
+
+                    std::memcpy(
+                        &value,
+                        message.payload.data(),
+                        sizeof(Payload)
+                    );
+
+                    topic.publish(value);
+
+                    return true;
+                };
+
+            return true;
+        }
 
     template<EndpointId Id>
     bool publish(const typename EndpointTraits<Id>::Payload& value)
@@ -425,26 +407,26 @@ private:
             (route.subscribers & platformBit(remotePlatform())) != 0;
         }
 
-    void dispatchLocal(
-        const BusMessage& message)
-    {
-        const size_t index =
-            static_cast<size_t>(
-                message.header.topic
-            );
-
-        if (index >= m_topics.size())
+    void dispatchLocal(const BusMessage& message)
         {
-            return;
-        }
+            const size_t index =
+                static_cast<size_t>(
+                    message.header.topic
+                );
 
-        IRoutedTopic* topic = m_topics[index];
+            if (index >= m_handlers.size())
+            {
+                return;
+            }
 
-        if (topic != nullptr)
-        {
-            topic->receive(message);
+            auto& handler =
+                m_handlers[index];
+
+            if (handler)
+            {
+                handler(message);
+            }
         }
-    }
 
     void receiveRemote(const BusMessage& message)
     {
@@ -459,7 +441,15 @@ private:
 private:
     UARTHandler& m_uart;
 
-    std::array<IRoutedTopic*,EndpointCount> m_topics{};
+    using MessageHandler =
+    std::function<
+        bool(const BusMessage&)
+    >;
+
+    std::array<
+        MessageHandler,
+        EndpointCount
+    > m_handlers{};
 
     std::array<uint16_t,EndpointCount> m_sequences{};
 
