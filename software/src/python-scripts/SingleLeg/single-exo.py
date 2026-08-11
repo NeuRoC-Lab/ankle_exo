@@ -6,7 +6,7 @@ Serves as library for the exoskeleton
 
 import threading
 import time
-
+from queue import Empty
 from bluetooth import BluetoothManager
 
 from sensors import (
@@ -72,17 +72,26 @@ class Exoskeleton:
         print("Disconnecting from the exoskeleton...")
 
         try: # Zero all MIT commands
+            # remove all pending commands
+            while True:
+                try:
+                    self.bluetooth.command_queue.get_nowait()
+                    self.bluetooth.control_queue.get_nowait()
+                except Empty:
+                    break
+
+            print("Flushed command and control queues")
             self.reset_command()
+            print("Stopped motor")
             self.stop_motor()
 
-            deadline = time.perf_counter() + 0.20
+            deadline = time.perf_counter() + 5.20
 
-            while (
-                self.bluetooth.has_pending_commands()
-                and
-                time.perf_counter() < deadline
-            ):
+            while self.bluetooth.has_pending_commands() and time.perf_counter() < deadline:
                 time.sleep(0.005)
+
+            if self.bluetooth.has_pending_commands():
+                print("Warning : queued commands not flushed")
 
         finally:
             self.bluetooth.disconnect()
@@ -254,5 +263,8 @@ class Exoskeleton:
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is KeyboardInterrupt:
+            print("Gently disconnecting up after Ctrl+C")
+        # turn off the motor before disconnecting !
         self.disconnect()

@@ -37,7 +37,7 @@ inline constexpr size_t EndpointCount =
     static_cast<size_t>(EndpointId::Count);
 // returns the size of Endpoints
 
-inline constexpr size_t MaxPayloadSize = 64;
+inline constexpr size_t MaxPayloadSize = 128;
 
 struct MessageHeader
 {

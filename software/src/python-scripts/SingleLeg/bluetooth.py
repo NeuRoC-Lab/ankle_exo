@@ -115,7 +115,6 @@ class BluetoothManager:
                 or not self.control_queue.empty()
         )
 
-
     # Bluetooth data queue
 
     def get_pending_snapshots(self):
@@ -259,7 +258,7 @@ class BluetoothManager:
 
         try:
             values = struct.unpack(
-                "<2H",
+                "<2f",
                 data
             )
 

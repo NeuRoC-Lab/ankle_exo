@@ -12,10 +12,16 @@ enum class Side : uint8_t
     Right,
 };
 
+struct EncoderRawPositions
+{
+    uint16_t left;
+    uint16_t right;
+};
+
 struct EncoderPositions
 {
-    uint16_t left{0};
-    uint16_t right{0};
+    float left;
+    float right;
 };
 
 #if defined(PLATFORM_TEENSY)

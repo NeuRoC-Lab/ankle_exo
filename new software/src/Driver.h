@@ -75,27 +75,114 @@ public:
 
     EncoderPositions sample() override
     {
-        EncoderPositions positions{};
+        static constexpr int32_t MAX_COUNT = 4096;
+        static constexpr uint16_t BAD_COUNT = 1445;
 
-        positions.left =
+        uint16_t left =
             m_leftEncoder.getPosition();
 
         delayMicroseconds(20);
 
-        positions.right =
+        uint16_t right =
             m_rightEncoder.getPosition();
 
-        if (positions.left == 1445) {
-            positions.left = m_lastValid.left;
-        } else {
-            m_lastValid.left = positions.left;
+        const bool leftValid =
+            Encoder::isValidPosition(left) &&
+            left != BAD_COUNT;
+
+        const bool rightValid =
+            Encoder::isValidPosition(right) &&
+            right != BAD_COUNT;
+
+        // ---------------------------------------------
+        // LEFT ENCODER
+        // ---------------------------------------------
+
+        if (leftValid)
+        {
+            if (!m_leftInitialized)
+            {
+                // First valid position becomes zero.
+                m_previousRaw.left = left;
+                m_lastValidRaw.left = left;
+
+                m_leftInitialized = true;
+            }
+            else
+            {
+                int32_t delta =
+                    static_cast<int32_t>(left) -
+                    static_cast<int32_t>(m_previousRaw.left);
+
+                // Correct 0 <-> 4095 rollover.
+                if (delta > MAX_COUNT / 2)
+                {
+                    delta -= MAX_COUNT;
+                }
+                else if (delta < -(MAX_COUNT / 2))
+                {
+                    delta += MAX_COUNT;
+                }
+
+                m_leftRelativeCount += delta;
+
+                m_previousRaw.left = left;
+                m_lastValidRaw.left = left;
+            }
         }
 
-        if (positions.right == 1445) {
-            positions.right = m_lastValid.right;
-        } else {
-            m_lastValid.right = positions.right;
+        // ---------------------------------------------
+        // RIGHT ENCODER
+        // ---------------------------------------------
+
+        if (rightValid)
+        {
+            if (!m_rightInitialized)
+            {
+                // First valid position becomes zero.
+                m_previousRaw.right = right;
+                m_lastValidRaw.right = right;
+
+                m_rightInitialized = true;
+            }
+            else
+            {
+                int32_t delta =
+                    static_cast<int32_t>(right) -
+                    static_cast<int32_t>(m_previousRaw.right);
+
+                // Correct 0 <-> 4095 rollover.
+                if (delta > MAX_COUNT / 2)
+                {
+                    delta -= MAX_COUNT;
+                }
+                else if (delta < -(MAX_COUNT / 2))
+                {
+                    delta += MAX_COUNT;
+                }
+
+                m_rightRelativeCount += delta;
+
+                m_previousRaw.right = right;
+                m_lastValidRaw.right = right;
+            }
         }
+
+        // ---------------------------------------------
+        // Convert relative counts -> degrees
+        // ---------------------------------------------
+
+        EncoderPositions positions{};
+
+        positions.left =
+            static_cast<float>(m_leftRelativeCount) *
+            360.0f /
+            static_cast<float>(MAX_COUNT);
+
+        positions.right =
+            static_cast<float>(m_rightRelativeCount) *
+            360.0f /
+            static_cast<float>(MAX_COUNT);
 
         return positions;
     }
@@ -103,7 +190,15 @@ public:
 private:
     Encoder m_leftEncoder;
     Encoder m_rightEncoder;
-    EncoderPositions m_lastValid{};
+
+    EncoderRawPositions m_lastValidRaw{};
+    EncoderRawPositions m_previousRaw{};
+
+    int32_t m_leftRelativeCount{0};
+    int32_t m_rightRelativeCount{0};
+
+    bool m_leftInitialized{false};
+    bool m_rightInitialized{false};
 };
 
 // INA232 ======

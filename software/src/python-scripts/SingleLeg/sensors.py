@@ -18,9 +18,6 @@ def clamp(value, minimum=-1000.0, maximum=1000.0):
     return max(minimum, min(value, maximum))
 
 
-# Encoder 12 bit absolute position count
-max_count = 4096
-half_count = max_count // 2
 
 class Encoder:
     def __init__(self):
@@ -51,13 +48,13 @@ class Encoder:
             if self.first_value is None: # zero the encoder at the beginning
                 self.first_value = raw_count
 
-            relative_count = (raw_count - self.first_value) % max_count 
+            relative_count = raw_count#(raw_count - self.first_value) % max_count
 
             # Avoid jumps from max count to zero
-            if relative_count >= half_count:
-                relative_count -= max_count
+            #if relative_count >= half_count:
+               # relative_count -= max_count
 
-            new_angle = (relative_count * 360.0 / max_count)
+            new_angle = raw_count#(relative_count * 360.0 / max_count)
 
             # encoder raw velocity
 
