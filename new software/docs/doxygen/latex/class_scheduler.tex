@@ -1,0 +1,59 @@
+\doxysection{Scheduler\texorpdfstring{$<$}{<} Max\+Tasks \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_scheduler}{}\label{class_scheduler}\index{Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_scheduler_a906ae5327fbc0421742437be304c2cc8}{add}} (\doxymbox{\hyperlink{class_i_task}{ITask}} \&task)
+\item 
+void \doxymbox{\hyperlink{class_scheduler_aaf98c789ae5619a62f17c86f108f120f}{run}} (uint32\+\_\+t now\+Us)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_i_task}{ITask}} \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{class_scheduler_a42b6d724a5b9ed711ac617cebb6493bc}{m\+\_\+tasks}} \+[Max\+Tasks]\+ \{\}
+\item 
+size\+\_\+t \doxymbox{\hyperlink{class_scheduler_a544743cc54dec7c984734c24136dfc48}{m\+\_\+count}} \{0\}
+\end{DoxyCompactItemize}
+
+
+\label{class_scheduler_doc-func-members}
+\Hypertarget{class_scheduler_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_scheduler_a906ae5327fbc0421742437be304c2cc8}\index{Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}!add@{add}}
+\index{add@{add}!Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_scheduler_a906ae5327fbc0421742437be304c2cc8} 
+template$<$size\+\_\+t Max\+Tasks$>$ \\
+bool \doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$ Max\+Tasks $>$::\+add (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_i_task}{ITask}} \&}]{task}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_scheduler_aaf98c789ae5619a62f17c86f108f120f}\index{Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}!run@{run}}
+\index{run@{run}!Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily \label{class_scheduler_aaf98c789ae5619a62f17c86f108f120f} 
+template$<$size\+\_\+t Max\+Tasks$>$ \\
+void \doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$ Max\+Tasks $>$::\+run (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{now\+Us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_scheduler_doc-variable-members}
+\Hypertarget{class_scheduler_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_scheduler_a544743cc54dec7c984734c24136dfc48}\index{Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}!m\_count@{m\_count}}
+\index{m\_count@{m\_count}!Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}}
+\doxysubsubsection{\texorpdfstring{m\_count}{m\_count}}
+{\footnotesize\ttfamily \label{class_scheduler_a544743cc54dec7c984734c24136dfc48} 
+template$<$size\+\_\+t Max\+Tasks$>$ \\
+size\+\_\+t \doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$ Max\+Tasks $>$::\+m\+\_\+count \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_scheduler_a42b6d724a5b9ed711ac617cebb6493bc}\index{Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}!m\_tasks@{m\_tasks}}
+\index{m\_tasks@{m\_tasks}!Scheduler$<$ MaxTasks $>$@{Scheduler$<$ MaxTasks $>$}}
+\doxysubsubsection{\texorpdfstring{m\_tasks}{m\_tasks}}
+{\footnotesize\ttfamily \label{class_scheduler_a42b6d724a5b9ed711ac617cebb6493bc} 
+template$<$size\+\_\+t Max\+Tasks$>$ \\
+\doxymbox{\hyperlink{class_i_task}{ITask}}\texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$ Max\+Tasks $>$::\+m\+\_\+tasks\+[Max\+Tasks]\+ \{\}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_motor_can_receiver" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>MotorCanReceiver</compoundname>
+    <basecompoundref refid="class_i_task" prot="public" virt="non-virtual">ITask</basecompoundref>
+    <includes refid="_motor_controllers_8h" local="no">MotorControllers.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_motor_can_receiver_1a7d5c6ba561b4fc52a6ad82270c7b0ca9" prot="private" static="no" mutable="no">
+        <type><ref refid="class_can_bus" kindref="compound">CanBus</ref> &amp;</type>
+        <definition>CanBus&amp; MotorCanReceiver::m_bus</definition>
+        <argsstring></argsstring>
+        <name>m_bus</name>
+        <qualifiedname>MotorCanReceiver::m_bus</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="118" column="12" bodyfile="src/MotorControllers.h" bodystart="118" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_motor_can_receiver_1aded511938d6d4328c38fd7e3e54ab1a5" prot="private" static="no" mutable="no">
+        <type><ref refid="class_motor_driver" kindref="compound">MotorDriver</ref> &amp;</type>
+        <definition>MotorDriver&amp; MotorCanReceiver::m_left</definition>
+        <argsstring></argsstring>
+        <name>m_left</name>
+        <qualifiedname>MotorCanReceiver::m_left</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="119" column="17" bodyfile="src/MotorControllers.h" bodystart="119" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_motor_can_receiver_1a283be6006bd427e34e57a8d5f597db7d" prot="private" static="no" mutable="no">
+        <type><ref refid="class_message_bus" kindref="compound">MessageBus</ref> &amp;</type>
+        <definition>MessageBus&amp; MotorCanReceiver::m_messageBus</definition>
+        <argsstring></argsstring>
+        <name>m_messageBus</name>
+        <qualifiedname>MotorCanReceiver::m_messageBus</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="121" column="16" bodyfile="src/MotorControllers.h" bodystart="121" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_motor_can_receiver_1a1b0851d32152f5d31913397da8dfc192" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>MotorCanReceiver::MotorCanReceiver</definition>
+        <argsstring>(CanBus &amp;bus, MotorDriver &amp;left, MessageBus &amp;messageBus)</argsstring>
+        <name>MotorCanReceiver</name>
+        <qualifiedname>MotorCanReceiver::MotorCanReceiver</qualifiedname>
+        <param>
+          <type><ref refid="class_can_bus" kindref="compound">CanBus</ref> &amp;</type>
+          <declname>bus</declname>
+        </param>
+        <param>
+          <type><ref refid="class_motor_driver" kindref="compound">MotorDriver</ref> &amp;</type>
+          <declname>left</declname>
+        </param>
+        <param>
+          <type><ref refid="class_message_bus" kindref="compound">MessageBus</ref> &amp;</type>
+          <declname>messageBus</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="78" column="5" bodyfile="src/MotorControllers.h" bodystart="78" bodyend="87"/>
+      </memberdef>
+      <memberdef kind="function" id="class_motor_can_receiver_1afc0dc4281e83f7e61b13e07c2e7c270c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void MotorCanReceiver::update</definition>
+        <argsstring>(uint32_t) override</argsstring>
+        <name>update</name>
+        <qualifiedname>MotorCanReceiver::update</qualifiedname>
+        <reimplements refid="class_i_task_1aa57dc9cc07cfda40d3dcac232f6115af">update</reimplements>
+        <param>
+          <type>uint32_t</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="89" column="10" bodyfile="src/MotorControllers.h" bodystart="89" bodyend="115"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>MotorCanReceiver</label>
+        <link refid="class_motor_can_receiver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="6">
+        <label>AK60Params</label>
+        <link refid="struct_a_k60_params"/>
+      </node>
+      <node id="9">
+        <label>BusMessage</label>
+        <link refid="struct_bus_message"/>
+        <childnode refid="10" relation="usage">
+          <edgelabel>header</edgelabel>
+        </childnode>
+      </node>
+      <node id="3">
+        <label>CanBus</label>
+        <link refid="class_can_bus"/>
+      </node>
+      <node id="5">
+        <label>CubeMarsMotor</label>
+        <link refid="class_cube_mars_motor"/>
+        <childnode refid="6" relation="usage">
+          <edgelabel>m_softwareLimits</edgelabel>
+        </childnode>
+      </node>
+      <node id="11">
+        <label>FixedQueue&lt; BusMessage, 16 &gt;</label>
+        <link refid="class_fixed_queue"/>
+      </node>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="7">
+        <label>MessageBus</label>
+        <link refid="class_message_bus"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="8" relation="usage">
+          <edgelabel>m_uart</edgelabel>
+        </childnode>
+        <childnode refid="11" relation="usage">
+          <edgelabel>m_rxQueue</edgelabel>
+        </childnode>
+      </node>
+      <node id="10">
+        <label>MessageHeader</label>
+        <link refid="struct_message_header"/>
+      </node>
+      <node id="1">
+        <label>MotorCanReceiver</label>
+        <link refid="class_motor_can_receiver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_bus</edgelabel>
+        </childnode>
+        <childnode refid="4" relation="usage">
+          <edgelabel>m_left</edgelabel>
+        </childnode>
+        <childnode refid="7" relation="usage">
+          <edgelabel>m_messageBus</edgelabel>
+        </childnode>
+      </node>
+      <node id="4">
+        <label>MotorDriver</label>
+        <link refid="class_motor_driver"/>
+        <childnode refid="5" relation="usage">
+          <edgelabel>m_motor</edgelabel>
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_canBus</edgelabel>
+        </childnode>
+      </node>
+      <node id="8">
+        <label>UARTHandler</label>
+        <link refid="class_u_a_r_t_handler"/>
+        <childnode refid="8" relation="usage">
+          <edgelabel>s_instance</edgelabel>
+        </childnode>
+        <childnode refid="9" relation="usage">
+          <edgelabel>m_callback</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/MotorControllers.h" line="74" column="1" bodyfile="src/MotorControllers.h" bodystart="76" bodyend="122"/>
+    <listofallmembers>
+      <member refid="class_motor_can_receiver_1a7d5c6ba561b4fc52a6ad82270c7b0ca9" prot="private" virt="non-virtual"><scope>MotorCanReceiver</scope><name>m_bus</name></member>
+      <member refid="class_motor_can_receiver_1aded511938d6d4328c38fd7e3e54ab1a5" prot="private" virt="non-virtual"><scope>MotorCanReceiver</scope><name>m_left</name></member>
+      <member refid="class_motor_can_receiver_1a283be6006bd427e34e57a8d5f597db7d" prot="private" virt="non-virtual"><scope>MotorCanReceiver</scope><name>m_messageBus</name></member>
+      <member refid="class_motor_can_receiver_1a1b0851d32152f5d31913397da8dfc192" prot="public" virt="non-virtual"><scope>MotorCanReceiver</scope><name>MotorCanReceiver</name></member>
+      <member refid="class_motor_can_receiver_1afc0dc4281e83f7e61b13e07c2e7c270c" prot="public" virt="virtual"><scope>MotorCanReceiver</scope><name>update</name></member>
+      <member refid="class_i_task_1a3fdb0c69908af669286b0903e0ab9a08" prot="public" virt="virtual"><scope>MotorCanReceiver</scope><name>~ITask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

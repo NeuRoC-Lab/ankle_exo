@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir">
+    <compoundname>src</compoundname>
+    <innerfile refid="_b_l_e_8h">BLE.h</innerfile>
+    <innerfile refid="board_8h">board.h</innerfile>
+    <innerfile refid="_bus_types_8h">BusTypes.h</innerfile>
+    <innerfile refid="_cube_mars_motor_8h">CubeMarsMotor.h</innerfile>
+    <innerfile refid="_driver_8h">Driver.h</innerfile>
+    <innerfile refid="_encoder_8h">Encoder.h</innerfile>
+    <innerfile refid="_load_cell_8h">LoadCell.h</innerfile>
+    <innerfile refid="main_8cpp">main.cpp</innerfile>
+    <innerfile refid="_message_bus_8h">MessageBus.h</innerfile>
+    <innerfile refid="_motor_controllers_8h">MotorControllers.h</innerfile>
+    <innerfile refid="regression_8py">regression.py</innerfile>
+    <innerfile refid="_uart_handler_8h">UartHandler.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/"/>
+  </compounddef>
+</doxygen>

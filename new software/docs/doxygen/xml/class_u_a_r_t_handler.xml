@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_u_a_r_t_handler" kind="class" language="C++" prot="public">
+    <compoundname>UARTHandler</compoundname>
+    <includes refid="_uart_handler_8h" local="no">UartHandler.h</includes>
+    <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="class_u_a_r_t_handler_1acd141e129db9c61e87ca76dc56c3177e" prot="public" static="no">
+        <type>void(*)(void *context, const <ref refid="struct_bus_message" kindref="compound">BusMessage</ref> &amp;)</type>
+        <definition>using UARTHandler::ReceiveCallback = 
+void(*)(void* context, const BusMessage&amp;)</definition>
+        <argsstring></argsstring>
+        <name>ReceiveCallback</name>
+        <qualifiedname>UARTHandler::ReceiveCallback</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="16" column="5" bodyfile="src/UartHandler.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="class_u_a_r_t_handler_1aa53cdea6ccbd3aa6e6845ce5b7258b3e" prot="private" static="yes" mutable="no">
+        <type><ref refid="class_u_a_r_t_handler" kindref="compound">UARTHandler</ref> *</type>
+        <definition>UARTHandler* UARTHandler::s_instance</definition>
+        <argsstring></argsstring>
+        <name>s_instance</name>
+        <qualifiedname>UARTHandler::s_instance</qualifiedname>
+        <initializer>= nullptr</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="214" column="31" bodyfile="src/UartHandler.h" bodystart="214" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_u_a_r_t_handler_1a4df34aee9f108a25457ba0f2fed94496" prot="private" static="no" mutable="no">
+        <type>HardwareSerial &amp;</type>
+        <definition>HardwareSerial&amp; UARTHandler::m_serial</definition>
+        <argsstring></argsstring>
+        <name>m_serial</name>
+        <qualifiedname>UARTHandler::m_serial</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="216" column="20" bodyfile="src/UartHandler.h" bodystart="216" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_u_a_r_t_handler_1a6eb586db2c200ef5ceae3776254af27e" prot="private" static="no" mutable="no">
+        <type>PacketSerial</type>
+        <definition>PacketSerial UARTHandler::m_packetSerial</definition>
+        <argsstring></argsstring>
+        <name>m_packetSerial</name>
+        <qualifiedname>UARTHandler::m_packetSerial</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="217" column="18" bodyfile="src/UartHandler.h" bodystart="217" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_u_a_r_t_handler_1aa3e0ccc24ee9fc9fbfa4013f33b14add" prot="private" static="no" mutable="no">
+        <type><ref refid="class_u_a_r_t_handler_1acd141e129db9c61e87ca76dc56c3177e" kindref="member">ReceiveCallback</ref></type>
+        <definition>ReceiveCallback UARTHandler::m_callback</definition>
+        <argsstring></argsstring>
+        <name>m_callback</name>
+        <qualifiedname>UARTHandler::m_callback</qualifiedname>
+        <initializer>{nullptr}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="219" column="21" bodyfile="src/UartHandler.h" bodystart="219" bodyend="219"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_u_a_r_t_handler_1a60ef79b48f7140ed87c4b6f9b5acf547" prot="private" static="no" mutable="no">
+        <type>void *</type>
+        <definition>void* UARTHandler::m_context</definition>
+        <argsstring></argsstring>
+        <name>m_context</name>
+        <qualifiedname>UARTHandler::m_context</qualifiedname>
+        <initializer>{nullptr}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="220" column="10" bodyfile="src/UartHandler.h" bodystart="220" bodyend="220"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_u_a_r_t_handler_1aab394e6186f7592a250acce61aefa8f7" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>UARTHandler::UARTHandler</definition>
+        <argsstring>(HardwareSerial &amp;serial)</argsstring>
+        <name>UARTHandler</name>
+        <qualifiedname>UARTHandler::UARTHandler</qualifiedname>
+        <param>
+          <type>HardwareSerial &amp;</type>
+          <declname>serial</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="19" column="14" bodyfile="src/UartHandler.h" bodystart="19" bodyend="23"/>
+      </memberdef>
+      <memberdef kind="function" id="class_u_a_r_t_handler_1acc105e1bf205f7dfdd567db0b095a590" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>UARTHandler::~UARTHandler</definition>
+        <argsstring>()</argsstring>
+        <name>~UARTHandler</name>
+        <qualifiedname>UARTHandler::~UARTHandler</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="25" column="5" bodyfile="src/UartHandler.h" bodystart="25" bodyend="30"/>
+      </memberdef>
+      <memberdef kind="function" id="class_u_a_r_t_handler_1a5a3274fd0af0b6601debf457ebef6f70" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void UARTHandler::setReceiveCallback</definition>
+        <argsstring>(ReceiveCallback callback, void *context)</argsstring>
+        <name>setReceiveCallback</name>
+        <qualifiedname>UARTHandler::setReceiveCallback</qualifiedname>
+        <param>
+          <type><ref refid="class_u_a_r_t_handler_1acd141e129db9c61e87ca76dc56c3177e" kindref="member">ReceiveCallback</ref></type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="32" column="10" bodyfile="src/UartHandler.h" bodystart="32" bodyend="38"/>
+      </memberdef>
+      <memberdef kind="function" id="class_u_a_r_t_handler_1a1c97040c1832cc58e0a80946636149ae" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void UARTHandler::begin</definition>
+        <argsstring>()</argsstring>
+        <name>begin</name>
+        <qualifiedname>UARTHandler::begin</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="40" column="10" bodyfile="src/UartHandler.h" bodystart="40" bodyend="46"/>
+      </memberdef>
+      <memberdef kind="function" id="class_u_a_r_t_handler_1a55f29b17a41ee19f7c49e2f14ef33b76" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool UARTHandler::send</definition>
+        <argsstring>(const BusMessage &amp;msg)</argsstring>
+        <name>send</name>
+        <qualifiedname>UARTHandler::send</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_bus_message" kindref="compound">BusMessage</ref> &amp;</type>
+          <declname>msg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="48" column="10" bodyfile="src/UartHandler.h" bodystart="48" bodyend="109"/>
+      </memberdef>
+      <memberdef kind="function" id="class_u_a_r_t_handler_1a8b06800550abf82f74585078345ca0b9" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void UARTHandler::update</definition>
+        <argsstring>()</argsstring>
+        <name>update</name>
+        <qualifiedname>UARTHandler::update</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="111" column="10" bodyfile="src/UartHandler.h" bodystart="111" bodyend="114"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="class_u_a_r_t_handler_1ad064539b7c0bdfe2f9fff3aafe390a88" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void UARTHandler::packetReceivedCallback</definition>
+        <argsstring>(const uint8_t *buffer, size_t size)</argsstring>
+        <name>packetReceivedCallback</name>
+        <qualifiedname>UARTHandler::packetReceivedCallback</qualifiedname>
+        <param>
+          <type>const uint8_t *</type>
+          <declname>buffer</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="117" column="17" bodyfile="src/UartHandler.h" bodystart="117" bodyend="128"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_u_a_r_t_handler_1ac3421c0cebe7ffd63d0e58d8710c2cf9" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void UARTHandler::onPacketReceived</definition>
+        <argsstring>(const uint8_t *buffer, size_t size)</argsstring>
+        <name>onPacketReceived</name>
+        <qualifiedname>UARTHandler::onPacketReceived</qualifiedname>
+        <param>
+          <type>const uint8_t *</type>
+          <declname>buffer</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/UartHandler.h" line="130" column="10" bodyfile="src/UartHandler.h" bodystart="130" bodyend="211"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>BusMessage</label>
+        <link refid="struct_bus_message"/>
+        <childnode refid="3" relation="usage">
+          <edgelabel>header</edgelabel>
+        </childnode>
+      </node>
+      <node id="3">
+        <label>MessageHeader</label>
+        <link refid="struct_message_header"/>
+      </node>
+      <node id="1">
+        <label>UARTHandler</label>
+        <link refid="class_u_a_r_t_handler"/>
+        <childnode refid="1" relation="usage">
+          <edgelabel>s_instance</edgelabel>
+        </childnode>
+        <childnode refid="2" relation="usage">
+          <edgelabel>m_callback</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/UartHandler.h" line="13" column="1" bodyfile="src/UartHandler.h" bodystart="14" bodyend="221"/>
+    <listofallmembers>
+      <member refid="class_u_a_r_t_handler_1a1c97040c1832cc58e0a80946636149ae" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>begin</name></member>
+      <member refid="class_u_a_r_t_handler_1aa3e0ccc24ee9fc9fbfa4013f33b14add" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>m_callback</name></member>
+      <member refid="class_u_a_r_t_handler_1a60ef79b48f7140ed87c4b6f9b5acf547" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>m_context</name></member>
+      <member refid="class_u_a_r_t_handler_1a6eb586db2c200ef5ceae3776254af27e" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>m_packetSerial</name></member>
+      <member refid="class_u_a_r_t_handler_1a4df34aee9f108a25457ba0f2fed94496" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>m_serial</name></member>
+      <member refid="class_u_a_r_t_handler_1ac3421c0cebe7ffd63d0e58d8710c2cf9" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>onPacketReceived</name></member>
+      <member refid="class_u_a_r_t_handler_1ad064539b7c0bdfe2f9fff3aafe390a88" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>packetReceivedCallback</name></member>
+      <member refid="class_u_a_r_t_handler_1acd141e129db9c61e87ca76dc56c3177e" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>ReceiveCallback</name></member>
+      <member refid="class_u_a_r_t_handler_1aa53cdea6ccbd3aa6e6845ce5b7258b3e" prot="private" virt="non-virtual"><scope>UARTHandler</scope><name>s_instance</name></member>
+      <member refid="class_u_a_r_t_handler_1a55f29b17a41ee19f7c49e2f14ef33b76" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>send</name></member>
+      <member refid="class_u_a_r_t_handler_1a5a3274fd0af0b6601debf457ebef6f70" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>setReceiveCallback</name></member>
+      <member refid="class_u_a_r_t_handler_1aab394e6186f7592a250acce61aefa8f7" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>UARTHandler</name></member>
+      <member refid="class_u_a_r_t_handler_1a8b06800550abf82f74585078345ca0b9" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>update</name></member>
+      <member refid="class_u_a_r_t_handler_1acc105e1bf205f7dfdd567db0b095a590" prot="public" virt="non-virtual"><scope>UARTHandler</scope><name>~UARTHandler</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

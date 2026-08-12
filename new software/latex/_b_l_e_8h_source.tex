@@ -1,0 +1,463 @@
+\doxysection{BLE.\+h}
+\hypertarget{_b_l_e_8h_source}{}\label{_b_l_e_8h_source}\index{src/BLE.h@{src/BLE.h}}
+\doxymbox{\hyperlink{_b_l_e_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#if\ defined(PLATFORM\_NANO)}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <ArduinoBLE.h>}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_driver_8h}{Driver.h}}"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_message_bus_8h}{MessageBus.h}}"{}}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_a910f5e40249728e6cb2bef5a57502e9f}{dataServiceUUID}}[]\ =}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{stringliteral}{"{}CF45813E-\/4358-\/4903-\/B961-\/09996BB081FB"{}};}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_a2f18e6149826670e92a6ed75f905a812}{loadCellCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{stringliteral}{"{}CA87289F-\/102B-\/4078-\/AD8C-\/8F53063547A6"{}};}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_a3de534dfc23abcb910778c7302f03379}{motorCommandCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{stringliteral}{"{}E0D883F6-\/705C-\/4A11-\/B117-\/E2B0909CC68E"{}};}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_aa79ae7457322a761597314458497255c}{encoderCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{stringliteral}{"{}094A717B-\/0C7F-\/4A23-\/BFD1-\/A4924E6E7DAB"{}};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_a9626c6ef30362a07a99f64473d96f16b}{powerCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{stringliteral}{"{}4D92C3F7-\/848C-\/42C2-\/B26A-\/9D1D15CB361A"{}};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_ad8b158429ad7e00445a7d4f97dd6ce34}{motorFeedbackCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{stringliteral}{"{}81DC2896-\/1B27-\/4195-\/A391-\/99A637FA50A4"{}};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \doxymbox{\hyperlink{_b_l_e_8h_acc7d5b38ca265b7aaf629645c15a2173}{motorControlCharacteristicUUID}}[]\ =}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{stringliteral}{"{}99F02A66-\/065C-\/41BE-\/B05E-\/4BE2B9035A8B"{}};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12}{BLEBridge}}\ final\ :}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keyword}{public}\ \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \doxymbox{\hyperlink{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12}{BLEBridge}}(}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus}{MessageBus}}\&\ bus,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic}{Topic<EncoderPositions>}}\&\ encoder,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic}{Topic<LoadCellForces>}}\&\ loadCells,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic}{Topic<MotorReply>}}\&\ \doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{leftMotor}},}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic}{Topic<PowerReadings>}}\&\ power)}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ m\_bus(bus),}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ m\_encoder(encoder),}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ m\_loadCells(loadCells),}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ m\_leftMotor(\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{leftMotor}}),}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ m\_power(power),}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ m\_service(}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_a910f5e40249728e6cb2bef5a57502e9f}{dataServiceUUID}}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ m\_encoderCharacteristic(}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_aa79ae7457322a761597314458497255c}{encoderCharacteristicUUID}},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ BLERead\ |\ BLENotify,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{struct_encoder_positions}{EncoderPositions}})}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ m\_loadCellCharacteristic(}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_a2f18e6149826670e92a6ed75f905a812}{loadCellCharacteristicUUID}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ BLERead\ |\ BLENotify,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{LoadCellForces}})}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ m\_motorReplyCharacteristic(}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_ad8b158429ad7e00445a7d4f97dd6ce34}{motorFeedbackCharacteristicUUID}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ BLERead\ |\ BLENotify,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{struct_motor_reply}{MotorReply}})}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ m\_powerCharacteristic(}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_a9626c6ef30362a07a99f64473d96f16b}{powerCharacteristicUUID}},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ BLERead\ |\ BLENotify,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{struct_power_readings}{PowerReadings}})}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ m\_motorCommandCharacteristic(}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_a3de534dfc23abcb910778c7302f03379}{motorCommandCharacteristicUUID}},}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ BLEWrite\ |\ BLEWriteWithoutResponse,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{struct_motor_cmd}{MotorCmd}})}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ m\_motorControlCharacteristic(}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_b_l_e_8h_acc7d5b38ca265b7aaf629645c15a2173}{motorControlCharacteristicUUID}},}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ BLEWrite\ |\ BLEWriteWithoutResponse,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ sizeof(\doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{MotorMetaCommand}})}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00090\ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ s\_instance\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{00092\ \ \ \ \ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_b_l_e_bridge_a3afd1aa72f387e442a5f6f463d527ade}{begin}}()}
+\DoxyCodeLine{00096\ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!BLE.begin())\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ BLE.setLocalName(}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}AnkleExo"{}}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ BLE.setAdvertisedService(}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ m\_service}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00110\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Telemetry\ characteristics}}
+\DoxyCodeLine{00111\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ m\_encoderCharacteristic}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ m\_loadCellCharacteristic}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ m\_motorReplyCharacteristic}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ m\_powerCharacteristic}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00130\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Command\ characteristics}}
+\DoxyCodeLine{00131\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ m\_motorCommandCharacteristic}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ m\_service.addCharacteristic(}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ m\_motorControlCharacteristic}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ BLE\ write\ callbacks}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ m\_motorCommandCharacteristic}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ .setEventHandler(}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BLEWritten,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ motorCommandWrittenCallback}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ m\_motorControlCharacteristic}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ .setEventHandler(}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BLEWritten,}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ motorControlWrittenCallback}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ BLE.addService(}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ m\_service}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ BLE.advertise();}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00166\ \ \ \ \ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_b_l_e_bridge_abf471aea41effc36bbf3185300d2135a}{update}}(}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ uint32\_t)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00171\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ BLE.poll();}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!BLE.connected())\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ publishChangedTopics();}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keywordtype}{void}\ publishChangedTopics()}
+\DoxyCodeLine{00185\ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ publishIfChanged(}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ m\_encoder,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ m\_encoderCharacteristic,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ m\_encoderSequence}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ publishIfChanged(}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ m\_loadCells,}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ m\_loadCellCharacteristic,}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ m\_loadCellSequence}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ publishIfChanged(}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ m\_leftMotor,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ m\_motorReplyCharacteristic,}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ m\_motorSequence}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ publishIfChanged(}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ m\_power,}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ m\_powerCharacteristic,}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ m\_powerSequence}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00209\ \ \ \ \ \}}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordtype}{void}\ publishIfChanged(}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ Topic<T>\&\ topic,}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ BLECharacteristic\&\ characteristic,}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ uint32\_t\&\ lastSequence)}
+\DoxyCodeLine{00217\ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!topic.\doxymbox{\hyperlink{class_topic_aa32efcc5ee43f9d08d5eb73e6179f9a0}{valid}}())\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ topic.\doxymbox{\hyperlink{class_topic_a406eaa650db2bbd7103f62fc8a054220}{sequence}}()\ ==}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ lastSequence}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ lastSequence\ =}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ topic.\doxymbox{\hyperlink{class_topic_a406eaa650db2bbd7103f62fc8a054220}{sequence}}();}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ T\&\ value\ =}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ topic.\doxymbox{\hyperlink{class_topic_a834ac893af336fd1c2c84efd8de29e21}{latest}}();}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ characteristic.writeValue(}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const\ }uint8\_t*}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{>}(\&value),}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(T)}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00241\ \ \ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00245\ \textcolor{comment}{\ \ \ \ \ *\ Motor\ command\ callback}}
+\DoxyCodeLine{00246\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00247\ \textcolor{comment}{\ \ \ \ \ *\ Continuous\ MIT\ command:}}
+\DoxyCodeLine{00248\ \textcolor{comment}{\ \ \ \ \ *\ position,\ velocity,\ kp,\ kd,\ torque}}
+\DoxyCodeLine{00249\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ motorCommandWrittenCallback(}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ BLEDevice\ central,}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ BLECharacteristic\ characteristic)}
+\DoxyCodeLine{00254\ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ (void)central;}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (s\_instance\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ s\_instance-\/>handleMotorCommand(}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ characteristic}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00264\ \ \ \ \ \}}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordtype}{void}\ handleMotorCommand(}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ BLECharacteristic\&\ characteristic)}
+\DoxyCodeLine{00269\ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ MotorCmd\ command\{\};}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ bytesRead\ =}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ characteristic.readValue(}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}uint8\_t*\textcolor{keyword}{>}(}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&command}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(command)}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ bytesRead\ !=}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(command)}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.print(}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Wrong\ MotorCmd\ size:\ "{}}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.println(}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytesRead}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ m\_bus.publish<}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0}{EndpointId::LeftMotorCommand}}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ >(command);}
+\DoxyCodeLine{00301\ \ \ \ \ \}}
+\DoxyCodeLine{00302\ }
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00305\ \textcolor{comment}{\ \ \ \ \ *\ Motor\ control\ callback}}
+\DoxyCodeLine{00306\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00307\ \textcolor{comment}{\ \ \ \ \ *\ Discrete\ commands:}}
+\DoxyCodeLine{00308\ \textcolor{comment}{\ \ \ \ \ *\ EnterMotorMode}}
+\DoxyCodeLine{00309\ \textcolor{comment}{\ \ \ \ \ *\ ExitMotorMode}}
+\DoxyCodeLine{00310\ \textcolor{comment}{\ \ \ \ \ *\ SetZero}}
+\DoxyCodeLine{00311\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ motorControlWrittenCallback(}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ BLEDevice\ central,}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ BLECharacteristic\ characteristic)}
+\DoxyCodeLine{00316\ \ \ \ \ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ (void)central;}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (s\_instance\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ s\_instance-\/>handleMotorControl(}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ characteristic}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00326\ \ \ \ \ \}}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ \ \ \ \ \textcolor{keywordtype}{void}\ handleMotorControl(}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ BLECharacteristic\&\ characteristic)}
+\DoxyCodeLine{00331\ \ \ \ \ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ uint8\_t\ rawCommand\{\};}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ bytesRead\ =}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ characteristic.readValue(}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&rawCommand,}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(rawCommand)}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ bytesRead\ !=}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(rawCommand)}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.print(}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Wrong\ MotorMetaCommand\ size:\ "{}}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.println(}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytesRead}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00359\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Validate\ before\ converting}}
+\DoxyCodeLine{00360\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ the\ incoming\ BLE\ byte\ into}}
+\DoxyCodeLine{00361\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ an\ enum.}}
+\DoxyCodeLine{00362\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ rawCommand\ >}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}(}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24}{MotorMetaCommand::SetZero}}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.print(}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ motor\ control\ command:\ "{}}}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ Serial.println(}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rawCommand}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00380\ }
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ command\ =}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{MotorMetaCommand}}}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{>}(rawCommand);}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ m\_bus.publish<}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ EndpointId::}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ LeftMotorMetaCommand}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ >(command);}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ Serial.print(}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Motor\ control\ command\ received:\ "{}}}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00394\ }
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ Serial.println(}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ rawCommand}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00398\ \ \ \ \ \}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \doxymbox{\hyperlink{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12}{BLEBridge}}*}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ s\_instance\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ }
+\DoxyCodeLine{00407\ \ \ \ \ MessageBus\&\ m\_bus;}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ Topic<EncoderPositions>\&}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ m\_encoder;}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \ \ \ \ Topic<LoadCellForces>\&}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ m\_loadCells;}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \ \ Topic<MotorReply>\&}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ m\_leftMotor;}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ Topic<PowerReadings>\&}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ m\_power;}
+\DoxyCodeLine{00420\ }
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00423\ \textcolor{comment}{\ \ \ \ \ *\ Last\ published\ BLE\ versions}}
+\DoxyCodeLine{00424\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00425\ }
+\DoxyCodeLine{00426\ \ \ \ \ uint32\_t\ m\_encoderSequence\{0\};}
+\DoxyCodeLine{00427\ \ \ \ \ uint32\_t\ m\_loadCellSequence\{0\};}
+\DoxyCodeLine{00428\ \ \ \ \ uint32\_t\ m\_motorSequence\{0\};}
+\DoxyCodeLine{00429\ \ \ \ \ uint32\_t\ m\_powerSequence\{0\};}
+\DoxyCodeLine{00430\ }
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00433\ \textcolor{comment}{\ \ \ \ \ *\ BLE\ objects}}
+\DoxyCodeLine{00434\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00435\ }
+\DoxyCodeLine{00436\ \ \ \ \ BLEService\ m\_service;}
+\DoxyCodeLine{00437\ }
+\DoxyCodeLine{00438\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ m\_encoderCharacteristic;}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ m\_loadCellCharacteristic;}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ m\_motorReplyCharacteristic;}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ m\_powerCharacteristic;}
+\DoxyCodeLine{00449\ }
+\DoxyCodeLine{00450\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ m\_motorCommandCharacteristic;}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \ \ BLECharacteristic}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ m\_motorControlCharacteristic;}
+\DoxyCodeLine{00455\ \};}
+\DoxyCodeLine{00456\ }
+\DoxyCodeLine{00457\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

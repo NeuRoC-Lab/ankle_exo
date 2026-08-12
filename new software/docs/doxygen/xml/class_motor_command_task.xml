@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_motor_command_task" kind="class" language="C++" prot="public">
+    <compoundname>MotorCommandTask</compoundname>
+    <basecompoundref refid="class_i_task" prot="public" virt="non-virtual">ITask</basecompoundref>
+    <includes refid="_motor_controllers_8h" local="no">MotorControllers.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_motor_command_task_1ad24ef9cea78855599502a0febcecbea7" prot="private" static="no" mutable="no">
+        <type><ref refid="class_motor_driver" kindref="compound">MotorDriver</ref> &amp;</type>
+        <definition>MotorDriver&amp; MotorCommandTask::m_motor</definition>
+        <argsstring></argsstring>
+        <name>m_motor</name>
+        <qualifiedname>MotorCommandTask::m_motor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="66" column="17" bodyfile="src/MotorControllers.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_motor_command_task_1a65af468457f1b0ab19c52848939ed614" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorCmd&gt;&amp; MotorCommandTask::m_command</definition>
+        <argsstring></argsstring>
+        <name>m_command</name>
+        <qualifiedname>MotorCommandTask::m_command</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="67" column="11" bodyfile="src/MotorControllers.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_motor_command_task_1a8dfa745a163669cae5d0de12e93a8f0c" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool MotorCommandTask::m_enabled</definition>
+        <argsstring></argsstring>
+        <name>m_enabled</name>
+        <qualifiedname>MotorCommandTask::m_enabled</qualifiedname>
+        <initializer>{true}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="69" column="10" bodyfile="src/MotorControllers.h" bodystart="69" bodyend="69"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_motor_command_task_1adbd1d0dc9b3d0b42ae71719ced2d92a9" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t MotorCommandTask::m_previousUs</definition>
+        <argsstring></argsstring>
+        <name>m_previousUs</name>
+        <qualifiedname>MotorCommandTask::m_previousUs</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="70" column="14" bodyfile="src/MotorControllers.h" bodystart="70" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_motor_command_task_1a11cde00a74cf0d3680bf0a95f5933af0" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>MotorCommandTask::MotorCommandTask</definition>
+        <argsstring>(MotorDriver &amp;motor, Topic&lt; MotorCmd &gt; &amp;command)</argsstring>
+        <name>MotorCommandTask</name>
+        <qualifiedname>MotorCommandTask::MotorCommandTask</qualifiedname>
+        <param>
+          <type><ref refid="class_motor_driver" kindref="compound">MotorDriver</ref> &amp;</type>
+          <declname>motor</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+          <declname>command</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="12" column="5" bodyfile="src/MotorControllers.h" bodystart="12" bodyend="17"/>
+      </memberdef>
+      <memberdef kind="function" id="class_motor_command_task_1a0aa40341aa5a90d176fc1418f5e3873e" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void MotorCommandTask::setEnabled</definition>
+        <argsstring>(bool enabled)</argsstring>
+        <name>setEnabled</name>
+        <qualifiedname>MotorCommandTask::setEnabled</qualifiedname>
+        <param>
+          <type>bool</type>
+          <declname>enabled</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="19" column="10" bodyfile="src/MotorControllers.h" bodystart="19" bodyend="22"/>
+      </memberdef>
+      <memberdef kind="function" id="class_motor_command_task_1ae7312676f5328d0828e8390568af5e2c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void MotorCommandTask::update</definition>
+        <argsstring>(uint32_t nowUs) override</argsstring>
+        <name>update</name>
+        <qualifiedname>MotorCommandTask::update</qualifiedname>
+        <reimplements refid="class_i_task_1aa57dc9cc07cfda40d3dcac232f6115af">update</reimplements>
+        <param>
+          <type>uint32_t</type>
+          <declname>nowUs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="24" column="10" bodyfile="src/MotorControllers.h" bodystart="24" bodyend="63"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>MotorCommandTask</label>
+        <link refid="class_motor_command_task"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="5">
+        <label>AK60Params</label>
+        <link refid="struct_a_k60_params"/>
+      </node>
+      <node id="6">
+        <label>CanBus</label>
+        <link refid="class_can_bus"/>
+      </node>
+      <node id="4">
+        <label>CubeMarsMotor</label>
+        <link refid="class_cube_mars_motor"/>
+        <childnode refid="5" relation="usage">
+          <edgelabel>m_softwareLimits</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="8">
+        <label>MotorCmd</label>
+        <link refid="struct_motor_cmd"/>
+      </node>
+      <node id="1">
+        <label>MotorCommandTask</label>
+        <link refid="class_motor_command_task"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_motor</edgelabel>
+        </childnode>
+        <childnode refid="7" relation="usage">
+          <edgelabel>m_command</edgelabel>
+        </childnode>
+      </node>
+      <node id="3">
+        <label>MotorDriver</label>
+        <link refid="class_motor_driver"/>
+        <childnode refid="4" relation="usage">
+          <edgelabel>m_motor</edgelabel>
+        </childnode>
+        <childnode refid="6" relation="usage">
+          <edgelabel>m_canBus</edgelabel>
+        </childnode>
+      </node>
+      <node id="7">
+        <label>Topic&lt; MotorCmd &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="8" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/MotorControllers.h" line="9" column="1" bodyfile="src/MotorControllers.h" bodystart="10" bodyend="71"/>
+    <listofallmembers>
+      <member refid="class_motor_command_task_1a65af468457f1b0ab19c52848939ed614" prot="private" virt="non-virtual"><scope>MotorCommandTask</scope><name>m_command</name></member>
+      <member refid="class_motor_command_task_1a8dfa745a163669cae5d0de12e93a8f0c" prot="private" virt="non-virtual"><scope>MotorCommandTask</scope><name>m_enabled</name></member>
+      <member refid="class_motor_command_task_1ad24ef9cea78855599502a0febcecbea7" prot="private" virt="non-virtual"><scope>MotorCommandTask</scope><name>m_motor</name></member>
+      <member refid="class_motor_command_task_1adbd1d0dc9b3d0b42ae71719ced2d92a9" prot="private" virt="non-virtual"><scope>MotorCommandTask</scope><name>m_previousUs</name></member>
+      <member refid="class_motor_command_task_1a11cde00a74cf0d3680bf0a95f5933af0" prot="public" virt="non-virtual"><scope>MotorCommandTask</scope><name>MotorCommandTask</name></member>
+      <member refid="class_motor_command_task_1a0aa40341aa5a90d176fc1418f5e3873e" prot="public" virt="non-virtual"><scope>MotorCommandTask</scope><name>setEnabled</name></member>
+      <member refid="class_motor_command_task_1ae7312676f5328d0828e8390568af5e2c" prot="public" virt="virtual"><scope>MotorCommandTask</scope><name>update</name></member>
+      <member refid="class_i_task_1a3fdb0c69908af669286b0903e0ab9a08" prot="public" virt="virtual"><scope>MotorCommandTask</scope><name>~ITask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

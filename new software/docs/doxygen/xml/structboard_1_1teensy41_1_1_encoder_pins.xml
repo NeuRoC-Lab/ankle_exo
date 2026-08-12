@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="structboard_1_1teensy41_1_1_encoder_pins" kind="struct" language="C++" prot="public">
+    <compoundname>board::teensy41::EncoderPins</compoundname>
+    <includes refid="board_8h" local="no">board.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structboard_1_1teensy41_1_1_encoder_pins_1a0f64a835236673166fbd9f175b20fea5" prot="public" static="no" mutable="no">
+        <type><ref refid="board_8h_1a6dcbd4f0606b9edc6335184b508860cf" kindref="member">Pin</ref></type>
+        <definition>Pin board::teensy41::EncoderPins::leftChipSelect</definition>
+        <argsstring></argsstring>
+        <name>leftChipSelect</name>
+        <qualifiedname>board::teensy41::EncoderPins::leftChipSelect</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="56" column="7" bodyfile="src/board.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structboard_1_1teensy41_1_1_encoder_pins_1ad413466434d5f75591323f182c67577f" prot="public" static="no" mutable="no">
+        <type><ref refid="board_8h_1a6dcbd4f0606b9edc6335184b508860cf" kindref="member">Pin</ref></type>
+        <definition>Pin board::teensy41::EncoderPins::rightChipSelect</definition>
+        <argsstring></argsstring>
+        <name>rightChipSelect</name>
+        <qualifiedname>board::teensy41::EncoderPins::rightChipSelect</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="57" column="7" bodyfile="src/board.h" bodystart="57" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/board.h" line="54" column="2" bodyfile="src/board.h" bodystart="55" bodyend="58"/>
+    <listofallmembers>
+      <member refid="structboard_1_1teensy41_1_1_encoder_pins_1a0f64a835236673166fbd9f175b20fea5" prot="public" virt="non-virtual"><scope>board::teensy41::EncoderPins</scope><name>leftChipSelect</name></member>
+      <member refid="structboard_1_1teensy41_1_1_encoder_pins_1ad413466434d5f75591323f182c67577f" prot="public" virt="non-virtual"><scope>board::teensy41::EncoderPins</scope><name>rightChipSelect</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

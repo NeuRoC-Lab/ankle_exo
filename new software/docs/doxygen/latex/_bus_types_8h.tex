@@ -1,0 +1,171 @@
+\doxysection{src/\+\+Bus\+Types.h File Reference}
+\hypertarget{_bus_types_8h}{}\label{_bus_types_8h}\index{src/BusTypes.h@{src/BusTypes.h}}
+{\ttfamily \+\#include $<$array$>$}\newline
+{\ttfamily \+\#include $<$cstddef$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{struct_message_header}{Message\+Header}}
+\item 
+struct \doxymbox{\hyperlink{struct_bus_message}{Bus\+Message}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{Platform\+Id}} :\+ uint8\+\_\+t \{ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{Teensy}}
+, \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}{Nano}}
+ \}
+\item 
+enum class \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{Endpoint\+Id}} :\+ uint8\+\_\+t \{ \newline
+\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}{Encoder\+Snapshot}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a}{Load\+Cell\+Snapshot}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27}{Left\+Motor\+Snapshot}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ab53e9e50c1f5d87990c9badc2af21c54}{Right\+Motor\+Snapshot}}
+, \newline
+\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0}{Left\+Motor\+Command}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a08f32044ca69bb4295c29252c4f5b0e1}{Left\+Motor\+Meta\+Command}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a2632e9f9f743502eb97e26e623f1f92c}{Right\+Motor\+Meta\+Command}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a575f81b3c2195e7269b6305618f5c1ff}{Safety\+Command}}
+, \newline
+\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5955677519e7ed5c71ff1cccf61c6b81}{Safety\+State}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae47ed8897cb6f9cc675c2cf5feb1d4a9}{System\+Command}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}{Ina232\+Snapshot}}
+, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae93f994f01c537c4e2f7d8528c3eb5e9}{Count}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \doxymbox{\hyperlink{_bus_types_8h_a8b74aab2721afe44f85070ef63d9701e}{Endpoint\+Count}}
+\item 
+constexpr size\+\_\+t \doxymbox{\hyperlink{_bus_types_8h_ae43691225dcb544010f569eb52da82db}{Max\+Payload\+Size}} = 128
+\end{DoxyCompactItemize}
+
+
+\label{_bus_types_8h_doc-enum-members}
+\Hypertarget{_bus_types_8h_doc-enum-members}
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}\index{BusTypes.h@{BusTypes.h}!EndpointId@{EndpointId}}
+\index{EndpointId@{EndpointId}!BusTypes.h@{BusTypes.h}}
+\doxysubsubsection{\texorpdfstring{EndpointId}{EndpointId}}
+{\footnotesize\ttfamily \label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001} 
+enum class \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{Endpoint\+Id}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EncoderSnapshot@{EncoderSnapshot}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!EncoderSnapshot@{EncoderSnapshot}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405} 
+Encoder\+Snapshot&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LoadCellSnapshot@{LoadCellSnapshot}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!LoadCellSnapshot@{LoadCellSnapshot}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a} 
+Load\+Cell\+Snapshot&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LeftMotorSnapshot@{LeftMotorSnapshot}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!LeftMotorSnapshot@{LeftMotorSnapshot}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27} 
+Left\+Motor\+Snapshot&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RightMotorSnapshot@{RightMotorSnapshot}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!RightMotorSnapshot@{RightMotorSnapshot}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ab53e9e50c1f5d87990c9badc2af21c54}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ab53e9e50c1f5d87990c9badc2af21c54} 
+Right\+Motor\+Snapshot&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LeftMotorCommand@{LeftMotorCommand}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!LeftMotorCommand@{LeftMotorCommand}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0} 
+Left\+Motor\+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LeftMotorMetaCommand@{LeftMotorMetaCommand}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!LeftMotorMetaCommand@{LeftMotorMetaCommand}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a08f32044ca69bb4295c29252c4f5b0e1}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a08f32044ca69bb4295c29252c4f5b0e1} 
+Left\+Motor\+Meta\+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RightMotorMetaCommand@{RightMotorMetaCommand}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!RightMotorMetaCommand@{RightMotorMetaCommand}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a2632e9f9f743502eb97e26e623f1f92c}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a2632e9f9f743502eb97e26e623f1f92c} 
+Right\+Motor\+Meta\+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SafetyCommand@{SafetyCommand}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!SafetyCommand@{SafetyCommand}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a575f81b3c2195e7269b6305618f5c1ff}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a575f81b3c2195e7269b6305618f5c1ff} 
+Safety\+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SafetyState@{SafetyState}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!SafetyState@{SafetyState}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5955677519e7ed5c71ff1cccf61c6b81}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5955677519e7ed5c71ff1cccf61c6b81} 
+Safety\+State&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SystemCommand@{SystemCommand}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!SystemCommand@{SystemCommand}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae47ed8897cb6f9cc675c2cf5feb1d4a9}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae47ed8897cb6f9cc675c2cf5feb1d4a9} 
+System\+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ina232Snapshot@{Ina232Snapshot}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!Ina232Snapshot@{Ina232Snapshot}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad} 
+Ina232\+Snapshot&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Count@{Count}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!Count@{Count}}
+}\Hypertarget{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae93f994f01c537c4e2f7d8528c3eb5e9}\label{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae93f994f01c537c4e2f7d8528c3eb5e9} 
+Count&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}\index{BusTypes.h@{BusTypes.h}!PlatformId@{PlatformId}}
+\index{PlatformId@{PlatformId}!BusTypes.h@{BusTypes.h}}
+\doxysubsubsection{\texorpdfstring{PlatformId}{PlatformId}}
+{\footnotesize\ttfamily \label{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3} 
+enum class \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{Platform\+Id}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Teensy@{Teensy}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!Teensy@{Teensy}}
+}\Hypertarget{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}\label{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84} 
+Teensy&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Nano@{Nano}!BusTypes.h@{BusTypes.h}}
+\index{BusTypes.h@{BusTypes.h}!Nano@{Nano}}
+}\Hypertarget{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}\label{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c} 
+Nano&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\label{_bus_types_8h_doc-var-members}
+\Hypertarget{_bus_types_8h_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{_bus_types_8h_a8b74aab2721afe44f85070ef63d9701e}\index{BusTypes.h@{BusTypes.h}!EndpointCount@{EndpointCount}}
+\index{EndpointCount@{EndpointCount}!BusTypes.h@{BusTypes.h}}
+\doxysubsubsection{\texorpdfstring{EndpointCount}{EndpointCount}}
+{\footnotesize\ttfamily \label{_bus_types_8h_a8b74aab2721afe44f85070ef63d9701e} 
+size\+\_\+t Endpoint\+Count\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ae93f994f01c537c4e2f7d8528c3eb5e9}{EndpointId::Count}})}
+
+\end{DoxyCode}
+\Hypertarget{_bus_types_8h_ae43691225dcb544010f569eb52da82db}\index{BusTypes.h@{BusTypes.h}!MaxPayloadSize@{MaxPayloadSize}}
+\index{MaxPayloadSize@{MaxPayloadSize}!BusTypes.h@{BusTypes.h}}
+\doxysubsubsection{\texorpdfstring{MaxPayloadSize}{MaxPayloadSize}}
+{\footnotesize\ttfamily \label{_bus_types_8h_ae43691225dcb544010f569eb52da82db} 
+size\+\_\+t Max\+Payload\+Size = 128\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+

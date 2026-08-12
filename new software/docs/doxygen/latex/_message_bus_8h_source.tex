@@ -1,0 +1,510 @@
+\doxysection{Message\+Bus.\+h}
+\hypertarget{_message_bus_8h_source}{}\label{_message_bus_8h_source}\index{src/MessageBus.h@{src/MessageBus.h}}
+\doxymbox{\hyperlink{_message_bus_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_bus_types_8h}{BusTypes.h}}"{}}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_encoder_8h}{Encoder.h}}"{}}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_load_cell_8h}{LoadCell.h}}"{}}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_cube_mars_motor_8h}{CubeMarsMotor.h}}"{}}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_uart_handler_8h}{UartHandler.h}}"{}}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{_driver_8h}{Driver.h}}"{}}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#if\ defined(PLATFORM\_NANO)}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{PlatformId}}\ \doxymbox{\hyperlink{_message_bus_8h_a7aefa246b3a39ea730f6db99ad3bb9c0}{LocalPlatform}}\ =}
+\DoxyCodeLine{00022\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}{PlatformId::Nano}};}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#elif\ defined(PLATFORM\_TEENSY)}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{PlatformId}}\ \doxymbox{\hyperlink{_message_bus_8h_a7aefa246b3a39ea730f6db99ad3bb9c0}{LocalPlatform}}\ =}
+\DoxyCodeLine{00027\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#error\ "{}No\ supported\ platform\ selected"{}}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_i_task}{ITask}}}
+\DoxyCodeLine{00036\ \{}
+\DoxyCodeLine{00037\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{virtual}\ \doxymbox{\hyperlink{class_i_task_a3fdb0c69908af669286b0903e0ab9a08}{\string~ITask}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_i_task_aa57dc9cc07cfda40d3dcac232f6115af}{update}}(uint32\_t\ nowUs)\ =\ 0;}
+\DoxyCodeLine{00040\ \};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{keyword}{template}<Endpo\textcolor{keywordtype}{int}Id\ Id>}
+\DoxyCodeLine{00043\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00046\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00047\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}{EncoderSnapshot}}>}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_encoder_snapshot_01_4_a23ef45d940c9be94da258f01945d3109}{Payload}}\ =\ \doxymbox{\hyperlink{struct_encoder_positions}{EncoderPositions}};}
+\DoxyCodeLine{00050\ \};}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00053\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00054\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a}{LoadCellSnapshot}}>}
+\DoxyCodeLine{00055\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_load_cell_snapshot_01_4_a32b33340e57753105953f6267e55342f}{Payload}}\ =\ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{LoadCellForces}};}
+\DoxyCodeLine{00057\ \};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00060\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00061\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27}{LeftMotorSnapshot}}>}
+\DoxyCodeLine{00062\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_left_motor_snapshot_01_4_a3bf7a5d888a9dcda3db95105320f78cb}{Payload}}\ =\ \doxymbox{\hyperlink{struct_motor_reply}{MotorReply}};}
+\DoxyCodeLine{00064\ \};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00067\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00068\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ab53e9e50c1f5d87990c9badc2af21c54}{RightMotorSnapshot}}>}
+\DoxyCodeLine{00069\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_right_motor_snapshot_01_4_a672452122723d4a31944b48b5a2d2c59}{Payload}}\ =\ \doxymbox{\hyperlink{struct_motor_reply}{MotorReply}};}
+\DoxyCodeLine{00071\ \};}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00074\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00075\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0}{LeftMotorCommand}}>}
+\DoxyCodeLine{00076\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_left_motor_command_01_4_ad7124be1fa8330a67aed8b3e821b289d}{Payload}}\ =\ \doxymbox{\hyperlink{struct_motor_cmd}{MotorCmd}};}
+\DoxyCodeLine{00078\ \};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00082\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00083\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}{Ina232Snapshot}}>}
+\DoxyCodeLine{00084\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_ina232_snapshot_01_4_a6089c98758f182d6b512bf431064289f}{Payload}}\ =\ \doxymbox{\hyperlink{struct_power_readings}{PowerReadings}};}
+\DoxyCodeLine{00086\ \};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{00089\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00090\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}::\doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a08f32044ca69bb4295c29252c4f5b0e1}{LeftMotorMetaCommand}}>}
+\DoxyCodeLine{00091\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{struct_endpoint_traits_3_01_endpoint_id_1_1_left_motor_meta_command_01_4_af7ad6feb3e8ac038a31694d284fa7d1f}{Payload}}\ =\ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{MotorMetaCommand}};}
+\DoxyCodeLine{00093\ \};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00105\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_topic}{Topic}}}
+\DoxyCodeLine{00106\ \{}
+\DoxyCodeLine{00107\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{class_topic_aab329cc2a23104fa675d0907d65ce19f}{ValueType}}\ =\ T;}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_topic_a8a1b652dd46f7da4fa5932819e226807}{publish}}(\textcolor{keyword}{const}\ T\&\ value)}
+\DoxyCodeLine{00116\ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic_a2bde4ca41b9482fc8bfaa36714826dd0}{m\_value}}\ =\ value;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ ++\doxymbox{\hyperlink{class_topic_a26a82226e3efe9e77cedf58090c2cf10}{m\_sequence}};\ \textcolor{comment}{//\ version\ coujnter\ for\ checking\ if\ value\ updated}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic_ac8366debdab1351ba406cdaf01c1c21d}{m\_valid}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00120\ \ \ \ \ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keyword}{const}\ T\&\ \doxymbox{\hyperlink{class_topic_a834ac893af336fd1c2c84efd8de29e21}{latest}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00128\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{class_topic_a2bde4ca41b9482fc8bfaa36714826dd0}{m\_value}};}
+\DoxyCodeLine{00130\ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_topic_aa32efcc5ee43f9d08d5eb73e6179f9a0}{valid}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00137\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{class_topic_ac8366debdab1351ba406cdaf01c1c21d}{m\_valid}};}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00146\ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{class_topic_a406eaa650db2bbd7103f62fc8a054220}{sequence}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00147\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{class_topic_a26a82226e3efe9e77cedf58090c2cf10}{m\_sequence}};}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00152\ \ \ \ \ T\ \doxymbox{\hyperlink{class_topic_a2bde4ca41b9482fc8bfaa36714826dd0}{m\_value}}\{\};}
+\DoxyCodeLine{00153\ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{class_topic_a26a82226e3efe9e77cedf58090c2cf10}{m\_sequence}}\{0\};}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_topic_ac8366debdab1351ba406cdaf01c1c21d}{m\_valid}}\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{00155\ \};}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{_message_bus_8h_afa04cee953d4ea83e7224a2b2e4178bf}{PlatformMask}}\ =\ uint8\_t;\ \textcolor{comment}{//\ a\ mask\ for\ indicating\ if\ a\ topic\ belongs\ to\ teensy\ or\ nano}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{_message_bus_8h_afa04cee953d4ea83e7224a2b2e4178bf}{PlatformMask}}\ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(}
+\DoxyCodeLine{00163\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{PlatformId}}\ platform)}
+\DoxyCodeLine{00164\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\doxymbox{\hyperlink{_message_bus_8h_afa04cee953d4ea83e7224a2b2e4178bf}{PlatformMask}}\textcolor{keyword}{>}(1U\ <<\ \textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}(platform));}
+\DoxyCodeLine{00166\ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_topic_route}{TopicRoute}}}
+\DoxyCodeLine{00169\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_afa04cee953d4ea83e7224a2b2e4178bf}{PlatformMask}}\ \doxymbox{\hyperlink{struct_topic_route_ae5992a9b653faa4090955572d64f80eb}{subscribers}}\{0\};}
+\DoxyCodeLine{00171\ \};}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::array<TopicRoute,EndpointCount>\ \doxymbox{\hyperlink{_message_bus_8h_a6632f0ab375fdd701bf1a39c1446d70d}{TopicRoutes}}\ =\ []()}
+\DoxyCodeLine{00174\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ std::array<}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{struct_topic_route}{TopicRoute}},}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a8b74aab2721afe44f85070ef63d9701e}{EndpointCount}}}
+\DoxyCodeLine{00178\ \ \ \ \ >\ routes\{\};}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{_message_bus_8h_afa04cee953d4ea83e7224a2b2e4178bf}{PlatformMask}}\ both\ =}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}})\ |}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}{PlatformId::Nano}});}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ routes[}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}{EndpointId::EncoderSnapshot}}}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00188\ \ \ \ \ ].subscribers\ =\ both;}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ routes[}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a}{EndpointId::LoadCellSnapshot}}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00194\ \ \ \ \ ].subscribers\ =\ both;}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ routes[}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27}{EndpointId::LeftMotorSnapshot}}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00200\ \ \ \ \ ].subscribers\ =\ both;}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ routes[}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001ab53e9e50c1f5d87990c9badc2af21c54}{EndpointId::RightMotorSnapshot}}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00206\ \ \ \ \ ].subscribers\ =\ both;}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ routes[}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a3bcd66e1767e990ae67c3e9bf3e8adf0}{EndpointId::LeftMotorCommand}}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00212\ \ \ \ \ ].subscribers\ =}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}});}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ routes[}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}{EndpointId::Ina232Snapshot}}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00219\ \ \ \ \ ].subscribers\ =}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}})\ |}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}{PlatformId::Nano}});}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ routes[}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a08f32044ca69bb4295c29252c4f5b0e1}{EndpointId::LeftMotorMetaCommand}}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00227\ \ \ \ \ ].subscribers\ =}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}});}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{return}\ routes;}
+\DoxyCodeLine{00231\ \}();}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ Capacity>}
+\DoxyCodeLine{00234\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_fixed_queue}{FixedQueue}}}
+\DoxyCodeLine{00235\ \{}
+\DoxyCodeLine{00236\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_fixed_queue_a4297df03128b599dd56ced178db8171d}{push}}(\textcolor{keyword}{const}\ T\&\ value)}
+\DoxyCodeLine{00238\ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\_count}}\ >=\ Capacity)\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3}{m\_data}}[\doxymbox{\hyperlink{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}{m\_tail}}]\ =\ value;}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}{m\_tail}}\ =}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ (\doxymbox{\hyperlink{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}{m\_tail}}\ +\ 1)\ \%\ Capacity;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ ++\doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\_count}};}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00249\ \ \ \ \ \}}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_fixed_queue_abaead34aff92a3ebd03286c2be844349}{pop}}(T\&\ value)}
+\DoxyCodeLine{00252\ \ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\_count}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ value\ =\ \doxymbox{\hyperlink{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3}{m\_data}}[\doxymbox{\hyperlink{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}{m\_head}}];}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}{m\_head}}\ =}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ (\doxymbox{\hyperlink{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}{m\_head}}\ +\ 1)\ \%\ Capacity;}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ -\/-\/\doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\_count}};}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00263\ \ \ \ \ \}}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00266\ \ \ \ \ std::array<T,\ Capacity>\ \doxymbox{\hyperlink{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3}{m\_data}}\{\};}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \doxymbox{\hyperlink{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}{m\_head}}\{0\};}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \doxymbox{\hyperlink{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}{m\_tail}}\{0\};}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\_count}}\{0\};}
+\DoxyCodeLine{00270\ \};}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_message_bus_a8f953f44e0875f0b921d055cf4130185}{MessageBus}}\ final\ :\ \textcolor{keyword}{public}\ \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\DoxyCodeLine{00273\ \{}
+\DoxyCodeLine{00274\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{keyword}{explicit}\ \doxymbox{\hyperlink{class_message_bus_a8f953f44e0875f0b921d055cf4130185}{MessageBus}}(}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_u_a_r_t_handler}{UARTHandler}}\&\ \doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}})}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ :\ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}}(\doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}})}
+\DoxyCodeLine{00278\ \ \ \ \ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}}.setReceiveCallback(}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keywordtype}{void}*\ context,}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\&\ message)}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}*\ bus\ =}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\doxymbox{\hyperlink{class_message_bus_a8f953f44e0875f0b921d055cf4130185}{MessageBus}}*\textcolor{keyword}{>}(}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bus-\/>receiveRemote(}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ this}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00294\ \ \ \ \ \}}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_message_bus_a680847ace437a065c3ede2fe5352bb64}{begin}}()}
+\DoxyCodeLine{00297\ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}}.begin();}
+\DoxyCodeLine{00299\ \ \ \ \ \}}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keyword}{template}<Endpo\textcolor{keywordtype}{int}Id\ Id>}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_message_bus_adf49fadc71e658a087e1ecde85a9ea55}{addTopic}}(}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_topic}{Topic}}<}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits<Id>::Payload}}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ >\&\ topic)}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }Payload\ =}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Id}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >::Payload;}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_trivially\_copyable\_v<}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Payload}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Payload\ must\ be\ trivially\ copyable"{}}}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ index\ =}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(Id);}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\ >=\ \doxymbox{\hyperlink{class_message_bus_ad1c4c287116bd70b2cb93537849d78a9}{m\_handlers}}.size())}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_ad1c4c287116bd70b2cb93537849d78a9}{m\_handlers}}[index]\ =}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\&topic](}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\&\ message)}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message.header.topic\ !=\ Id}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message.payloadSize\ !=}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(Payload)}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Payload\ value\{\};}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&value,}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message.payload.data(),}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(Payload)}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ topic.publish(value);}
+\DoxyCodeLine{00350\ }
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{keyword}{template}<Endpo\textcolor{keywordtype}{int}Id\ Id>}
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_message_bus_ad6d2c1a4ed342ae68d7474a09eccf8b3}{publish}}(\textcolor{keyword}{const}\ \textcolor{keyword}{typename}\ \doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits<Id>::Payload}}\&\ value)}
+\DoxyCodeLine{00359\ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }Payload\ =}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits<Id>::Payload}};}
+\DoxyCodeLine{00362\ }
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_trivially\_copyable\_v<Payload>}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(Payload)\ <=\ \doxymbox{\hyperlink{_bus_types_8h_ae43691225dcb544010f569eb52da82db}{MaxPayloadSize}}}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\ message\{\};}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_af8a91ee715270b254a5d3d6c1776d85e}{header}}.\doxymbox{\hyperlink{struct_message_header_a596fa02aabc1f872febc7906e536ef56}{topic}}\ =\ Id;}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_af8a91ee715270b254a5d3d6c1776d85e}{header}}.\doxymbox{\hyperlink{struct_message_header_a778749784b55e67528f518180a260cdc}{origin}}\ =\ \doxymbox{\hyperlink{_message_bus_8h_a7aefa246b3a39ea730f6db99ad3bb9c0}{LocalPlatform}};}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_af8a91ee715270b254a5d3d6c1776d85e}{header}}.\doxymbox{\hyperlink{struct_message_header_af6cfed7dbcb15285ecbe63854b9c9c14}{sequence}}\ =++\doxymbox{\hyperlink{class_message_bus_aedfaa694030e35c3a42f0dfb515ae334}{m\_sequences}}[\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(Id)];}
+\DoxyCodeLine{00377\ }
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_a1235f12dcbc873adb13a8505a89133d6}{payloadSize}}\ =\textcolor{keyword}{sizeof}(Payload);}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ std::memcpy(}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_a0ccf2bcded98b3a7008b5790a30e1457}{payload}}.data(),}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \&value,}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(Payload)}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_af7b2ed7d9b10b6944fd99ef57e2ccdbb}{dispatchLocal}}(message);\ \textcolor{comment}{//\ local\ dispatching\ (i.e\ on\ teensy\ if\ this\ code\ runs\ on\ teensy)}}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\doxymbox{\hyperlink{class_message_bus_af3ac4095410e36e5837f6f259c6df82b}{remoteNeeds}}(Id))}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}}.send(message);}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00394\ \ \ \ \ \}}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_message_bus_ad2f806d582621d3e80b93b1d484fc8b9}{update}}(uint32\_t)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00397\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PacketSerial\ must\ be\ serviced\ continuously.}}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}}.update();}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\ message\{\};}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\doxymbox{\hyperlink{class_message_bus_ae65db3546c622fe625f47359e55d6fff}{m\_rxQueue}}.pop(message))}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_af7b2ed7d9b10b6944fd99ef57e2ccdbb}{dispatchLocal}}(message);}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00407\ \ \ \ \ \}}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00410\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}}
+\DoxyCodeLine{00411\ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3}{PlatformId}}\ \doxymbox{\hyperlink{class_message_bus_aa0241cd77f7c9fb94ace05a106990f28}{remotePlatform}}()}
+\DoxyCodeLine{00412\ \ \ \ \ \{}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_a7aefa246b3a39ea730f6db99ad3bb9c0}{LocalPlatform}}\ ==}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}})}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a79b048d6d742fae8fc4f0524dcb6949c}{PlatformId::Nano}};}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{_bus_types_8h_a66a9ecf4b4d12e8358a86ce004ccded3a808df221b9ad3f55cd701930c55baf84}{PlatformId::Teensy}};}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00423\ \ \ \ \ \}}
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00425\ \ \ \ \ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{class_message_bus_af3ac4095410e36e5837f6f259c6df82b}{remoteNeeds}}(}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001}{EndpointId}}\ \textcolor{keywordtype}{id})\textcolor{keyword}{\ const}}
+\DoxyCodeLine{00427\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ route\ =}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_message_bus_8h_a6632f0ab375fdd701bf1a39c1446d70d}{TopicRoutes}}[}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(id)}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ (route.subscribers\ \&\ \doxymbox{\hyperlink{_message_bus_8h_ad7e08a4602fc350a542569a242e0d083}{platformBit}}(\doxymbox{\hyperlink{class_message_bus_aa0241cd77f7c9fb94ace05a106990f28}{remotePlatform}}()))\ !=\ 0;}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_message_bus_af7b2ed7d9b10b6944fd99ef57e2ccdbb}{dispatchLocal}}(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\&\ message)}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ index\ =}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ message.\doxymbox{\hyperlink{struct_bus_message_af8a91ee715270b254a5d3d6c1776d85e}{header}}.\doxymbox{\hyperlink{struct_message_header_a596fa02aabc1f872febc7906e536ef56}{topic}}}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\ >=\ \doxymbox{\hyperlink{class_message_bus_ad1c4c287116bd70b2cb93537849d78a9}{m\_handlers}}.size())}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ handler\ =}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_ad1c4c287116bd70b2cb93537849d78a9}{m\_handlers}}[index];}
+\DoxyCodeLine{00451\ }
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (handler)}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler(message);}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_message_bus_ab81a3d4d16b009964e993c6f470d4405}{receiveRemote}}(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\&\ message)}
+\DoxyCodeLine{00459\ \ \ \ \ \{}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (message.\doxymbox{\hyperlink{struct_bus_message_af8a91ee715270b254a5d3d6c1776d85e}{header}}.\doxymbox{\hyperlink{struct_message_header_a778749784b55e67528f518180a260cdc}{origin}}\ ==\doxymbox{\hyperlink{_message_bus_8h_a7aefa246b3a39ea730f6db99ad3bb9c0}{LocalPlatform}})}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_ae65db3546c622fe625f47359e55d6fff}{m\_rxQueue}}.push(message);}
+\DoxyCodeLine{00466\ \ \ \ \ \}}
+\DoxyCodeLine{00467\ }
+\DoxyCodeLine{00468\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00469\ \ \ \ \ \doxymbox{\hyperlink{class_u_a_r_t_handler}{UARTHandler}}\&\ \doxymbox{\hyperlink{class_message_bus_a66d726e6fa82476ad8f590969749d088}{m\_uart}};}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{class_message_bus_a3e39fb1d36c7348038cc26a3290ba9da}{MessageHandler}}\ =}
+\DoxyCodeLine{00472\ \ \ \ \ std::function<}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ bool(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{struct_bus_message}{BusMessage}}\&)}
+\DoxyCodeLine{00474\ \ \ \ \ >;}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \ \ \ \ std::array<}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus_a3e39fb1d36c7348038cc26a3290ba9da}{MessageHandler}},}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{_bus_types_8h_a8b74aab2721afe44f85070ef63d9701e}{EndpointCount}}}
+\DoxyCodeLine{00479\ \ \ \ \ >\ \doxymbox{\hyperlink{class_message_bus_ad1c4c287116bd70b2cb93537849d78a9}{m\_handlers}}\{\};}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ \ \ \ \ std::array<uint16\_t,EndpointCount>\ \doxymbox{\hyperlink{class_message_bus_aedfaa694030e35c3a42f0dfb515ae334}{m\_sequences}}\{\};}
+\DoxyCodeLine{00482\ }
+\DoxyCodeLine{00483\ \ \ \ \ \doxymbox{\hyperlink{class_fixed_queue}{FixedQueue<BusMessage,16>}}\ \doxymbox{\hyperlink{class_message_bus_ae65db3546c622fe625f47359e55d6fff}{m\_rxQueue}};\ \textcolor{comment}{//\ could\ have\ used\ std::queue\ but\ that\ container\ is\ unbounded\ which\ is\ risky\ for\ out\ embedded\ platforms}}
+\DoxyCodeLine{00484\ \};}
+\DoxyCodeLine{00485\ }
+\DoxyCodeLine{00486\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DriverT,Endpo\textcolor{keywordtype}{int}Id\ Id,u\textcolor{keywordtype}{int}32\_t\ PeriodUs>}
+\DoxyCodeLine{00487\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_polling_publisher_aaf5aba42a202f173bf2ac7c5b2ccfd32}{PollingPublisher}}\ final\ :}
+\DoxyCodeLine{00488\ \ \ \ \ \textcolor{keyword}{public}\ \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\DoxyCodeLine{00489\ \{}
+\DoxyCodeLine{00490\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{class_polling_publisher_abb777823146bab8bec768f1442eab58e}{Payload}}\ =}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \doxymbox{\hyperlink{struct_endpoint_traits}{EndpointTraits}}<}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ Id}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ >\doxymbox{\hyperlink{class_polling_publisher_abb777823146bab8bec768f1442eab58e}{::Payload}};}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00496\ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_aaf5aba42a202f173bf2ac7c5b2ccfd32}{PollingPublisher}}(}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ DriverT\&\ driver,}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_message_bus}{MessageBus}}\&\ bus)}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ :\ \doxymbox{\hyperlink{class_polling_publisher_ac7feb171d98f8042b09a9d02ead7c8e7}{m\_driver}}(driver),}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_afb1f07526277960d35a8499f58f14ad1}{m\_bus}}(bus)}
+\DoxyCodeLine{00501\ \ \ \ \ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ DriverT::ValueType,}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_abb777823146bab8bec768f1442eab58e}{Payload}}}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Driver\ output\ does\ not\ match\ topic\ payload"{}}}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00509\ \ \ \ \ \}}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_polling_publisher_a0769eb05bf37096c79bad46385dc9072}{update}}(}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ uint32\_t\ nowUs)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{00513\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nowUs\ -\/\ \doxymbox{\hyperlink{class_polling_publisher_a3da058bbac3e585a2e84a6dc6d963657}{m\_previousUs}}\ <}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ PeriodUs)}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00519\ }
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_a3da058bbac3e585a2e84a6dc6d963657}{m\_previousUs}}\ +=\ PeriodUs;}
+\DoxyCodeLine{00521\ }
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_afb1f07526277960d35a8499f58f14ad1}{m\_bus}}.publish<Id>(}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{class_polling_publisher_ac7feb171d98f8042b09a9d02ead7c8e7}{m\_driver}}.sample()}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00525\ \ \ \ \ \}}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00528\ \ \ \ \ DriverT\&\ \doxymbox{\hyperlink{class_polling_publisher_ac7feb171d98f8042b09a9d02ead7c8e7}{m\_driver}};}
+\DoxyCodeLine{00529\ \ \ \ \ \doxymbox{\hyperlink{class_message_bus}{MessageBus}}\&\ \doxymbox{\hyperlink{class_polling_publisher_afb1f07526277960d35a8499f58f14ad1}{m\_bus}};}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{class_polling_publisher_a3da058bbac3e585a2e84a6dc6d963657}{m\_previousUs}}\{0\};}
+\DoxyCodeLine{00532\ \};}
+
+\end{DoxyCode}

@@ -36,6 +36,26 @@ struct PowerReadings
 
 // Encoder ======
 
+/**
+ * @brief Driver for the left and right joint encoders.
+ *
+ * Handles initialization of both encoders and converts raw encoder
+ * counts into relative angular positions in degrees.
+ *
+ * The first valid encoder position is treated as zero. Subsequent
+ * samples handle the 0–4095 rollover automatically.
+ * @param theory Even if there is only one possible unified theory. it is just a
+ *               set of rules and equations.
+ *
+ * Typical usage:
+ * @code
+ * EncoderDriver driver;
+ *
+ * driver.begin();
+ *
+ * EncoderPositions positions = driver.sample();
+ * @endcode
+ */
 class EncoderDriver :
     public Driver<EncoderPositions>
 {

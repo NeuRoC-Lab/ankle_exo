@@ -1,0 +1,114 @@
+\doxysection{src/\+\+Cube\+Mars\+Motor.h File Reference}
+\hypertarget{_cube_mars_motor_8h}{}\label{_cube_mars_motor_8h}\index{src/CubeMarsMotor.h@{src/CubeMarsMotor.h}}
+{\ttfamily \+\#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \+\#include $<$algorithm$>$}\newline
+{\ttfamily \+\#include $<$array$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+{\ttfamily \+\#include $<$cstring$>$}\newline
+{\ttfamily \+\#include "{}board.\+h"{}}\newline
+{\ttfamily \+\#include $<$Flex\+CAN\+\_\+\+T4.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}}
+\item 
+struct \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}}
+\item 
+struct \doxymbox{\hyperlink{struct_can_frame}{Can\+Frame}}
+\item 
+struct \doxymbox{\hyperlink{struct_a_k60_params}{AK60\+Params}}
+\item 
+class \doxymbox{\hyperlink{class_can_bus}{Can\+Bus}}
+\item 
+class \doxymbox{\hyperlink{class_cube_mars_motor}{Cube\+Mars\+Motor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} :\+ uint8\+\_\+t \{ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3}{Enter\+Motor\+Mode}}
+, \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a}{Exit\+Motor\+Mode}}
+, \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24}{Set\+Zero}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+float \doxymbox{\hyperlink{_cube_mars_motor_8h_a02000d77f07336f84b3ae1b203cdc381}{uint\+\_\+to\+\_\+float}} (uint16\+\_\+t code, float x\+\_\+min, float x\+\_\+max, int bits)
+\item 
+uint16\+\_\+t \doxymbox{\hyperlink{_cube_mars_motor_8h_acc2243edd0f77abae4fd6ae94c41d3a0}{float\+\_\+to\+\_\+uint}} (float x, float x\+\_\+min, float x\+\_\+max, int bits)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \doxymbox{\hyperlink{struct_a_k60_params}{AK60\+Params}} \doxymbox{\hyperlink{_cube_mars_motor_8h_a8ba8251c1e7bb49887515e271c9483ed}{Motor\+Params}}
+\end{DoxyCompactItemize}
+
+
+\label{_cube_mars_motor_8h_doc-enum-members}
+\Hypertarget{_cube_mars_motor_8h_doc-enum-members}
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}\index{CubeMarsMotor.h@{CubeMarsMotor.h}!MotorMetaCommand@{MotorMetaCommand}}
+\index{MotorMetaCommand@{MotorMetaCommand}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\doxysubsubsection{\texorpdfstring{MotorMetaCommand}{MotorMetaCommand}}
+{\footnotesize\ttfamily \label{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8} 
+enum class \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EnterMotorMode@{EnterMotorMode}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\index{CubeMarsMotor.h@{CubeMarsMotor.h}!EnterMotorMode@{EnterMotorMode}}
+}\Hypertarget{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3}\label{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3} 
+Enter\+Motor\+Mode&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExitMotorMode@{ExitMotorMode}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\index{CubeMarsMotor.h@{CubeMarsMotor.h}!ExitMotorMode@{ExitMotorMode}}
+}\Hypertarget{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a}\label{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a} 
+Exit\+Motor\+Mode&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SetZero@{SetZero}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\index{CubeMarsMotor.h@{CubeMarsMotor.h}!SetZero@{SetZero}}
+}\Hypertarget{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24}\label{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24} 
+Set\+Zero&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\label{_cube_mars_motor_8h_doc-func-members}
+\Hypertarget{_cube_mars_motor_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{_cube_mars_motor_8h_acc2243edd0f77abae4fd6ae94c41d3a0}\index{CubeMarsMotor.h@{CubeMarsMotor.h}!float\_to\_uint@{float\_to\_uint}}
+\index{float\_to\_uint@{float\_to\_uint}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\doxysubsubsection{\texorpdfstring{float\_to\_uint()}{float\_to\_uint()}}
+{\footnotesize\ttfamily \label{_cube_mars_motor_8h_acc2243edd0f77abae4fd6ae94c41d3a0} 
+uint16\+\_\+t float\+\_\+to\+\_\+uint (\begin{DoxyParamCaption}\item[{float}]{x}{, }\item[{float}]{x\+\_\+min}{, }\item[{float}]{x\+\_\+max}{, }\item[{int}]{bits}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{_cube_mars_motor_8h_a02000d77f07336f84b3ae1b203cdc381}\index{CubeMarsMotor.h@{CubeMarsMotor.h}!uint\_to\_float@{uint\_to\_float}}
+\index{uint\_to\_float@{uint\_to\_float}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\doxysubsubsection{\texorpdfstring{uint\_to\_float()}{uint\_to\_float()}}
+{\footnotesize\ttfamily \label{_cube_mars_motor_8h_a02000d77f07336f84b3ae1b203cdc381} 
+float uint\+\_\+to\+\_\+float (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{code}{, }\item[{float}]{x\+\_\+min}{, }\item[{float}]{x\+\_\+max}{, }\item[{int}]{bits}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{_cube_mars_motor_8h_doc-var-members}
+\Hypertarget{_cube_mars_motor_8h_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{_cube_mars_motor_8h_a8ba8251c1e7bb49887515e271c9483ed}\index{CubeMarsMotor.h@{CubeMarsMotor.h}!MotorParams@{MotorParams}}
+\index{MotorParams@{MotorParams}!CubeMarsMotor.h@{CubeMarsMotor.h}}
+\doxysubsubsection{\texorpdfstring{MotorParams}{MotorParams}}
+{\footnotesize\ttfamily \label{_cube_mars_motor_8h_a8ba8251c1e7bb49887515e271c9483ed} 
+\doxymbox{\hyperlink{struct_a_k60_params}{AK60\+Params}} Motor\+Params\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ -\/12.5f,\ 12.5f,}
+\DoxyCodeLine{\ \ \ \ -\/45.0f,\ 45.0f,}
+\DoxyCodeLine{\ \ \ \ 0.0f,\ 500.0f,}
+\DoxyCodeLine{\ \ \ \ 0.0f,\ 5.0f,}
+\DoxyCodeLine{\ \ \ \ -\/15.0f,\ 15.0f}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}

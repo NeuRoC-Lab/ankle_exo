@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_fixed_queue" kind="class" language="C++" prot="public">
+    <compoundname>FixedQueue</compoundname>
+    <includes refid="_message_bus_8h" local="no">MessageBus.h</includes>
+    <templateparamlist>
+      <param>
+        <type>typename T</type>
+      </param>
+      <param>
+        <type>size_t</type>
+        <declname>Capacity</declname>
+        <defname>Capacity</defname>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_fixed_queue_1a2ab74a1dfc3d873426a7544a5d4af1e3" prot="private" static="no" mutable="no">
+        <type>std::array&lt; T, Capacity &gt;</type>
+        <definition>std::array&lt;T, Capacity&gt; FixedQueue&lt; T, Capacity &gt;::m_data</definition>
+        <argsstring></argsstring>
+        <name>m_data</name>
+        <qualifiedname>FixedQueue::m_data</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="266" column="16" bodyfile="src/MessageBus.h" bodystart="266" bodyend="266"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_fixed_queue_1a8fb8bf9da5d68d03950a9171e8f31db8" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t FixedQueue&lt; T, Capacity &gt;::m_head</definition>
+        <argsstring></argsstring>
+        <name>m_head</name>
+        <qualifiedname>FixedQueue::m_head</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="267" column="12" bodyfile="src/MessageBus.h" bodystart="267" bodyend="267"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_fixed_queue_1aa667c1aaf8388b43690425bf68f9e1c2" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t FixedQueue&lt; T, Capacity &gt;::m_tail</definition>
+        <argsstring></argsstring>
+        <name>m_tail</name>
+        <qualifiedname>FixedQueue::m_tail</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="268" column="12" bodyfile="src/MessageBus.h" bodystart="268" bodyend="268"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_fixed_queue_1aaefc620d476d1a04ae5863bcb3908707" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t FixedQueue&lt; T, Capacity &gt;::m_count</definition>
+        <argsstring></argsstring>
+        <name>m_count</name>
+        <qualifiedname>FixedQueue::m_count</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="269" column="12" bodyfile="src/MessageBus.h" bodystart="269" bodyend="269"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_fixed_queue_1a4297df03128b599dd56ced178db8171d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool FixedQueue&lt; T, Capacity &gt;::push</definition>
+        <argsstring>(const T &amp;value)</argsstring>
+        <name>push</name>
+        <qualifiedname>FixedQueue::push</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="237" column="10" bodyfile="src/MessageBus.h" bodystart="237" bodyend="249"/>
+      </memberdef>
+      <memberdef kind="function" id="class_fixed_queue_1abaead34aff92a3ebd03286c2be844349" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool FixedQueue&lt; T, Capacity &gt;::pop</definition>
+        <argsstring>(T &amp;value)</argsstring>
+        <name>pop</name>
+        <qualifiedname>FixedQueue::pop</qualifiedname>
+        <param>
+          <type>T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="251" column="10" bodyfile="src/MessageBus.h" bodystart="251" bodyend="263"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/MessageBus.h" line="234" column="1" bodyfile="src/MessageBus.h" bodystart="235" bodyend="270"/>
+    <listofallmembers>
+      <member refid="class_fixed_queue_1aaefc620d476d1a04ae5863bcb3908707" prot="private" virt="non-virtual"><scope>FixedQueue</scope><name>m_count</name></member>
+      <member refid="class_fixed_queue_1a2ab74a1dfc3d873426a7544a5d4af1e3" prot="private" virt="non-virtual"><scope>FixedQueue</scope><name>m_data</name></member>
+      <member refid="class_fixed_queue_1a8fb8bf9da5d68d03950a9171e8f31db8" prot="private" virt="non-virtual"><scope>FixedQueue</scope><name>m_head</name></member>
+      <member refid="class_fixed_queue_1aa667c1aaf8388b43690425bf68f9e1c2" prot="private" virt="non-virtual"><scope>FixedQueue</scope><name>m_tail</name></member>
+      <member refid="class_fixed_queue_1abaead34aff92a3ebd03286c2be844349" prot="public" virt="non-virtual"><scope>FixedQueue</scope><name>pop</name></member>
+      <member refid="class_fixed_queue_1a4297df03128b599dd56ced178db8171d" prot="public" virt="non-virtual"><scope>FixedQueue</scope><name>push</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

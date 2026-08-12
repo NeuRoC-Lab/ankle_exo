@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_driver" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>Driver</compoundname>
+    <includes refid="_driver_8h" local="no">Driver.h</includes>
+    <templateparamlist>
+      <param>
+        <type>typename T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="class_driver_1a72372814b0fdad0cdc33424fb5243421" prot="public" static="no">
+        <type>T</type>
+        <definition>using Driver&lt; T &gt;::ValueType = T</definition>
+        <argsstring></argsstring>
+        <name>ValueType</name>
+        <qualifiedname>Driver::ValueType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="16" column="5" bodyfile="src/Driver.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_driver_1a8f8161301eba5ad066bb80ffdebff3c2" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual Driver&lt; T &gt;::~Driver</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Driver</name>
+        <qualifiedname>Driver::~Driver</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="18" column="13"/>
+      </memberdef>
+      <memberdef kind="function" id="class_driver_1ab4ba2e186dc35e027b878c83e6405253" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool Driver&lt; T &gt;::begin</definition>
+        <argsstring>()=0</argsstring>
+        <name>begin</name>
+        <qualifiedname>Driver::begin</qualifiedname>
+        <reimplementedby refid="class_encoder_driver_1a7bffef70d334fae2b32c6bf6e9fba168">begin</reimplementedby>
+        <reimplementedby refid="class_i_n_a232_driver_1ad50833331d0ee5e3d103108afae8bed2">begin</reimplementedby>
+        <reimplementedby refid="class_load_cell_driver_1ab08fa8476b7cd6a8c971424b4fc74f66">begin</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="20" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="class_driver_1ae143b3584051ec560cbd96d825a72f76" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>T</type>
+        <definition>virtual T Driver&lt; T &gt;::sample</definition>
+        <argsstring>()=0</argsstring>
+        <name>sample</name>
+        <qualifiedname>Driver::sample</qualifiedname>
+        <reimplementedby refid="class_encoder_driver_1aabf88a18cadbaefa3a917ba2fc68f84c">sample</reimplementedby>
+        <reimplementedby refid="class_i_n_a232_driver_1acf6b9b8c0c38caceaa3b8c71166d705a">sample</reimplementedby>
+        <reimplementedby refid="class_load_cell_driver_1a9fa4290ce109ecc83292920fdac10bc5">sample</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="21" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Driver.h" line="13" column="1" bodyfile="src/Driver.h" bodystart="14" bodyend="22"/>
+    <listofallmembers>
+      <member refid="class_driver_1ab4ba2e186dc35e027b878c83e6405253" prot="public" virt="pure-virtual"><scope>Driver</scope><name>begin</name></member>
+      <member refid="class_driver_1ae143b3584051ec560cbd96d825a72f76" prot="public" virt="pure-virtual"><scope>Driver</scope><name>sample</name></member>
+      <member refid="class_driver_1a72372814b0fdad0cdc33424fb5243421" prot="public" virt="non-virtual"><scope>Driver</scope><name>ValueType</name></member>
+      <member refid="class_driver_1a8f8161301eba5ad066bb80ffdebff3c2" prot="public" virt="virtual"><scope>Driver</scope><name>~Driver</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_load_cell_driver" kind="class" language="C++" prot="public">
+    <compoundname>LoadCellDriver</compoundname>
+    <basecompoundref refid="class_driver" prot="public" virt="non-virtual">Driver&lt; LoadCellForces &gt;</basecompoundref>
+    <includes refid="_driver_8h" local="no">Driver.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_load_cell_driver_1a75fae734d2eebe01d5b7ddfb4b0a03cf" prot="private" static="no" mutable="no">
+        <type>nrf_saadc_value_t</type>
+        <definition>nrf_saadc_value_t LoadCellDriver::m_rawBuffer[NRF_SAADC_CHANNEL_COUNT]</definition>
+        <argsstring>[NRF_SAADC_CHANNEL_COUNT]</argsstring>
+        <name>m_rawBuffer</name>
+        <qualifiedname>LoadCellDriver::m_rawBuffer</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="558" column="9" bodyfile="src/Driver.h" bodystart="558" bodyend="558"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_load_cell_driver_1afb226ac87abbfd4d9d018c20ca89eecb" prot="private" static="no" mutable="no">
+        <type>std::array&lt; <ref refid="class_load_cell" kindref="compound">LoadCell</ref>, <ref refid="board_8h_1a79cf27009260690babacedf37f7ffb78" kindref="member">LoadCellCount</ref> &gt;</type>
+        <definition>std::array&lt;LoadCell, LoadCellCount&gt; LoadCellDriver::m_loadCells</definition>
+        <argsstring></argsstring>
+        <name>m_loadCells</name>
+        <qualifiedname>LoadCellDriver::m_loadCells</qualifiedname>
+        <initializer>{
+            <ref refid="class_load_cell" kindref="compound">LoadCell</ref>{
+                <ref refid="_load_cell_8h_1a430be82f2debfa73e26864c0a44e4ee4" kindref="member">loadCellParams</ref>,
+                <ref refid="board_8h_1a95ae982631b81cb4d5b6f13e9c1d053fac57b85e67e47634176edf7be18cb6b57" kindref="member">LoadCellId::Left1</ref>
+            },
+            <ref refid="class_load_cell" kindref="compound">LoadCell</ref>{
+                <ref refid="_load_cell_8h_1a430be82f2debfa73e26864c0a44e4ee4" kindref="member">loadCellParams</ref>,
+                <ref refid="board_8h_1a95ae982631b81cb4d5b6f13e9c1d053fac37e68566be79d23cd24c9c994bd8efb" kindref="member">LoadCellId::Left2</ref>
+            },
+            <ref refid="class_load_cell" kindref="compound">LoadCell</ref>{
+                <ref refid="_load_cell_8h_1a430be82f2debfa73e26864c0a44e4ee4" kindref="member">loadCellParams</ref>,
+                <ref refid="board_8h_1a95ae982631b81cb4d5b6f13e9c1d053fab04475cb50c3a71f0a7f9ffe1e1256a0" kindref="member">LoadCellId::Right1</ref>
+            },
+            <ref refid="class_load_cell" kindref="compound">LoadCell</ref>{
+                <ref refid="_load_cell_8h_1a430be82f2debfa73e26864c0a44e4ee4" kindref="member">loadCellParams</ref>,
+                <ref refid="board_8h_1a95ae982631b81cb4d5b6f13e9c1d053fa98888a7c164745ae51f9ecff4e6b17e7" kindref="member">LoadCellId::Right2</ref>
+            }
+        }</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="561" column="9" bodyfile="src/Driver.h" bodystart="561" bodyend="578"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_load_cell_driver_1ab08fa8476b7cd6a8c971424b4fc74f66" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool LoadCellDriver::begin</definition>
+        <argsstring>() override</argsstring>
+        <name>begin</name>
+        <qualifiedname>LoadCellDriver::begin</qualifiedname>
+        <reimplements refid="class_driver_1ab4ba2e186dc35e027b878c83e6405253">begin</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="360" column="10" bodyfile="src/Driver.h" bodystart="360" bodyend="399"/>
+      </memberdef>
+      <memberdef kind="function" id="class_load_cell_driver_1a9fa4290ce109ecc83292920fdac10bc5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type><ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref></type>
+        <definition>LoadCellForces LoadCellDriver::sample</definition>
+        <argsstring>() override</argsstring>
+        <name>sample</name>
+        <qualifiedname>LoadCellDriver::sample</qualifiedname>
+        <reimplements refid="class_driver_1ae143b3584051ec560cbd96d825a72f76">sample</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="401" column="20" bodyfile="src/Driver.h" bodystart="401" bodyend="420"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="class_load_cell_driver_1a01e66e9c1f7a16929cd6b9c917aad765" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>float</type>
+        <definition>static float LoadCellDriver::rawToDiffVoltage</definition>
+        <argsstring>(nrf_saadc_value_t raw)</argsstring>
+        <name>rawToDiffVoltage</name>
+        <qualifiedname>LoadCellDriver::rawToDiffVoltage</qualifiedname>
+        <param>
+          <type>nrf_saadc_value_t</type>
+          <declname>raw</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="423" column="18" bodyfile="src/Driver.h" bodystart="423" bodyend="433"/>
+      </memberdef>
+      <memberdef kind="function" id="class_load_cell_driver_1ada55143fc24e0b233059349e0416d477" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void LoadCellDriver::waitForEvent</definition>
+        <argsstring>(nrf_saadc_event_t event)</argsstring>
+        <name>waitForEvent</name>
+        <qualifiedname>LoadCellDriver::waitForEvent</qualifiedname>
+        <param>
+          <type>nrf_saadc_event_t</type>
+          <declname>event</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="435" column="17" bodyfile="src/Driver.h" bodystart="435" bodyend="443"/>
+      </memberdef>
+      <memberdef kind="function" id="class_load_cell_driver_1a39713d4944317e8787d6b1b9b28c24e6" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void LoadCellDriver::calibrateSaadcHardwareOffset</definition>
+        <argsstring>()</argsstring>
+        <name>calibrateSaadcHardwareOffset</name>
+        <qualifiedname>LoadCellDriver::calibrateSaadcHardwareOffset</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="445" column="17" bodyfile="src/Driver.h" bodystart="445" bodyend="458"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_load_cell_driver_1a86b43a665dedb3655784ae50f1c17c79" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool LoadCellDriver::performScan</definition>
+        <argsstring>()</argsstring>
+        <name>performScan</name>
+        <qualifiedname>LoadCellDriver::performScan</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="460" column="10" bodyfile="src/Driver.h" bodystart="460" bodyend="508"/>
+      </memberdef>
+      <memberdef kind="function" id="class_load_cell_driver_1a2a1ad3f74701236462fa1983f8d874f9" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void LoadCellDriver::calibrateOffsets</definition>
+        <argsstring>(uint16_t sampleCount=100)</argsstring>
+        <name>calibrateOffsets</name>
+        <qualifiedname>LoadCellDriver::calibrateOffsets</qualifiedname>
+        <param>
+          <type>uint16_t</type>
+          <declname>sampleCount</declname>
+          <defval>100</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="510" column="10" bodyfile="src/Driver.h" bodystart="510" bodyend="554"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>Driver&lt; LoadCellForces &gt;</label>
+        <link refid="class_driver"/>
+      </node>
+      <node id="1">
+        <label>LoadCellDriver</label>
+        <link refid="class_load_cell_driver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>Driver&lt; LoadCellForces &gt;</label>
+        <link refid="class_driver"/>
+      </node>
+      <node id="1">
+        <label>LoadCellDriver</label>
+        <link refid="class_load_cell_driver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/Driver.h" line="356" column="1" bodyfile="src/Driver.h" bodystart="358" bodyend="579"/>
+    <listofallmembers>
+      <member refid="class_load_cell_driver_1ab08fa8476b7cd6a8c971424b4fc74f66" prot="public" virt="virtual"><scope>LoadCellDriver</scope><name>begin</name></member>
+      <member refid="class_load_cell_driver_1a2a1ad3f74701236462fa1983f8d874f9" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>calibrateOffsets</name></member>
+      <member refid="class_load_cell_driver_1a39713d4944317e8787d6b1b9b28c24e6" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>calibrateSaadcHardwareOffset</name></member>
+      <member refid="class_load_cell_driver_1afb226ac87abbfd4d9d018c20ca89eecb" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>m_loadCells</name></member>
+      <member refid="class_load_cell_driver_1a75fae734d2eebe01d5b7ddfb4b0a03cf" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>m_rawBuffer</name></member>
+      <member refid="class_load_cell_driver_1a86b43a665dedb3655784ae50f1c17c79" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>performScan</name></member>
+      <member refid="class_load_cell_driver_1a01e66e9c1f7a16929cd6b9c917aad765" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>rawToDiffVoltage</name></member>
+      <member refid="class_load_cell_driver_1a9fa4290ce109ecc83292920fdac10bc5" prot="public" virt="virtual"><scope>LoadCellDriver</scope><name>sample</name></member>
+      <member refid="class_driver_1a72372814b0fdad0cdc33424fb5243421" prot="public" virt="non-virtual"><scope>LoadCellDriver</scope><name>ValueType</name></member>
+      <member refid="class_load_cell_driver_1ada55143fc24e0b233059349e0416d477" prot="private" virt="non-virtual"><scope>LoadCellDriver</scope><name>waitForEvent</name></member>
+      <member refid="class_driver_1a8f8161301eba5ad066bb80ffdebff3c2" prot="public" virt="virtual"><scope>LoadCellDriver</scope><name>~Driver</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

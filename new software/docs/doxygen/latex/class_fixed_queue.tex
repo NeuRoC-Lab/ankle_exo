@@ -1,0 +1,81 @@
+\doxysection{Fixed\+Queue\texorpdfstring{$<$}{<} T, Capacity \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_fixed_queue}{}\label{class_fixed_queue}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+
+
+{\ttfamily \+\#include $<$Message\+Bus.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{class_fixed_queue_a4297df03128b599dd56ced178db8171d}{push}} (const T \&value)
+\item 
+bool \doxymbox{\hyperlink{class_fixed_queue_abaead34aff92a3ebd03286c2be844349}{pop}} (T \&value)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+array$<$ T, Capacity $>$ \doxymbox{\hyperlink{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3}{m\+\_\+data}} \{\}
+\item 
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}{m\+\_\+head}} \{0\}
+\item 
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}{m\+\_\+tail}} \{0\}
+\item 
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}{m\+\_\+count}} \{0\}
+\end{DoxyCompactItemize}
+
+
+\label{class_fixed_queue_doc-func-members}
+\Hypertarget{class_fixed_queue_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_fixed_queue_abaead34aff92a3ebd03286c2be844349}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!pop@{pop}}
+\index{pop@{pop}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{pop()}{pop()}}
+{\footnotesize\ttfamily \label{class_fixed_queue_abaead34aff92a3ebd03286c2be844349} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+bool \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+pop (\begin{DoxyParamCaption}\item[{T \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_fixed_queue_a4297df03128b599dd56ced178db8171d}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!push@{push}}
+\index{push@{push}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily \label{class_fixed_queue_a4297df03128b599dd56ced178db8171d} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+bool \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+push (\begin{DoxyParamCaption}\item[{const T \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_fixed_queue_doc-variable-members}
+\Hypertarget{class_fixed_queue_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!m\_count@{m\_count}}
+\index{m\_count@{m\_count}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{m\_count}{m\_count}}
+{\footnotesize\ttfamily \label{class_fixed_queue_aaefc620d476d1a04ae5863bcb3908707} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+m\+\_\+count \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!m\_data@{m\_data}}
+\index{m\_data@{m\_data}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{m\_data}{m\_data}}
+{\footnotesize\ttfamily \label{class_fixed_queue_a2ab74a1dfc3d873426a7544a5d4af1e3} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+std::\+array$<$T, Capacity$>$ \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+m\+\_\+data \{\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!m\_head@{m\_head}}
+\index{m\_head@{m\_head}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{m\_head}{m\_head}}
+{\footnotesize\ttfamily \label{class_fixed_queue_a8fb8bf9da5d68d03950a9171e8f31db8} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+m\+\_\+head \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2}\index{FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}!m\_tail@{m\_tail}}
+\index{m\_tail@{m\_tail}!FixedQueue$<$ T, Capacity $>$@{FixedQueue$<$ T, Capacity $>$}}
+\doxysubsubsection{\texorpdfstring{m\_tail}{m\_tail}}
+{\footnotesize\ttfamily \label{class_fixed_queue_aa667c1aaf8388b43690425bf68f9e1c2} 
+template$<$typename T, size\+\_\+t Capacity$>$ \\
+size\+\_\+t \doxymbox{\hyperlink{class_fixed_queue}{Fixed\+Queue}}$<$ T, Capacity $>$::\+m\+\_\+tail \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{_message_bus_8h}{Message\+Bus.\+h}}\end{DoxyCompactItemize}

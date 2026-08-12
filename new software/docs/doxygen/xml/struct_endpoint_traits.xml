@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="struct_endpoint_traits" kind="struct" language="C++" prot="public">
+    <compoundname>EndpointTraits</compoundname>
+    <templateparamlist>
+      <param>
+        <type><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001" kindref="member">EndpointId</ref></type>
+        <declname>Id</declname>
+        <defname>Id</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/MessageBus.h" line="43" column="1" bodyfile="src/MessageBus.h" bodystart="43" bodyend="-1"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

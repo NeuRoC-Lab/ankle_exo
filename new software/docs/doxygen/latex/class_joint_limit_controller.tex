@@ -1,0 +1,226 @@
+\doxysection{Joint\+Limit\+Controller Class Reference}
+\hypertarget{class_joint_limit_controller}{}\label{class_joint_limit_controller}\index{JointLimitController@{JointLimitController}}
+
+
+{\ttfamily \+\#include $<$Motor\+Controllers.\+h$>$}
+
+Inheritance diagram for Joint\+Limit\+Controller:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_joint_limit_controller}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8}{Joint\+Limit\+Controller}} (\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&encoders, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&load\+Cells, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&left\+Motor\+Feed, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&left\+Motor\+Cmd, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \&left\+Motor\+Control)
+\item 
+void \doxymbox{\hyperlink{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58}{update}} (uint32\+\_\+t now\+Us) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \doxymbox{\hyperlink{class_i_task_a3fdb0c69908af669286b0903e0ab9a08}{\texorpdfstring{$\sim$}{\string~}\+ITask}} ()=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \& \doxymbox{\hyperlink{class_joint_limit_controller_af71d0f06bdc2f92a92bc815460e34ac7}{m\+\_\+encoders}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \& \doxymbox{\hyperlink{class_joint_limit_controller_af2d70ccc5c04d0c361fb882bbcd2b8aa}{m\+\_\+loadcells}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \& \doxymbox{\hyperlink{class_joint_limit_controller_a6fd1957d5b1216375aac8af3754d5265}{m\+\_\+left\+Motor\+Feed}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \& \doxymbox{\hyperlink{class_joint_limit_controller_a78b678cee6000b908d8bbe95d7198e11}{m\+\_\+left\+Motor\+Cmd}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \& \doxymbox{\hyperlink{class_joint_limit_controller_aca4fc29fc61928ed756ce10414992315}{m\+\_\+left\+Motor\+Control}}
+\item 
+float \doxymbox{\hyperlink{class_joint_limit_controller_ad33e152c63f6c1a1101d29ec4e9328de}{m\+\_\+previous\+Position}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_joint_limit_controller_a32801da70c1afa273a96f94b1cf38110}{m\+\_\+filtered\+Velocity}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_joint_limit_controller_a0c454952a9320388988bee2a1464fe38}{m\+\_\+previous\+Filtered\+Velocity}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_joint_limit_controller_a607fad06ffeaa1dcfbde899e581f1553}{m\+\_\+filtered\+Acceleration}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_joint_limit_controller_aa1ab9cd42ce3c6384775b2c3a590b88f}{m\+\_\+filtered\+Torque}} \{0.\+0f\}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{class_joint_limit_controller_a4b860251a198f10af1af44ff70cf0f9f}{m\+\_\+previous\+Us}} \{0\}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{class_joint_limit_controller_a5ea7332313742f0c7e25cc035086b916}{m\+\_\+previous\+Update\+Us}} \{0\}
+\item 
+bool \doxymbox{\hyperlink{class_joint_limit_controller_a126074ccb42c3d4534a75c265e2c5657}{m\+\_\+initialized}} \{false\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_a263f345eef3e44d073abd7a4b033f3bd}{software\+Limit}} = 15.\+0f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_a34a749bfb90d64b2631a5a3ac9d94b5d}{absolute\+Limit}} = 35.\+0f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_aaba2bd9e99b79dcfbfeed0bf60bf20fd}{VELOCITY\+\_\+\+ALPHA}} = 0.\+15f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_a04123c2cefe580c32c738d5cdeaa9c06}{ACCELERATION\+\_\+\+ALPHA}} = 0.\+08f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_ac414ae5bf00518d248820ad1c836b1e1}{TORQUE\+\_\+\+ALPHA}} = 0.\+15f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_acee9fa02b9a7a67d273c8e5d21768fe6}{MIN\+\_\+\+ACCELERATION\+\_\+\+RAD}} = 0.\+2f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_joint_limit_controller_a6655e67db27ec6d77404c3deb3702e00}{MAX\+\_\+\+REASONABLE\+\_\+\+INERTIA}} = 10.\+0f
+\end{DoxyCompactItemize}
+
+
+\label{class_joint_limit_controller_doc-constructors}
+\Hypertarget{class_joint_limit_controller_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8}\index{JointLimitController@{JointLimitController}!JointLimitController@{JointLimitController}}
+\index{JointLimitController@{JointLimitController}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{JointLimitController()}{JointLimitController()}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8} 
+Joint\+Limit\+Controller::\+\+Joint\+Limit\+Controller (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&}]{encoders}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&}]{load\+Cells}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&}]{left\+Motor\+Feed}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&}]{left\+Motor\+Cmd}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \&}]{left\+Motor\+Control}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_joint_limit_controller_doc-func-members}
+\Hypertarget{class_joint_limit_controller_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58}\index{JointLimitController@{JointLimitController}!update@{update}}
+\index{update@{update}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58} 
+void Joint\+Limit\+Controller::\+update (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{now\+Us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \doxymbox{\hyperlink{class_i_task_aa57dc9cc07cfda40d3dcac232f6115af}{ITask}}.
+
+
+
+\label{class_joint_limit_controller_doc-variable-members}
+\Hypertarget{class_joint_limit_controller_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_joint_limit_controller_a34a749bfb90d64b2631a5a3ac9d94b5d}\index{JointLimitController@{JointLimitController}!absoluteLimit@{absoluteLimit}}
+\index{absoluteLimit@{absoluteLimit}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{absoluteLimit}{absoluteLimit}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a34a749bfb90d64b2631a5a3ac9d94b5d} 
+float Joint\+Limit\+Controller::\+absolute\+Limit = 35.\+0f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a04123c2cefe580c32c738d5cdeaa9c06}\index{JointLimitController@{JointLimitController}!ACCELERATION\_ALPHA@{ACCELERATION\_ALPHA}}
+\index{ACCELERATION\_ALPHA@{ACCELERATION\_ALPHA}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{ACCELERATION\_ALPHA}{ACCELERATION\_ALPHA}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a04123c2cefe580c32c738d5cdeaa9c06} 
+float Joint\+Limit\+Controller::\+\+ACCELERATION\+\_\+\+ALPHA = 0.\+08f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_af71d0f06bdc2f92a92bc815460e34ac7}\index{JointLimitController@{JointLimitController}!m\_encoders@{m\_encoders}}
+\index{m\_encoders@{m\_encoders}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_encoders}{m\_encoders}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_af71d0f06bdc2f92a92bc815460e34ac7} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}}$>$\& Joint\+Limit\+Controller::\+m\+\_\+encoders\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a607fad06ffeaa1dcfbde899e581f1553}\index{JointLimitController@{JointLimitController}!m\_filteredAcceleration@{m\_filteredAcceleration}}
+\index{m\_filteredAcceleration@{m\_filteredAcceleration}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_filteredAcceleration}{m\_filteredAcceleration}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a607fad06ffeaa1dcfbde899e581f1553} 
+float Joint\+Limit\+Controller::\+m\+\_\+filtered\+Acceleration \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_aa1ab9cd42ce3c6384775b2c3a590b88f}\index{JointLimitController@{JointLimitController}!m\_filteredTorque@{m\_filteredTorque}}
+\index{m\_filteredTorque@{m\_filteredTorque}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_filteredTorque}{m\_filteredTorque}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aa1ab9cd42ce3c6384775b2c3a590b88f} 
+float Joint\+Limit\+Controller::\+m\+\_\+filtered\+Torque \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a32801da70c1afa273a96f94b1cf38110}\index{JointLimitController@{JointLimitController}!m\_filteredVelocity@{m\_filteredVelocity}}
+\index{m\_filteredVelocity@{m\_filteredVelocity}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_filteredVelocity}{m\_filteredVelocity}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a32801da70c1afa273a96f94b1cf38110} 
+float Joint\+Limit\+Controller::\+m\+\_\+filtered\+Velocity \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a126074ccb42c3d4534a75c265e2c5657}\index{JointLimitController@{JointLimitController}!m\_initialized@{m\_initialized}}
+\index{m\_initialized@{m\_initialized}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_initialized}{m\_initialized}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a126074ccb42c3d4534a75c265e2c5657} 
+bool Joint\+Limit\+Controller::\+m\+\_\+initialized \{false\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a78b678cee6000b908d8bbe95d7198e11}\index{JointLimitController@{JointLimitController}!m\_leftMotorCmd@{m\_leftMotorCmd}}
+\index{m\_leftMotorCmd@{m\_leftMotorCmd}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_leftMotorCmd}{m\_leftMotorCmd}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a78b678cee6000b908d8bbe95d7198e11} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}}$>$\& Joint\+Limit\+Controller::\+m\+\_\+left\+Motor\+Cmd\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_aca4fc29fc61928ed756ce10414992315}\index{JointLimitController@{JointLimitController}!m\_leftMotorControl@{m\_leftMotorControl}}
+\index{m\_leftMotorControl@{m\_leftMotorControl}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_leftMotorControl}{m\_leftMotorControl}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aca4fc29fc61928ed756ce10414992315} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}}$>$\& Joint\+Limit\+Controller::\+m\+\_\+left\+Motor\+Control\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a6fd1957d5b1216375aac8af3754d5265}\index{JointLimitController@{JointLimitController}!m\_leftMotorFeed@{m\_leftMotorFeed}}
+\index{m\_leftMotorFeed@{m\_leftMotorFeed}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_leftMotorFeed}{m\_leftMotorFeed}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a6fd1957d5b1216375aac8af3754d5265} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}}$>$\& Joint\+Limit\+Controller::\+m\+\_\+left\+Motor\+Feed\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_af2d70ccc5c04d0c361fb882bbcd2b8aa}\index{JointLimitController@{JointLimitController}!m\_loadcells@{m\_loadcells}}
+\index{m\_loadcells@{m\_loadcells}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_loadcells}{m\_loadcells}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_af2d70ccc5c04d0c361fb882bbcd2b8aa} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}}$>$\& Joint\+Limit\+Controller::\+m\+\_\+loadcells\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a0c454952a9320388988bee2a1464fe38}\index{JointLimitController@{JointLimitController}!m\_previousFilteredVelocity@{m\_previousFilteredVelocity}}
+\index{m\_previousFilteredVelocity@{m\_previousFilteredVelocity}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_previousFilteredVelocity}{m\_previousFilteredVelocity}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a0c454952a9320388988bee2a1464fe38} 
+float Joint\+Limit\+Controller::\+m\+\_\+previous\+Filtered\+Velocity \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_ad33e152c63f6c1a1101d29ec4e9328de}\index{JointLimitController@{JointLimitController}!m\_previousPosition@{m\_previousPosition}}
+\index{m\_previousPosition@{m\_previousPosition}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_previousPosition}{m\_previousPosition}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_ad33e152c63f6c1a1101d29ec4e9328de} 
+float Joint\+Limit\+Controller::\+m\+\_\+previous\+Position \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a5ea7332313742f0c7e25cc035086b916}\index{JointLimitController@{JointLimitController}!m\_previousUpdateUs@{m\_previousUpdateUs}}
+\index{m\_previousUpdateUs@{m\_previousUpdateUs}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_previousUpdateUs}{m\_previousUpdateUs}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a5ea7332313742f0c7e25cc035086b916} 
+uint32\+\_\+t Joint\+Limit\+Controller::\+m\+\_\+previous\+Update\+Us \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a4b860251a198f10af1af44ff70cf0f9f}\index{JointLimitController@{JointLimitController}!m\_previousUs@{m\_previousUs}}
+\index{m\_previousUs@{m\_previousUs}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{m\_previousUs}{m\_previousUs}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a4b860251a198f10af1af44ff70cf0f9f} 
+uint32\+\_\+t Joint\+Limit\+Controller::\+m\+\_\+previous\+Us \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a6655e67db27ec6d77404c3deb3702e00}\index{JointLimitController@{JointLimitController}!MAX\_REASONABLE\_INERTIA@{MAX\_REASONABLE\_INERTIA}}
+\index{MAX\_REASONABLE\_INERTIA@{MAX\_REASONABLE\_INERTIA}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{MAX\_REASONABLE\_INERTIA}{MAX\_REASONABLE\_INERTIA}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a6655e67db27ec6d77404c3deb3702e00} 
+float Joint\+Limit\+Controller::\+\+MAX\+\_\+\+REASONABLE\+\_\+\+INERTIA = 10.\+0f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_acee9fa02b9a7a67d273c8e5d21768fe6}\index{JointLimitController@{JointLimitController}!MIN\_ACCELERATION\_RAD@{MIN\_ACCELERATION\_RAD}}
+\index{MIN\_ACCELERATION\_RAD@{MIN\_ACCELERATION\_RAD}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{MIN\_ACCELERATION\_RAD}{MIN\_ACCELERATION\_RAD}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_acee9fa02b9a7a67d273c8e5d21768fe6} 
+float Joint\+Limit\+Controller::\+\+MIN\+\_\+\+ACCELERATION\+\_\+\+RAD = 0.\+2f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_a263f345eef3e44d073abd7a4b033f3bd}\index{JointLimitController@{JointLimitController}!softwareLimit@{softwareLimit}}
+\index{softwareLimit@{softwareLimit}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{softwareLimit}{softwareLimit}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_a263f345eef3e44d073abd7a4b033f3bd} 
+float Joint\+Limit\+Controller::\+software\+Limit = 15.\+0f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_ac414ae5bf00518d248820ad1c836b1e1}\index{JointLimitController@{JointLimitController}!TORQUE\_ALPHA@{TORQUE\_ALPHA}}
+\index{TORQUE\_ALPHA@{TORQUE\_ALPHA}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{TORQUE\_ALPHA}{TORQUE\_ALPHA}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_ac414ae5bf00518d248820ad1c836b1e1} 
+float Joint\+Limit\+Controller::\+\+TORQUE\+\_\+\+ALPHA = 0.\+15f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_joint_limit_controller_aaba2bd9e99b79dcfbfeed0bf60bf20fd}\index{JointLimitController@{JointLimitController}!VELOCITY\_ALPHA@{VELOCITY\_ALPHA}}
+\index{VELOCITY\_ALPHA@{VELOCITY\_ALPHA}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{VELOCITY\_ALPHA}{VELOCITY\_ALPHA}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aaba2bd9e99b79dcfbfeed0bf60bf20fd} 
+float Joint\+Limit\+Controller::\+\+VELOCITY\+\_\+\+ALPHA = 0.\+15f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{_motor_controllers_8h}{Motor\+Controllers.\+h}}\end{DoxyCompactItemize}

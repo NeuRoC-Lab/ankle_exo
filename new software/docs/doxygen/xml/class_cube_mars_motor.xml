@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_cube_mars_motor" kind="class" language="C++" prot="public">
+    <compoundname>CubeMarsMotor</compoundname>
+    <includes refid="_cube_mars_motor_8h" local="no">CubeMarsMotor.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" prot="private" static="no" mutable="no">
+        <type>uint8_t</type>
+        <definition>uint8_t CubeMarsMotor::m_canId</definition>
+        <argsstring></argsstring>
+        <name>m_canId</name>
+        <qualifiedname>CubeMarsMotor::m_canId</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="364" column="13" bodyfile="src/CubeMarsMotor.h" bodystart="364" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" prot="private" static="no" mutable="no">
+        <type><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref></type>
+        <definition>AK60Params CubeMarsMotor::m_softwareLimits</definition>
+        <argsstring></argsstring>
+        <name>m_softwareLimits</name>
+        <qualifiedname>CubeMarsMotor::m_softwareLimits</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="365" column="16" bodyfile="src/CubeMarsMotor.h" bodystart="365" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_cube_mars_motor_1aa0fe323b3932c3b5284f3fd758fc77b8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>CubeMarsMotor::CubeMarsMotor</definition>
+        <argsstring>(uint8_t canId, const AK60Params &amp;motorSoftwareLimits)</argsstring>
+        <name>CubeMarsMotor</name>
+        <qualifiedname>CubeMarsMotor::CubeMarsMotor</qualifiedname>
+        <param>
+          <type>uint8_t</type>
+          <declname>canId</declname>
+        </param>
+        <param>
+          <type>const <ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref> &amp;</type>
+          <declname>motorSoftwareLimits</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="178" column="5" bodyfile="src/CubeMarsMotor.h" bodystart="178" bodyend="183"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1afb1198cfacb64218b4da60d942d6543d" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></type>
+        <definition>CanFrame CubeMarsMotor::enterMotorMode</definition>
+        <argsstring>() const</argsstring>
+        <name>enterMotorMode</name>
+        <qualifiedname>CubeMarsMotor::enterMotorMode</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="185" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="185" bodyend="191"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1a57f61dcbe93f59e03649ea30187d8601" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></type>
+        <definition>CanFrame CubeMarsMotor::exitMotorMode</definition>
+        <argsstring>() const</argsstring>
+        <name>exitMotorMode</name>
+        <qualifiedname>CubeMarsMotor::exitMotorMode</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="193" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="193" bodyend="199"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1ac16830d20696d934ab9ec0bdc710fb28" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></type>
+        <definition>CanFrame CubeMarsMotor::setZeroPosition</definition>
+        <argsstring>() const</argsstring>
+        <name>setZeroPosition</name>
+        <qualifiedname>CubeMarsMotor::setZeroPosition</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="201" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="201" bodyend="207"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1a3dd68f8f9e34ad8e6de3257f06f3d9c7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool CubeMarsMotor::begin</definition>
+        <argsstring>()</argsstring>
+        <name>begin</name>
+        <qualifiedname>CubeMarsMotor::begin</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="209" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="209" bodyend="212"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint8_t</type>
+        <definition>uint8_t CubeMarsMotor::canId</definition>
+        <argsstring>() const</argsstring>
+        <name>canId</name>
+        <qualifiedname>CubeMarsMotor::canId</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="214" column="13" bodyfile="src/CubeMarsMotor.h" bodystart="214" bodyend="217"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1ac6fb646ae7c76cc9161168a27a048b11" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></type>
+        <definition>CanFrame CubeMarsMotor::packCommand</definition>
+        <argsstring>(const MotorCmd &amp;cmd) const</argsstring>
+        <name>packCommand</name>
+        <qualifiedname>CubeMarsMotor::packCommand</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &amp;</type>
+          <declname>cmd</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="219" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="219" bodyend="302"/>
+      </memberdef>
+      <memberdef kind="function" id="class_cube_mars_motor_1a6673bd8632b0f6fa1814ff4e08023ff0" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_motor_reply" kindref="compound">MotorReply</ref></type>
+        <definition>MotorReply CubeMarsMotor::unpackReply</definition>
+        <argsstring>(const CanFrame &amp;frame) const</argsstring>
+        <name>unpackReply</name>
+        <qualifiedname>CubeMarsMotor::unpackReply</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_can_frame" kindref="compound">CanFrame</ref> &amp;</type>
+          <declname>frame</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="304" column="16" bodyfile="src/CubeMarsMotor.h" bodystart="304" bodyend="347"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></type>
+        <definition>CanFrame CubeMarsMotor::specialFrame</definition>
+        <argsstring>(const std::array&lt; uint8_t, 8 &gt; &amp;data) const</argsstring>
+        <name>specialFrame</name>
+        <qualifiedname>CubeMarsMotor::specialFrame</qualifiedname>
+        <param>
+          <type>const std::array&lt; uint8_t, 8 &gt; &amp;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="351" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="351" bodyend="361"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>AK60Params</label>
+        <link refid="struct_a_k60_params"/>
+      </node>
+      <node id="1">
+        <label>CubeMarsMotor</label>
+        <link refid="class_cube_mars_motor"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>m_softwareLimits</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/CubeMarsMotor.h" line="175" column="1" bodyfile="src/CubeMarsMotor.h" bodystart="176" bodyend="366"/>
+    <listofallmembers>
+      <member refid="class_cube_mars_motor_1a3dd68f8f9e34ad8e6de3257f06f3d9c7" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>begin</name></member>
+      <member refid="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>canId</name></member>
+      <member refid="class_cube_mars_motor_1aa0fe323b3932c3b5284f3fd758fc77b8" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>CubeMarsMotor</name></member>
+      <member refid="class_cube_mars_motor_1afb1198cfacb64218b4da60d942d6543d" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>enterMotorMode</name></member>
+      <member refid="class_cube_mars_motor_1a57f61dcbe93f59e03649ea30187d8601" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>exitMotorMode</name></member>
+      <member refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" prot="private" virt="non-virtual"><scope>CubeMarsMotor</scope><name>m_canId</name></member>
+      <member refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" prot="private" virt="non-virtual"><scope>CubeMarsMotor</scope><name>m_softwareLimits</name></member>
+      <member refid="class_cube_mars_motor_1ac6fb646ae7c76cc9161168a27a048b11" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>packCommand</name></member>
+      <member refid="class_cube_mars_motor_1ac16830d20696d934ab9ec0bdc710fb28" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>setZeroPosition</name></member>
+      <member refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" prot="private" virt="non-virtual"><scope>CubeMarsMotor</scope><name>specialFrame</name></member>
+      <member refid="class_cube_mars_motor_1a6673bd8632b0f6fa1814ff4e08023ff0" prot="public" virt="non-virtual"><scope>CubeMarsMotor</scope><name>unpackReply</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

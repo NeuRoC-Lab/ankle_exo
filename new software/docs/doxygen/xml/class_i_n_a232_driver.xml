@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_i_n_a232_driver" kind="class" language="C++" prot="public">
+    <compoundname>INA232Driver</compoundname>
+    <basecompoundref refid="class_driver" prot="public" virt="non-virtual">Driver&lt; PowerReadings &gt;</basecompoundref>
+    <includes refid="_driver_8h" local="no">Driver.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_i_n_a232_driver_1a3485f6955aa43d49505bd4082c8ec807" prot="private" static="no" mutable="no">
+        <type>InaBridge226</type>
+        <definition>InaBridge226 INA232Driver::m_sensor</definition>
+        <argsstring></argsstring>
+        <name>m_sensor</name>
+        <qualifiedname>INA232Driver::m_sensor</qualifiedname>
+        <initializer>{
+        &quot;INA232&quot;,
+        0x40
+    }</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="260" column="18" bodyfile="src/Driver.h" bodystart="260" bodyend="263"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_i_n_a232_driver_1ad50833331d0ee5e3d103108afae8bed2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool INA232Driver::begin</definition>
+        <argsstring>() override</argsstring>
+        <name>begin</name>
+        <qualifiedname>INA232Driver::begin</qualifiedname>
+        <reimplements refid="class_driver_1ab4ba2e186dc35e027b878c83e6405253">begin</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="231" column="10" bodyfile="src/Driver.h" bodystart="231" bodyend="239"/>
+      </memberdef>
+      <memberdef kind="function" id="class_i_n_a232_driver_1acf6b9b8c0c38caceaa3b8c71166d705a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type><ref refid="struct_power_readings" kindref="compound">PowerReadings</ref></type>
+        <definition>PowerReadings INA232Driver::sample</definition>
+        <argsstring>() override</argsstring>
+        <name>sample</name>
+        <qualifiedname>INA232Driver::sample</qualifiedname>
+        <reimplements refid="class_driver_1ae143b3584051ec560cbd96d825a72f76">sample</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Driver.h" line="241" column="19" bodyfile="src/Driver.h" bodystart="241" bodyend="257"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>Driver&lt; PowerReadings &gt;</label>
+        <link refid="class_driver"/>
+      </node>
+      <node id="1">
+        <label>INA232Driver</label>
+        <link refid="class_i_n_a232_driver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>Driver&lt; PowerReadings &gt;</label>
+        <link refid="class_driver"/>
+      </node>
+      <node id="1">
+        <label>INA232Driver</label>
+        <link refid="class_i_n_a232_driver"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/Driver.h" line="227" column="1" bodyfile="src/Driver.h" bodystart="229" bodyend="264"/>
+    <listofallmembers>
+      <member refid="class_i_n_a232_driver_1ad50833331d0ee5e3d103108afae8bed2" prot="public" virt="virtual"><scope>INA232Driver</scope><name>begin</name></member>
+      <member refid="class_i_n_a232_driver_1a3485f6955aa43d49505bd4082c8ec807" prot="private" virt="non-virtual"><scope>INA232Driver</scope><name>m_sensor</name></member>
+      <member refid="class_i_n_a232_driver_1acf6b9b8c0c38caceaa3b8c71166d705a" prot="public" virt="virtual"><scope>INA232Driver</scope><name>sample</name></member>
+      <member refid="class_driver_1a72372814b0fdad0cdc33424fb5243421" prot="public" virt="non-virtual"><scope>INA232Driver</scope><name>ValueType</name></member>
+      <member refid="class_driver_1a8f8161301eba5ad066bb80ffdebff3c2" prot="public" virt="virtual"><scope>INA232Driver</scope><name>~Driver</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

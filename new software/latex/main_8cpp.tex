@@ -1,0 +1,238 @@
+\doxysection{src/\+main.cpp File Reference}
+\hypertarget{main_8cpp}{}\label{main_8cpp}\index{src/main.cpp@{src/main.cpp}}
+{\ttfamily \+\#include $<$functional$>$}\newline
+{\ttfamily \+\#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \+\#include "{}board.\+h"{}}\newline
+{\ttfamily \+\#include "{}Message\+Bus.\+h"{}}\newline
+{\ttfamily \+\#include "{}Driver.\+h"{}}\newline
+{\ttfamily \+\#include "{}BLE.\+h"{}}\newline
+{\ttfamily \+\#include "{}Motor\+Controllers.\+h"{}}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \doxymbox{\hyperlink{class_scheduler}{Scheduler$<$ Max\+Tasks $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{main_8cpp_a4fc01d736fe50cf5b977f755b675f11d}{setup}} ()
+\item 
+void \doxymbox{\hyperlink{main_8cpp_afe461d27b9c48d5921c00d521181f12f}{loop}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$ 12 $>$ \doxymbox{\hyperlink{main_8cpp_a2525ad6fd9361e5ef6dcef1b3ad2e35e}{scheduler}}
+\item 
+\doxymbox{\hyperlink{class_u_a_r_t_handler}{UARTHandler}} \doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}} (\doxymbox{\hyperlink{namespaceboard_1_1teensy41_a223922e284389ddb3b75455c7f587849}{board::\+teensy41::\+nano\+Uart}})
+\item 
+\doxymbox{\hyperlink{class_message_bus}{Message\+Bus}} \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}} (\doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}})
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_power_readings}{Power\+Readings}} $>$ \doxymbox{\hyperlink{main_8cpp_a6833283966bd3bc2b9c92440715ece6b}{ina232\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}
+\item 
+\doxymbox{\hyperlink{class_encoder_driver}{Encoder\+Driver}} \doxymbox{\hyperlink{main_8cpp_a469636a695bdf03be0f0e0495d51515a}{encoder\+Driver}}
+\item 
+\doxymbox{\hyperlink{class_polling_publisher}{Polling\+Publisher}}$<$ \doxymbox{\hyperlink{class_encoder_driver}{Encoder\+Driver}}, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}{Endpoint\+Id::\+\+Encoder\+Snapshot}}, 5 \textquotesingle{}000 $>$ \doxymbox{\hyperlink{main_8cpp_aa9b2898122316c6c7a572806052f600c}{encoder\+Publisher}} (\doxymbox{\hyperlink{main_8cpp_a469636a695bdf03be0f0e0495d51515a}{encoder\+Driver}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}})
+\item 
+\doxymbox{\hyperlink{class_i_n_a232_driver}{INA232\+Driver}} \doxymbox{\hyperlink{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296}{ina232\+Driver}}
+\item 
+\doxymbox{\hyperlink{class_polling_publisher}{Polling\+Publisher}}$<$ \doxymbox{\hyperlink{class_i_n_a232_driver}{INA232\+Driver}}, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}{Endpoint\+Id::\+\+Ina232\+Snapshot}}, 10 \textquotesingle{}000 $>$ \doxymbox{\hyperlink{main_8cpp_a9312156dbbbfcd3b6112e03d5ae7dccf}{ina232\+Publisher}} (\doxymbox{\hyperlink{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296}{ina232\+Driver}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}})
+\item 
+\doxymbox{\hyperlink{class_can_bus}{Can\+Bus}} \doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}
+\item 
+constexpr uint8\+\_\+t \doxymbox{\hyperlink{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6}{LEFT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID}} = 0x02
+\item 
+constexpr uint8\+\_\+t \doxymbox{\hyperlink{main_8cpp_a2e5ca71647b8b9a1d9e40af4a327d007}{RIGHT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID}} = 0x02
+\item 
+\doxymbox{\hyperlink{struct_a_k60_params}{AK60\+Params}} \doxymbox{\hyperlink{main_8cpp_aaf924b886e3a9b8250516ae9662f1362}{left\+Motor\+Limits}} = \doxymbox{\hyperlink{_cube_mars_motor_8h_a8ba8251c1e7bb49887515e271c9483ed}{Motor\+Params}}
+\item 
+\doxymbox{\hyperlink{class_motor_driver}{Motor\+Driver}} \doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}} (\doxymbox{\hyperlink{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6}{LEFT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID}}, \doxymbox{\hyperlink{main_8cpp_aaf924b886e3a9b8250516ae9662f1362}{left\+Motor\+Limits}}, \doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}})
+\item 
+\doxymbox{\hyperlink{class_motor_command_task}{Motor\+Command\+Task}} \doxymbox{\hyperlink{main_8cpp_a78b41ee76e114105b6b59ccda47eb601}{left\+Motor\+Command\+Task}} (\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}})
+\item 
+\doxymbox{\hyperlink{class_motor_can_receiver}{Motor\+Can\+Receiver}} \doxymbox{\hyperlink{main_8cpp_a97d0ca95e66637010e7728fa476dbde5}{motor\+Receiver}} (\doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}, \doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}})
+\item 
+\doxymbox{\hyperlink{class_motor_meta_command_task}{Motor\+Meta\+Command\+Task}} \doxymbox{\hyperlink{main_8cpp_aaf4a6c4dc32054f2dbfe38b7f4f914f3}{left\+Motor\+Meta\+Command\+Task}} (\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a78b41ee76e114105b6b59ccda47eb601}{left\+Motor\+Command\+Task}})
+\item 
+\doxymbox{\hyperlink{class_dummy_controller}{Dummy\+Controller}} \doxymbox{\hyperlink{main_8cpp_a00c8d48500e12c40bf1bdc8329118a4e}{dummy\+Controller}} (\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a6833283966bd3bc2b9c92440715ece6b}{ina232\+Topic}})
+\item 
+\doxymbox{\hyperlink{class_joint_limit_controller}{Joint\+Limit\+Controller}} \doxymbox{\hyperlink{main_8cpp_abe4479c0f1d6ac71ad2336e6fba45bc9}{joint\+Controller}} (\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}})
+\item 
+\doxymbox{\hyperlink{class_transparent_mode_controller}{Transparent\+Mode\+Controller}} \doxymbox{\hyperlink{main_8cpp_a8da4c85249dfd35c649ac829d737d962}{transparent\+Mode\+Controller}} (\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}})
+\end{DoxyCompactItemize}
+
+
+\label{main_8cpp_doc-func-members}
+\Hypertarget{main_8cpp_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{main_8cpp_afe461d27b9c48d5921c00d521181f12f}\index{main.cpp@{main.cpp}!loop@{loop}}
+\index{loop@{loop}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{loop()}{loop()}}
+{\footnotesize\ttfamily \label{main_8cpp_afe461d27b9c48d5921c00d521181f12f} 
+void loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a4fc01d736fe50cf5b977f755b675f11d}\index{main.cpp@{main.cpp}!setup@{setup}}
+\index{setup@{setup}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{setup()}{setup()}}
+{\footnotesize\ttfamily \label{main_8cpp_a4fc01d736fe50cf5b977f755b675f11d} 
+void setup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\label{main_8cpp_doc-var-members}
+\Hypertarget{main_8cpp_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}\index{main.cpp@{main.cpp}!canBus@{canBus}}
+\index{canBus@{canBus}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{canBus}{canBus}}
+{\footnotesize\ttfamily \label{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac} 
+\doxymbox{\hyperlink{class_can_bus}{Can\+Bus}} can\+Bus}
+
+\Hypertarget{main_8cpp_a00c8d48500e12c40bf1bdc8329118a4e}\index{main.cpp@{main.cpp}!dummyController@{dummyController}}
+\index{dummyController@{dummyController}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{dummyController}{dummyController}}
+{\footnotesize\ttfamily \label{main_8cpp_a00c8d48500e12c40bf1bdc8329118a4e} 
+\doxymbox{\hyperlink{class_dummy_controller}{Dummy\+Controller}} dummy\+Controller(\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a6833283966bd3bc2b9c92440715ece6b}{ina232\+Topic}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a6833283966bd3bc2b9c92440715ece6b}{ina232\+Topic}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a469636a695bdf03be0f0e0495d51515a}\index{main.cpp@{main.cpp}!encoderDriver@{encoderDriver}}
+\index{encoderDriver@{encoderDriver}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{encoderDriver}{encoderDriver}}
+{\footnotesize\ttfamily \label{main_8cpp_a469636a695bdf03be0f0e0495d51515a} 
+\doxymbox{\hyperlink{class_encoder_driver}{Encoder\+Driver}} encoder\+Driver}
+
+\Hypertarget{main_8cpp_aa9b2898122316c6c7a572806052f600c}\index{main.cpp@{main.cpp}!encoderPublisher@{encoderPublisher}}
+\index{encoderPublisher@{encoderPublisher}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{encoderPublisher}{encoderPublisher}}
+{\footnotesize\ttfamily \label{main_8cpp_aa9b2898122316c6c7a572806052f600c} 
+\doxymbox{\hyperlink{class_polling_publisher}{Polling\+Publisher}}$<$ \doxymbox{\hyperlink{class_encoder_driver}{Encoder\+Driver}}, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405}{Endpoint\+Id::\+\+Encoder\+Snapshot}}, 5 \textquotesingle{}000 $>$ encoder\+Publisher(\doxymbox{\hyperlink{main_8cpp_a469636a695bdf03be0f0e0495d51515a}{encoder\+Driver}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a469636a695bdf03be0f0e0495d51515a}{encoder\+Driver}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}\index{main.cpp@{main.cpp}!encoderTopic@{encoderTopic}}
+\index{encoderTopic@{encoderTopic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{encoderTopic}{encoderTopic}}
+{\footnotesize\ttfamily \label{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}}$>$ encoder\+Topic}
+
+\Hypertarget{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296}\index{main.cpp@{main.cpp}!ina232Driver@{ina232Driver}}
+\index{ina232Driver@{ina232Driver}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{ina232Driver}{ina232Driver}}
+{\footnotesize\ttfamily \label{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296} 
+\doxymbox{\hyperlink{class_i_n_a232_driver}{INA232\+Driver}} ina232\+Driver}
+
+\Hypertarget{main_8cpp_a9312156dbbbfcd3b6112e03d5ae7dccf}\index{main.cpp@{main.cpp}!ina232Publisher@{ina232Publisher}}
+\index{ina232Publisher@{ina232Publisher}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{ina232Publisher}{ina232Publisher}}
+{\footnotesize\ttfamily \label{main_8cpp_a9312156dbbbfcd3b6112e03d5ae7dccf} 
+\doxymbox{\hyperlink{class_polling_publisher}{Polling\+Publisher}}$<$ \doxymbox{\hyperlink{class_i_n_a232_driver}{INA232\+Driver}}, \doxymbox{\hyperlink{_bus_types_8h_aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad}{Endpoint\+Id::\+\+Ina232\+Snapshot}}, 10 \textquotesingle{}000 $>$ ina232\+Publisher(\doxymbox{\hyperlink{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296}{ina232\+Driver}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a083c485c4154e8a478dc8fd63ab7e296}{ina232\+Driver}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a6833283966bd3bc2b9c92440715ece6b}\index{main.cpp@{main.cpp}!ina232Topic@{ina232Topic}}
+\index{ina232Topic@{ina232Topic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{ina232Topic}{ina232Topic}}
+{\footnotesize\ttfamily \label{main_8cpp_a6833283966bd3bc2b9c92440715ece6b} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_power_readings}{Power\+Readings}}$>$ ina232\+Topic}
+
+\Hypertarget{main_8cpp_abe4479c0f1d6ac71ad2336e6fba45bc9}\index{main.cpp@{main.cpp}!jointController@{jointController}}
+\index{jointController@{jointController}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{jointController}{jointController}}
+{\footnotesize\ttfamily \label{main_8cpp_abe4479c0f1d6ac71ad2336e6fba45bc9} 
+\doxymbox{\hyperlink{class_joint_limit_controller}{Joint\+Limit\+Controller}} joint\+Controller(\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6}\index{main.cpp@{main.cpp}!LEFT\_MOTOR\_CAN\_ID@{LEFT\_MOTOR\_CAN\_ID}}
+\index{LEFT\_MOTOR\_CAN\_ID@{LEFT\_MOTOR\_CAN\_ID}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{LEFT\_MOTOR\_CAN\_ID}{LEFT\_MOTOR\_CAN\_ID}}
+{\footnotesize\ttfamily \label{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6} 
+uint8\+\_\+t LEFT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID = 0x02\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{main_8cpp_a809392b8050614028e546585505304e0}\index{main.cpp@{main.cpp}!leftMotor@{leftMotor}}
+\index{leftMotor@{leftMotor}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotor}{leftMotor}}
+{\footnotesize\ttfamily \label{main_8cpp_a809392b8050614028e546585505304e0} 
+\doxymbox{\hyperlink{class_motor_driver}{Motor\+Driver}} left\+Motor(\doxymbox{\hyperlink{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6}{LEFT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID}}, \doxymbox{\hyperlink{main_8cpp_aaf924b886e3a9b8250516ae9662f1362}{left\+Motor\+Limits}}, \doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a0fee15aa36f6a612fdf7b50405a75ea6}{LEFT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_aaf924b886e3a9b8250516ae9662f1362}{left\+Motor\+Limits}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a78b41ee76e114105b6b59ccda47eb601}\index{main.cpp@{main.cpp}!leftMotorCommandTask@{leftMotorCommandTask}}
+\index{leftMotorCommandTask@{leftMotorCommandTask}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorCommandTask}{leftMotorCommandTask}}
+{\footnotesize\ttfamily \label{main_8cpp_a78b41ee76e114105b6b59ccda47eb601} 
+\doxymbox{\hyperlink{class_motor_command_task}{Motor\+Command\+Task}} left\+Motor\+Command\+Task(\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}\index{main.cpp@{main.cpp}!leftMotorCommandTopic@{leftMotorCommandTopic}}
+\index{leftMotorCommandTopic@{leftMotorCommandTopic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorCommandTopic}{leftMotorCommandTopic}}
+{\footnotesize\ttfamily \label{main_8cpp_a5ac48a9d9f994ca172a046a48598e262} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}}$>$ left\+Motor\+Command\+Topic}
+
+\Hypertarget{main_8cpp_aaf924b886e3a9b8250516ae9662f1362}\index{main.cpp@{main.cpp}!leftMotorLimits@{leftMotorLimits}}
+\index{leftMotorLimits@{leftMotorLimits}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorLimits}{leftMotorLimits}}
+{\footnotesize\ttfamily \label{main_8cpp_aaf924b886e3a9b8250516ae9662f1362} 
+\doxymbox{\hyperlink{struct_a_k60_params}{AK60\+Params}} left\+Motor\+Limits = \doxymbox{\hyperlink{_cube_mars_motor_8h_a8ba8251c1e7bb49887515e271c9483ed}{Motor\+Params}}}
+
+\Hypertarget{main_8cpp_aaf4a6c4dc32054f2dbfe38b7f4f914f3}\index{main.cpp@{main.cpp}!leftMotorMetaCommandTask@{leftMotorMetaCommandTask}}
+\index{leftMotorMetaCommandTask@{leftMotorMetaCommandTask}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorMetaCommandTask}{leftMotorMetaCommandTask}}
+{\footnotesize\ttfamily \label{main_8cpp_aaf4a6c4dc32054f2dbfe38b7f4f914f3} 
+\doxymbox{\hyperlink{class_motor_meta_command_task}{Motor\+Meta\+Command\+Task}} left\+Motor\+Meta\+Command\+Task(\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a78b41ee76e114105b6b59ccda47eb601}{left\+Motor\+Command\+Task}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}{left\+Motor\+Meta\+Command\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a78b41ee76e114105b6b59ccda47eb601}{left\+Motor\+Command\+Task}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f}\index{main.cpp@{main.cpp}!leftMotorMetaCommandTopic@{leftMotorMetaCommandTopic}}
+\index{leftMotorMetaCommandTopic@{leftMotorMetaCommandTopic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorMetaCommandTopic}{leftMotorMetaCommandTopic}}
+{\footnotesize\ttfamily \label{main_8cpp_a26f4139bcbb11e288a8cbd1f2d07b78f} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}}$>$ left\+Motor\+Meta\+Command\+Topic}
+
+\Hypertarget{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}\index{main.cpp@{main.cpp}!leftMotorTopic@{leftMotorTopic}}
+\index{leftMotorTopic@{leftMotorTopic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{leftMotorTopic}{leftMotorTopic}}
+{\footnotesize\ttfamily \label{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}}$>$ left\+Motor\+Topic}
+
+\Hypertarget{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}\index{main.cpp@{main.cpp}!loadCellTopic@{loadCellTopic}}
+\index{loadCellTopic@{loadCellTopic}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{loadCellTopic}{loadCellTopic}}
+{\footnotesize\ttfamily \label{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}}$>$ load\+Cell\+Topic}
+
+\Hypertarget{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}\index{main.cpp@{main.cpp}!messageBus@{messageBus}}
+\index{messageBus@{messageBus}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{messageBus}{messageBus}}
+{\footnotesize\ttfamily \label{main_8cpp_ab2793e9beaf7252835efef0b7cca5763} 
+\doxymbox{\hyperlink{class_message_bus}{Message\+Bus}} message\+Bus(\doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}{uart}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a97d0ca95e66637010e7728fa476dbde5}\index{main.cpp@{main.cpp}!motorReceiver@{motorReceiver}}
+\index{motorReceiver@{motorReceiver}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{motorReceiver}{motorReceiver}}
+{\footnotesize\ttfamily \label{main_8cpp_a97d0ca95e66637010e7728fa476dbde5} 
+\doxymbox{\hyperlink{class_motor_can_receiver}{Motor\+Can\+Receiver}} motor\+Receiver(\doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}, \doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}, \doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a71b95c27a9d01f9c9723c07d36e040ac}{can\+Bus}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a809392b8050614028e546585505304e0}{left\+Motor}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_ab2793e9beaf7252835efef0b7cca5763}{message\+Bus}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_a2e5ca71647b8b9a1d9e40af4a327d007}\index{main.cpp@{main.cpp}!RIGHT\_MOTOR\_CAN\_ID@{RIGHT\_MOTOR\_CAN\_ID}}
+\index{RIGHT\_MOTOR\_CAN\_ID@{RIGHT\_MOTOR\_CAN\_ID}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{RIGHT\_MOTOR\_CAN\_ID}{RIGHT\_MOTOR\_CAN\_ID}}
+{\footnotesize\ttfamily \label{main_8cpp_a2e5ca71647b8b9a1d9e40af4a327d007} 
+uint8\+\_\+t RIGHT\+\_\+\+MOTOR\+\_\+\+CAN\+\_\+\+ID = 0x02\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{main_8cpp_a2525ad6fd9361e5ef6dcef1b3ad2e35e}\index{main.cpp@{main.cpp}!scheduler@{scheduler}}
+\index{scheduler@{scheduler}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{scheduler}{scheduler}}
+{\footnotesize\ttfamily \label{main_8cpp_a2525ad6fd9361e5ef6dcef1b3ad2e35e} 
+\doxymbox{\hyperlink{class_scheduler}{Scheduler}}$<$12$>$ scheduler}
+
+\Hypertarget{main_8cpp_a8da4c85249dfd35c649ac829d737d962}\index{main.cpp@{main.cpp}!transparentModeController@{transparentModeController}}
+\index{transparentModeController@{transparentModeController}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{transparentModeController}{transparentModeController}}
+{\footnotesize\ttfamily \label{main_8cpp_a8da4c85249dfd35c649ac829d737d962} 
+\doxymbox{\hyperlink{class_transparent_mode_controller}{Transparent\+Mode\+Controller}} transparent\+Mode\+Controller(\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}, \doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}, \doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{main_8cpp_a8a47c1f04ae79535aa082951e8e1b7af}{encoder\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_afcf3eb5ab3d297f144ff2a1a2e9e207a}{load\+Cell\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a4a53a8d4a67e8f0899fcf7377a9815bc}{left\+Motor\+Topic}}}]{}{, }\item[{\doxymbox{\hyperlink{main_8cpp_a5ac48a9d9f994ca172a046a48598e262}{left\+Motor\+Command\+Topic}}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1}\index{main.cpp@{main.cpp}!uart@{uart}}
+\index{uart@{uart}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{uart}{uart}}
+{\footnotesize\ttfamily \label{main_8cpp_aaf842336c1e32dbd810662ccdedaa5d1} 
+\doxymbox{\hyperlink{class_u_a_r_t_handler}{UARTHandler}} uart(\doxymbox{\hyperlink{namespaceboard_1_1teensy41_a223922e284389ddb3b75455c7f587849}{board::\+teensy41::\+nano\+Uart}}) (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{namespaceboard_1_1teensy41_a223922e284389ddb3b75455c7f587849}{board::\+teensy41::\+nano\+Uart}}}]{}{}\end{DoxyParamCaption})}
+

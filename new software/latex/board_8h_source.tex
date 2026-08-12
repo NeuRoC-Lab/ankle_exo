@@ -1,0 +1,124 @@
+\doxysection{board.\+h}
+\hypertarget{board_8h_source}{}\label{board_8h_source}\index{src/board.h@{src/board.h}}
+\doxymbox{\hyperlink{board_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <SPI.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#if\ defined(PLATFORM\_TEENSY)\ \&\&\ defined(PLATFORM\_NANO)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#error\ "{}You\ specified\ both\ PLATFORM\_TEENSY\ and\ PLATFORM\_NANO.\ Please\ select\ ONLY\ ONE\ platform\ to\ compile"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{constexpr}\ uint8\_t\ \doxymbox{\hyperlink{board_8h_a79cf27009260690babacedf37f7ffb78}{LoadCellCount}}\ =\ 4;}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{using\ }\doxymbox{\hyperlink{board_8h_a6dcbd4f0606b9edc6335184b508860cf}{Pin}}\ =\ int;\ \textcolor{comment}{//\ defining\ a\ type\ for\ pins\ to\ make\ intent\ clearer}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_single_ended_load_cell_pins}{SingleEndedLoadCellPins}}}
+\DoxyCodeLine{00017\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ std::array<Pin,\ 4>\ \doxymbox{\hyperlink{struct_single_ended_load_cell_pins_a24e8d985ca51f7d3d57ff41253a2af2d}{outputs}};\ \textcolor{comment}{//\ these\ are\ the\ Vo\ pins\ referenced\ to\ GND\ (array\ of\ 4)}}
+\DoxyCodeLine{00019\ \};}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ a\ enum\ class\ to\ do\ the\ mapping\ between\ load\ cell\ id\ and\ corresponding\ load\ cell\ location.\ All\ the\ code\ uses}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ This\ ensures\ that\ we\ can\ address\ the\ load\ cells\ by\ their\ location\ and\ not\ by\ their\ raw\ pin}}
+\DoxyCodeLine{00023\ \textcolor{keyword}{enum\ class}\ \doxymbox{\hyperlink{board_8h_a95ae982631b81cb4d5b6f13e9c1d053f}{LoadCellId}}\ :\ std::uint8\_t}
+\DoxyCodeLine{00024\ \{}
+\DoxyCodeLine{00025\ \ \doxymbox{\hyperlink{board_8h_a95ae982631b81cb4d5b6f13e9c1d053fac57b85e67e47634176edf7be18cb6b57}{Left1}},\ \textcolor{comment}{//\ 0}}
+\DoxyCodeLine{00026\ \ \doxymbox{\hyperlink{board_8h_a95ae982631b81cb4d5b6f13e9c1d053fac37e68566be79d23cd24c9c994bd8efb}{Left2}},\ \textcolor{comment}{//\ 1}}
+\DoxyCodeLine{00027\ \ \doxymbox{\hyperlink{board_8h_a95ae982631b81cb4d5b6f13e9c1d053fab04475cb50c3a71f0a7f9ffe1e1256a0}{Right1}},\ \textcolor{comment}{//\ 2}}
+\DoxyCodeLine{00028\ \ \doxymbox{\hyperlink{board_8h_a95ae982631b81cb4d5b6f13e9c1d053fa98888a7c164745ae51f9ecff4e6b17e7}{Right2}}\ \textcolor{comment}{//\ 3}}
+\DoxyCodeLine{00029\ \};}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ these\ are\ now\ FIXED}}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{struct_i_n_a125_u_params}{INA125UParams}}\ \{}
+\DoxyCodeLine{00034\ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{float}\ \doxymbox{\hyperlink{struct_i_n_a125_u_params_a7c5edc86886dfd1f6f18a2f0ac7c642d}{gainR}}\ =\ 50.0f;\ \textcolor{comment}{//\ used\ to\ be\ 10\ Ohms\ on\ V1.1.0,\ now\ 50\ Ohms\ on\ V1.1.1}}
+\DoxyCodeLine{00035\ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{float}\ \doxymbox{\hyperlink{struct_i_n_a125_u_params_aa75dd37c5a3f6ef673c11ec4c315b782}{ampGain}}\ =\ 4.0f\ +\ 60000.0f\ /\ \doxymbox{\hyperlink{struct_i_n_a125_u_params_a7c5edc86886dfd1f6f18a2f0ac7c642d}{gainR}};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{float}\ \doxymbox{\hyperlink{struct_i_n_a125_u_params_acce2f79d47255c9d7dc3bc83db86f740}{IAref}}\ =\ 2.5f;\ \textcolor{comment}{//\ the\ internal\ reference\ which\ shifts\ the\ output\ voltage}}
+\DoxyCodeLine{00038\ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{float}\ \doxymbox{\hyperlink{struct_i_n_a125_u_params_ae3ed6852b8d7d11e05bf0755ed490157}{Vexc}}\ \ =\ 5.0f;\ \textcolor{comment}{//\ the\ excitation\ voltage\ used\ for\ the\ load\ cells}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \}\ \doxymbox{\hyperlink{board_8h_a354c6176406bace21fae11d4c3923b68}{inaParams}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ ==============\ Teensy\ definitions\ \ ==============}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#if\ defined(PLATFORM\_TEENSY)}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespaceboard_1_1teensy41}{board::teensy41}}}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structboard_1_1teensy41_1_1_level_shifter_pins}{LevelShifterPins}}\ \textcolor{comment}{//\ enable\ pins\ for\ the\ level\ shifters}}
+\DoxyCodeLine{00049\ \ \{}
+\DoxyCodeLine{00050\ \ \ \doxymbox{\hyperlink{board_8h_a6dcbd4f0606b9edc6335184b508860cf}{Pin}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_level_shifter_pins_a3355f16aa06bd89163b4111fb7760c93}{oe1}};}
+\DoxyCodeLine{00051\ \ \ \doxymbox{\hyperlink{board_8h_a6dcbd4f0606b9edc6335184b508860cf}{Pin}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_level_shifter_pins_a5b142f013287bc31380f43d0ae744de8}{oe2}};}
+\DoxyCodeLine{00052\ \ \};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structboard_1_1teensy41_1_1_encoder_pins}{EncoderPins}}\ \textcolor{comment}{//\ chip\ select\ pins\ for\ the\ encoders}}
+\DoxyCodeLine{00055\ \ \{}
+\DoxyCodeLine{00056\ \ \ \doxymbox{\hyperlink{board_8h_a6dcbd4f0606b9edc6335184b508860cf}{Pin}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_encoder_pins_a0f64a835236673166fbd9f175b20fea5}{leftChipSelect}};}
+\DoxyCodeLine{00057\ \ \ \doxymbox{\hyperlink{board_8h_a6dcbd4f0606b9edc6335184b508860cf}{Pin}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_encoder_pins_ad413466434d5f75591323f182c67577f}{rightChipSelect}};}
+\DoxyCodeLine{00058\ \ \};}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structboard_1_1teensy41_1_1_teensy_pins}{TeensyPins}}}
+\DoxyCodeLine{00061\ \ \{}
+\DoxyCodeLine{00062\ \ \ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_encoder_pins}{EncoderPins}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_teensy_pins_abbccd30252ddb109c30c8bd868b29c8e}{encoders}};}
+\DoxyCodeLine{00063\ \ \ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_level_shifter_pins}{LevelShifterPins}}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_teensy_pins_a509ac5ba490b2fe814d27921413a5391}{levelShifters}};}
+\DoxyCodeLine{00064\ \ \};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structboard_1_1teensy41_1_1_teensy_pins}{TeensyPins}}\ \doxymbox{\hyperlink{namespaceboard_1_1teensy41_a19e12b19a159738fc22c49ef8835560d}{pins}}\{}
+\DoxyCodeLine{00067\ \ \ .encoders\ =\ \{}
+\DoxyCodeLine{00068\ \ \ \ .leftChipSelect\ =\ 0,}
+\DoxyCodeLine{00069\ \ \ \ .rightChipSelect\ =\ 7}
+\DoxyCodeLine{00070\ \},}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ .levelShifters\ =\ \{}
+\DoxyCodeLine{00073\ \ \ \ .oe1\ =\ 6,}
+\DoxyCodeLine{00074\ \ \ \ .oe2\ =\ 3}
+\DoxyCodeLine{00075\ \},}
+\DoxyCodeLine{00076\ \ \};}
+\DoxyCodeLine{00077\ \ \textcolor{comment}{//inline\ SPIClass\&\ nanoSpi\ =\ SPI;}}
+\DoxyCodeLine{00078\ \ \textcolor{keyword}{inline}\ HardwareSerial\&\ \doxymbox{\hyperlink{namespaceboard_1_1teensy41_a223922e284389ddb3b75455c7f587849}{nanoUart}}\ =\ Serial8;}
+\DoxyCodeLine{00079\ \ \textcolor{comment}{//\ CAN\ configurations}}
+\DoxyCodeLine{00080\ \ \textcolor{comment}{//inline\ FlexCAN\_T4<CAN1,\ RX\_SIZE\_256,\ TX\_SIZE\_16>\ motorCan;}}
+\DoxyCodeLine{00081\ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ \doxymbox{\hyperlink{namespaceboard_1_1teensy41_ad5a9220861bed90e1a89d13bb50c15c9}{motorCanBaud}}\ =\ 1'000'000U;}
+\DoxyCodeLine{00082\ \textcolor{comment}{//\ Encoder\ SPI\ baudrate}}
+\DoxyCodeLine{00083\ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ \doxymbox{\hyperlink{namespaceboard_1_1teensy41_a5b8f21edc18aba3dbcf8cb3aeaac769f}{encoderSPIBaud}}\ =\ 1'000'000U;}
+\DoxyCodeLine{00084\ \}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{comment}{//\ ==============\ Arduino\ Nano\ definitions\ \ ==============}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#elif\ defined(PLATFORM\_NANO)}}
+\DoxyCodeLine{00088\ \textcolor{keyword}{namespace\ }board::nano}
+\DoxyCodeLine{00089\ \{}
+\DoxyCodeLine{00090\ \ \textcolor{keyword}{struct\ }ExcitationLoadCellPins}
+\DoxyCodeLine{00091\ \ \{}
+\DoxyCodeLine{00092\ \ \ std::array<Pin,\ 4>\ outputs;}
+\DoxyCodeLine{00093\ \ \};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{keyword}{struct\ }NanoPins\ \{}
+\DoxyCodeLine{00096\ \textcolor{comment}{//\ in\ a\ struct\ order\ matters\ for\ in-\/place\ initialization\ so\ put\ the\ latest\ hardware\ revisions\ at\ the\ end}}
+\DoxyCodeLine{00097\ \ ExcitationLoadCellPins\ excitationPins;}
+\DoxyCodeLine{00098\ \ \doxymbox{\hyperlink{struct_single_ended_load_cell_pins}{SingleEndedLoadCellPins}}\ loadCells;}
+\DoxyCodeLine{00099\ \};}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ NanoPins\ \doxymbox{\hyperlink{namespaceboard_1_1teensy41_a19e12b19a159738fc22c49ef8835560d}{pins}}\{}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ ExcitationLoadCellPins\{}
+\DoxyCodeLine{00104\ \ \ \ std::array<Pin,\ 4>\{A1,\ A3,\ A5,\ A7\}}
+\DoxyCodeLine{00105\ \ \ \},}
+\DoxyCodeLine{00106\ \ \ SingleEndedLoadCellPins\{}
+\DoxyCodeLine{00107\ \ \ \ std::array<Pin,\ 4>\{A0,\ A2,\ A4,\ A6\}}
+\DoxyCodeLine{00108\ \ \ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \};}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \textcolor{keyword}{inline}\ SPIClass\&\ teensySpi\ =\ SPI;}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \textcolor{keyword}{inline}\ HardwareSerial\&\ teensyUart\ =\ Serial1;}
+\DoxyCodeLine{00115\ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ teensyUartBaudrate\ =\ 230'400;}
+\DoxyCodeLine{00116\ \textcolor{comment}{//TODO\ decide\ whether\ to\ keep\ this\ or\ simply\ assume\ every\ Serial\ interface\ uses\ 230'400\ bauds}}
+\DoxyCodeLine{00117\ \}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

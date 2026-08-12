@@ -94,11 +94,24 @@ struct EndpointTraits<
 
 
 template<typename T>
+/**
+ * @brief Publishes a new value to the topic.
+ *
+ * Replaces the previously stored value and increments the
+ * topic sequence number.
+ *
+ * @param value Value to publish.
+ */
 class Topic
 {
 public:
     using ValueType = T;
 
+    /**
+     * @brief Publishes a value to the topic (e.g updating a sensor topic from the driver)
+     *
+     * @return None
+     */
     void publish(const T& value)
     {
         m_value = value;
@@ -106,16 +119,30 @@ public:
         m_valid = true;
     }
 
+    /**
+     * @brief Returns the latest published value.
+     *
+     * @return Reference to the latest value stored in the topic.
+     */
     const T& latest() const
     {
         return m_value;
     }
-
+    /**
+     * @brief Indicates if data is valid
+     *
+     * @return booleam
+     */
     bool valid() const
     {
         return m_valid;
     }
 
+    /**
+     * @brief Sequence index
+     *
+     * @return 32bit unsigned int
+     */
     uint32_t sequence() const
     {
         return m_sequence;

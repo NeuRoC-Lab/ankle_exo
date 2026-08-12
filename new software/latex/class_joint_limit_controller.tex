@@ -1,0 +1,55 @@
+\doxysection{Joint\+Limit\+Controller Class Reference}
+\hypertarget{class_joint_limit_controller}{}\label{class_joint_limit_controller}\index{JointLimitController@{JointLimitController}}
+
+
+{\ttfamily \+\#include $<$Motor\+Controllers.\+h$>$}
+
+Inheritance diagram for Joint\+Limit\+Controller:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_joint_limit_controller}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8}{Joint\+Limit\+Controller}} (\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&encoders, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&load\+Cells, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&left\+Motor\+Feed, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&left\+Motor\+Cmd, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \&left\+Motor\+Control)
+\item 
+void \doxymbox{\hyperlink{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58}{update}} (uint32\+\_\+t now\+Us) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \doxymbox{\hyperlink{class_i_task_a3fdb0c69908af669286b0903e0ab9a08}{\texorpdfstring{$\sim$}{\string~}\+ITask}} ()=default
+\end{DoxyCompactItemize}
+
+
+\label{class_joint_limit_controller_doc-constructors}
+\Hypertarget{class_joint_limit_controller_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8}\index{JointLimitController@{JointLimitController}!JointLimitController@{JointLimitController}}
+\index{JointLimitController@{JointLimitController}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{JointLimitController()}{JointLimitController()}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aee9ee621bd5306ca0e000fc4480278c8} 
+Joint\+Limit\+Controller::\+\+Joint\+Limit\+Controller (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&}]{encoders}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&}]{load\+Cells}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&}]{left\+Motor\+Feed}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&}]{left\+Motor\+Cmd}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_cube_mars_motor_8h_afafad627c19c8a6dff8e59522d537ee8}{Motor\+Meta\+Command}} $>$ \&}]{left\+Motor\+Control}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_joint_limit_controller_doc-func-members}
+\Hypertarget{class_joint_limit_controller_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58}\index{JointLimitController@{JointLimitController}!update@{update}}
+\index{update@{update}!JointLimitController@{JointLimitController}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{class_joint_limit_controller_aee6e159becf4fba20b9b8a0b1c2fad58} 
+void Joint\+Limit\+Controller::\+update (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{now\+Us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \doxymbox{\hyperlink{class_i_task_aa57dc9cc07cfda40d3dcac232f6115af}{ITask}}.
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{_motor_controllers_8h}{Motor\+Controllers.\+h}}\end{DoxyCompactItemize}

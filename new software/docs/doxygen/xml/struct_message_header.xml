@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="struct_message_header" kind="struct" language="C++" prot="public">
+    <compoundname>MessageHeader</compoundname>
+    <includes refid="_bus_types_8h" local="no">BusTypes.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_message_header_1a596fa02aabc1f872febc7906e536ef56" prot="public" static="no" mutable="no">
+        <type><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001" kindref="member">EndpointId</ref></type>
+        <definition>EndpointId MessageHeader::topic</definition>
+        <argsstring></argsstring>
+        <name>topic</name>
+        <qualifiedname>MessageHeader::topic</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/BusTypes.h" line="44" column="16" bodyfile="src/BusTypes.h" bodystart="44" bodyend="44"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_message_header_1a778749784b55e67528f518180a260cdc" prot="public" static="no" mutable="no">
+        <type><ref refid="_bus_types_8h_1a66a9ecf4b4d12e8358a86ce004ccded3" kindref="member">PlatformId</ref></type>
+        <definition>PlatformId MessageHeader::origin</definition>
+        <argsstring></argsstring>
+        <name>origin</name>
+        <qualifiedname>MessageHeader::origin</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/BusTypes.h" line="45" column="16" bodyfile="src/BusTypes.h" bodystart="45" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_message_header_1af6cfed7dbcb15285ecbe63854b9c9c14" prot="public" static="no" mutable="no">
+        <type>uint16_t</type>
+        <definition>uint16_t MessageHeader::sequence</definition>
+        <argsstring></argsstring>
+        <name>sequence</name>
+        <qualifiedname>MessageHeader::sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/BusTypes.h" line="46" column="14" bodyfile="src/BusTypes.h" bodystart="46" bodyend="46"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/BusTypes.h" line="42" column="1" bodyfile="src/BusTypes.h" bodystart="43" bodyend="47"/>
+    <listofallmembers>
+      <member refid="struct_message_header_1a778749784b55e67528f518180a260cdc" prot="public" virt="non-virtual"><scope>MessageHeader</scope><name>origin</name></member>
+      <member refid="struct_message_header_1af6cfed7dbcb15285ecbe63854b9c9c14" prot="public" virt="non-virtual"><scope>MessageHeader</scope><name>sequence</name></member>
+      <member refid="struct_message_header_1a596fa02aabc1f872febc7906e536ef56" prot="public" virt="non-virtual"><scope>MessageHeader</scope><name>topic</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

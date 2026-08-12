@@ -1,0 +1,240 @@
+\doxysection{Transparent\+Mode\+Controller Class Reference}
+\hypertarget{class_transparent_mode_controller}{}\label{class_transparent_mode_controller}\index{TransparentModeController@{TransparentModeController}}
+
+
+{\ttfamily \+\#include $<$Motor\+Controllers.\+h$>$}
+
+Inheritance diagram for Transparent\+Mode\+Controller:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_transparent_mode_controller}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_transparent_mode_controller_a7d90e072eb79c3d0a864a36fec841b41}{Transparent\+Mode\+Controller}} (\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&encoders, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&load\+Cells, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&left\+Motor\+Feed, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&left\+Motor\+Cmd)
+\item 
+void \doxymbox{\hyperlink{class_transparent_mode_controller_a62a5d7d5230c4e96dea3110539326219}{update}} (uint32\+\_\+t now\+Us) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \doxymbox{\hyperlink{class_i_task_a3fdb0c69908af669286b0903e0ab9a08}{\texorpdfstring{$\sim$}{\string~}\+ITask}} ()=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \& \doxymbox{\hyperlink{class_transparent_mode_controller_a8d16d62b2fdb8aa3b7f1a2e98f5618b7}{m\+\_\+encoders}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \& \doxymbox{\hyperlink{class_transparent_mode_controller_a10e5966bc688a80d7e11e5c87ba87b02}{m\+\_\+loadcells}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \& \doxymbox{\hyperlink{class_transparent_mode_controller_a2b108cb756d812674c4c76a11b4ae794}{m\+\_\+left\+Motor\+Feed}}
+\item 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \& \doxymbox{\hyperlink{class_transparent_mode_controller_aff9d30e738bae9641984cfd4a96158bd}{m\+\_\+left\+Motor\+Cmd}}
+\item 
+float \doxymbox{\hyperlink{class_transparent_mode_controller_ae6e5caed2fae2f1f1e68351f81ea0c84}{m\+\_\+previous\+Torque}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_transparent_mode_controller_addf680edca868129fa437677e1ce20c8}{m\+\_\+filtered\+Torque}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_transparent_mode_controller_aa8a6f11f55eab5a82f8e2b0368a7546d}{m\+\_\+previous\+Filtered\+Torque}} \{0.\+0f\}
+\item 
+float \doxymbox{\hyperlink{class_transparent_mode_controller_aa43bc758ad14c2c36298c3c8e96894ff}{m\+\_\+filtered\+Torque\+Derivative}} \{0.\+0f\}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{class_transparent_mode_controller_a004b6d1a94b5fa4024c76d5aba106100}{m\+\_\+previous\+Us}} \{0\}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{class_transparent_mode_controller_af939c56b5a987d81b4f6aee4002c29d9}{m\+\_\+previous\+Update\+Us}} \{0\}
+\item 
+bool \doxymbox{\hyperlink{class_transparent_mode_controller_afbdf90b51b62518e95183b9f6d83e5d0}{m\+\_\+initialized}} \{false\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_a0e736aa66f51e4217ec4f9ef989f45dd}{KP}} = 0.\+5f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_aa1af2be775af0c506545d6f68d37532d}{KD}} = 0.\+01f
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_a7909bda2af6335f89b147db2060e6260}{LOAD\+\_\+\+CELL\+\_\+\+LEVER\+\_\+\+ARM}}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_ab1d3af69c53168971929f9ad2d8405b8}{TORQUE\+\_\+\+SIGN}}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_a04ab7e2946e0629745a37303149b666a}{MAX\+\_\+\+TRANSPARENT\+\_\+\+TORQUE}}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_a4a4f33bf477166287c77a936cf134b9a}{TORQUE\+\_\+\+FILTER\+\_\+\+ALPHA}}
+\item 
+static constexpr float \doxymbox{\hyperlink{class_transparent_mode_controller_a035da911532fb8b34856ba3e8188ed69}{DERIVATIVE\+\_\+\+FILTER\+\_\+\+ALPHA}}
+\end{DoxyCompactItemize}
+
+
+\label{class_transparent_mode_controller_doc-constructors}
+\Hypertarget{class_transparent_mode_controller_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_transparent_mode_controller_a7d90e072eb79c3d0a864a36fec841b41}\index{TransparentModeController@{TransparentModeController}!TransparentModeController@{TransparentModeController}}
+\index{TransparentModeController@{TransparentModeController}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{TransparentModeController()}{TransparentModeController()}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a7d90e072eb79c3d0a864a36fec841b41} 
+Transparent\+Mode\+Controller::\+\+Transparent\+Mode\+Controller (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&}]{encoders}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&}]{load\+Cells}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&}]{left\+Motor\+Feed}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}} $>$ \&}]{left\+Motor\+Cmd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_transparent_mode_controller_doc-func-members}
+\Hypertarget{class_transparent_mode_controller_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_transparent_mode_controller_a62a5d7d5230c4e96dea3110539326219}\index{TransparentModeController@{TransparentModeController}!update@{update}}
+\index{update@{update}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a62a5d7d5230c4e96dea3110539326219} 
+void Transparent\+Mode\+Controller::\+update (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{now\+Us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \doxymbox{\hyperlink{class_i_task_aa57dc9cc07cfda40d3dcac232f6115af}{ITask}}.
+
+
+
+\label{class_transparent_mode_controller_doc-variable-members}
+\Hypertarget{class_transparent_mode_controller_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_transparent_mode_controller_a035da911532fb8b34856ba3e8188ed69}\index{TransparentModeController@{TransparentModeController}!DERIVATIVE\_FILTER\_ALPHA@{DERIVATIVE\_FILTER\_ALPHA}}
+\index{DERIVATIVE\_FILTER\_ALPHA@{DERIVATIVE\_FILTER\_ALPHA}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{DERIVATIVE\_FILTER\_ALPHA}{DERIVATIVE\_FILTER\_ALPHA}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a035da911532fb8b34856ba3e8188ed69} 
+float Transparent\+Mode\+Controller::\+\+DERIVATIVE\+\_\+\+FILTER\+\_\+\+ALPHA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{0.05f}
+
+\end{DoxyCode}
+\Hypertarget{class_transparent_mode_controller_aa1af2be775af0c506545d6f68d37532d}\index{TransparentModeController@{TransparentModeController}!KD@{KD}}
+\index{KD@{KD}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{KD}{KD}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_aa1af2be775af0c506545d6f68d37532d} 
+float Transparent\+Mode\+Controller::\+\+KD = 0.\+01f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a0e736aa66f51e4217ec4f9ef989f45dd}\index{TransparentModeController@{TransparentModeController}!KP@{KP}}
+\index{KP@{KP}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{KP}{KP}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a0e736aa66f51e4217ec4f9ef989f45dd} 
+float Transparent\+Mode\+Controller::\+\+KP = 0.\+5f\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a7909bda2af6335f89b147db2060e6260}\index{TransparentModeController@{TransparentModeController}!LOAD\_CELL\_LEVER\_ARM@{LOAD\_CELL\_LEVER\_ARM}}
+\index{LOAD\_CELL\_LEVER\_ARM@{LOAD\_CELL\_LEVER\_ARM}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{LOAD\_CELL\_LEVER\_ARM}{LOAD\_CELL\_LEVER\_ARM}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a7909bda2af6335f89b147db2060e6260} 
+float Transparent\+Mode\+Controller::\+\+LOAD\+\_\+\+CELL\+\_\+\+LEVER\+\_\+\+ARM\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{0.055f}
+
+\end{DoxyCode}
+\Hypertarget{class_transparent_mode_controller_a8d16d62b2fdb8aa3b7f1a2e98f5618b7}\index{TransparentModeController@{TransparentModeController}!m\_encoders@{m\_encoders}}
+\index{m\_encoders@{m\_encoders}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_encoders}{m\_encoders}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a8d16d62b2fdb8aa3b7f1a2e98f5618b7} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}}$>$\& Transparent\+Mode\+Controller::\+m\+\_\+encoders\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_addf680edca868129fa437677e1ce20c8}\index{TransparentModeController@{TransparentModeController}!m\_filteredTorque@{m\_filteredTorque}}
+\index{m\_filteredTorque@{m\_filteredTorque}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_filteredTorque}{m\_filteredTorque}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_addf680edca868129fa437677e1ce20c8} 
+float Transparent\+Mode\+Controller::\+m\+\_\+filtered\+Torque \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_aa43bc758ad14c2c36298c3c8e96894ff}\index{TransparentModeController@{TransparentModeController}!m\_filteredTorqueDerivative@{m\_filteredTorqueDerivative}}
+\index{m\_filteredTorqueDerivative@{m\_filteredTorqueDerivative}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_filteredTorqueDerivative}{m\_filteredTorqueDerivative}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_aa43bc758ad14c2c36298c3c8e96894ff} 
+float Transparent\+Mode\+Controller::\+m\+\_\+filtered\+Torque\+Derivative \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_afbdf90b51b62518e95183b9f6d83e5d0}\index{TransparentModeController@{TransparentModeController}!m\_initialized@{m\_initialized}}
+\index{m\_initialized@{m\_initialized}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_initialized}{m\_initialized}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_afbdf90b51b62518e95183b9f6d83e5d0} 
+bool Transparent\+Mode\+Controller::\+m\+\_\+initialized \{false\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_aff9d30e738bae9641984cfd4a96158bd}\index{TransparentModeController@{TransparentModeController}!m\_leftMotorCmd@{m\_leftMotorCmd}}
+\index{m\_leftMotorCmd@{m\_leftMotorCmd}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_leftMotorCmd}{m\_leftMotorCmd}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_aff9d30e738bae9641984cfd4a96158bd} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_cmd}{Motor\+Cmd}}$>$\& Transparent\+Mode\+Controller::\+m\+\_\+left\+Motor\+Cmd\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a2b108cb756d812674c4c76a11b4ae794}\index{TransparentModeController@{TransparentModeController}!m\_leftMotorFeed@{m\_leftMotorFeed}}
+\index{m\_leftMotorFeed@{m\_leftMotorFeed}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_leftMotorFeed}{m\_leftMotorFeed}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a2b108cb756d812674c4c76a11b4ae794} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}}$>$\& Transparent\+Mode\+Controller::\+m\+\_\+left\+Motor\+Feed\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a10e5966bc688a80d7e11e5c87ba87b02}\index{TransparentModeController@{TransparentModeController}!m\_loadcells@{m\_loadcells}}
+\index{m\_loadcells@{m\_loadcells}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_loadcells}{m\_loadcells}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a10e5966bc688a80d7e11e5c87ba87b02} 
+\doxymbox{\hyperlink{class_topic}{Topic}}$<$\doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}}$>$\& Transparent\+Mode\+Controller::\+m\+\_\+loadcells\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_aa8a6f11f55eab5a82f8e2b0368a7546d}\index{TransparentModeController@{TransparentModeController}!m\_previousFilteredTorque@{m\_previousFilteredTorque}}
+\index{m\_previousFilteredTorque@{m\_previousFilteredTorque}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_previousFilteredTorque}{m\_previousFilteredTorque}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_aa8a6f11f55eab5a82f8e2b0368a7546d} 
+float Transparent\+Mode\+Controller::\+m\+\_\+previous\+Filtered\+Torque \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_ae6e5caed2fae2f1f1e68351f81ea0c84}\index{TransparentModeController@{TransparentModeController}!m\_previousTorque@{m\_previousTorque}}
+\index{m\_previousTorque@{m\_previousTorque}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_previousTorque}{m\_previousTorque}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_ae6e5caed2fae2f1f1e68351f81ea0c84} 
+float Transparent\+Mode\+Controller::\+m\+\_\+previous\+Torque \{0.\+0f\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_af939c56b5a987d81b4f6aee4002c29d9}\index{TransparentModeController@{TransparentModeController}!m\_previousUpdateUs@{m\_previousUpdateUs}}
+\index{m\_previousUpdateUs@{m\_previousUpdateUs}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_previousUpdateUs}{m\_previousUpdateUs}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_af939c56b5a987d81b4f6aee4002c29d9} 
+uint32\+\_\+t Transparent\+Mode\+Controller::\+m\+\_\+previous\+Update\+Us \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a004b6d1a94b5fa4024c76d5aba106100}\index{TransparentModeController@{TransparentModeController}!m\_previousUs@{m\_previousUs}}
+\index{m\_previousUs@{m\_previousUs}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{m\_previousUs}{m\_previousUs}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a004b6d1a94b5fa4024c76d5aba106100} 
+uint32\+\_\+t Transparent\+Mode\+Controller::\+m\+\_\+previous\+Us \{0\}\hspace{0.3cm}{\ttfamily [private]}}
+
+\Hypertarget{class_transparent_mode_controller_a04ab7e2946e0629745a37303149b666a}\index{TransparentModeController@{TransparentModeController}!MAX\_TRANSPARENT\_TORQUE@{MAX\_TRANSPARENT\_TORQUE}}
+\index{MAX\_TRANSPARENT\_TORQUE@{MAX\_TRANSPARENT\_TORQUE}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{MAX\_TRANSPARENT\_TORQUE}{MAX\_TRANSPARENT\_TORQUE}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a04ab7e2946e0629745a37303149b666a} 
+float Transparent\+Mode\+Controller::\+\+MAX\+\_\+\+TRANSPARENT\+\_\+\+TORQUE\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{0.4f}
+
+\end{DoxyCode}
+\Hypertarget{class_transparent_mode_controller_a4a4f33bf477166287c77a936cf134b9a}\index{TransparentModeController@{TransparentModeController}!TORQUE\_FILTER\_ALPHA@{TORQUE\_FILTER\_ALPHA}}
+\index{TORQUE\_FILTER\_ALPHA@{TORQUE\_FILTER\_ALPHA}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{TORQUE\_FILTER\_ALPHA}{TORQUE\_FILTER\_ALPHA}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_a4a4f33bf477166287c77a936cf134b9a} 
+float Transparent\+Mode\+Controller::\+\+TORQUE\+\_\+\+FILTER\+\_\+\+ALPHA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{0.15f}
+
+\end{DoxyCode}
+\Hypertarget{class_transparent_mode_controller_ab1d3af69c53168971929f9ad2d8405b8}\index{TransparentModeController@{TransparentModeController}!TORQUE\_SIGN@{TORQUE\_SIGN}}
+\index{TORQUE\_SIGN@{TORQUE\_SIGN}!TransparentModeController@{TransparentModeController}}
+\doxysubsubsection{\texorpdfstring{TORQUE\_SIGN}{TORQUE\_SIGN}}
+{\footnotesize\ttfamily \label{class_transparent_mode_controller_ab1d3af69c53168971929f9ad2d8405b8} 
+float Transparent\+Mode\+Controller::\+\+TORQUE\+\_\+\+SIGN\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}, {\ttfamily [private]}}
+
+{\bfseries Initial value:\+}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =}
+\DoxyCodeLine{1.0f}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{_motor_controllers_8h}{Motor\+Controllers.\+h}}\end{DoxyCompactItemize}

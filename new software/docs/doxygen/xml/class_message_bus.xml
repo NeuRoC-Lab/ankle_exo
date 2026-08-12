@@ -1,0 +1,338 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_message_bus" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>MessageBus</compoundname>
+    <basecompoundref refid="class_i_task" prot="public" virt="non-virtual">ITask</basecompoundref>
+    <includes refid="_message_bus_8h" local="no">MessageBus.h</includes>
+    <sectiondef kind="private-type">
+      <memberdef kind="typedef" id="class_message_bus_1a3e39fb1d36c7348038cc26a3290ba9da" prot="private" static="no">
+        <type>std::function&lt; bool(const <ref refid="struct_bus_message" kindref="compound">BusMessage</ref> &amp;) &gt;</type>
+        <definition>using MessageBus::MessageHandler = 
+std::function&lt;
+    bool(const BusMessage&amp;)
+&gt;</definition>
+        <argsstring></argsstring>
+        <name>MessageHandler</name>
+        <qualifiedname>MessageBus::MessageHandler</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="471" column="5" bodyfile="src/MessageBus.h" bodystart="471" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_message_bus_1a66d726e6fa82476ad8f590969749d088" prot="private" static="no" mutable="no">
+        <type><ref refid="class_u_a_r_t_handler" kindref="compound">UARTHandler</ref> &amp;</type>
+        <definition>UARTHandler&amp; MessageBus::m_uart</definition>
+        <argsstring></argsstring>
+        <name>m_uart</name>
+        <qualifiedname>MessageBus::m_uart</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="469" column="17" bodyfile="src/MessageBus.h" bodystart="469" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_message_bus_1ad1c4c287116bd70b2cb93537849d78a9" prot="private" static="no" mutable="no">
+        <type>std::array&lt; <ref refid="class_message_bus_1a3e39fb1d36c7348038cc26a3290ba9da" kindref="member">MessageHandler</ref>, <ref refid="_bus_types_8h_1a8b74aab2721afe44f85070ef63d9701e" kindref="member">EndpointCount</ref> &gt;</type>
+        <definition>std::array&lt; MessageHandler, EndpointCount &gt; MessageBus::m_handlers</definition>
+        <argsstring></argsstring>
+        <name>m_handlers</name>
+        <qualifiedname>MessageBus::m_handlers</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="479" column="2" bodyfile="src/MessageBus.h" bodystart="479" bodyend="479"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_message_bus_1aedfaa694030e35c3a42f0dfb515ae334" prot="private" static="no" mutable="no">
+        <type>std::array&lt; uint16_t, <ref refid="_bus_types_8h_1a8b74aab2721afe44f85070ef63d9701e" kindref="member">EndpointCount</ref> &gt;</type>
+        <definition>std::array&lt;uint16_t,EndpointCount&gt; MessageBus::m_sequences</definition>
+        <argsstring></argsstring>
+        <name>m_sequences</name>
+        <qualifiedname>MessageBus::m_sequences</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="481" column="16" bodyfile="src/MessageBus.h" bodystart="481" bodyend="481"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_message_bus_1ae65db3546c622fe625f47359e55d6fff" prot="private" static="no" mutable="no">
+        <type><ref refid="class_fixed_queue" kindref="compound">FixedQueue</ref>&lt; <ref refid="struct_bus_message" kindref="compound">BusMessage</ref>, 16 &gt;</type>
+        <definition>FixedQueue&lt;BusMessage,16&gt; MessageBus::m_rxQueue</definition>
+        <argsstring></argsstring>
+        <name>m_rxQueue</name>
+        <qualifiedname>MessageBus::m_rxQueue</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="483" column="16" bodyfile="src/MessageBus.h" bodystart="483" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_message_bus_1a8f953f44e0875f0b921d055cf4130185" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>MessageBus::MessageBus</definition>
+        <argsstring>(UARTHandler &amp;uart)</argsstring>
+        <name>MessageBus</name>
+        <qualifiedname>MessageBus::MessageBus</qualifiedname>
+        <param>
+          <type><ref refid="class_u_a_r_t_handler" kindref="compound">UARTHandler</ref> &amp;</type>
+          <declname>uart</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="275" column="14" bodyfile="src/MessageBus.h" bodystart="275" bodyend="294"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1a680847ace437a065c3ede2fe5352bb64" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void MessageBus::begin</definition>
+        <argsstring>()</argsstring>
+        <name>begin</name>
+        <qualifiedname>MessageBus::begin</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="296" column="10" bodyfile="src/MessageBus.h" bodystart="296" bodyend="299"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1adf49fadc71e658a087e1ecde85a9ea55" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001" kindref="member">EndpointId</ref></type>
+            <declname>Id</declname>
+            <defname>Id</defname>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool MessageBus::addTopic</definition>
+        <argsstring>(Topic&lt; typename EndpointTraits&lt; Id &gt;::Payload &gt; &amp;topic)</argsstring>
+        <name>addTopic</name>
+        <qualifiedname>MessageBus::addTopic</qualifiedname>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; typename <ref refid="struct_endpoint_traits" kindref="compound">EndpointTraits</ref>&lt; Id &gt;::Payload &gt; &amp;</type>
+          <declname>topic</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="302" column="10" bodyfile="src/MessageBus.h" bodystart="302" bodyend="355"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1ad6d2c1a4ed342ae68d7474a09eccf8b3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001" kindref="member">EndpointId</ref></type>
+            <declname>Id</declname>
+            <defname>Id</defname>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool MessageBus::publish</definition>
+        <argsstring>(const typename EndpointTraits&lt; Id &gt;::Payload &amp;value)</argsstring>
+        <name>publish</name>
+        <qualifiedname>MessageBus::publish</qualifiedname>
+        <param>
+          <type>const typename <ref refid="struct_endpoint_traits" kindref="compound">EndpointTraits</ref>&lt; Id &gt;::Payload &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="358" column="10" bodyfile="src/MessageBus.h" bodystart="358" bodyend="394"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1ad2f806d582621d3e80b93b1d484fc8b9" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void MessageBus::update</definition>
+        <argsstring>(uint32_t) override</argsstring>
+        <name>update</name>
+        <qualifiedname>MessageBus::update</qualifiedname>
+        <reimplements refid="class_i_task_1aa57dc9cc07cfda40d3dcac232f6115af">update</reimplements>
+        <param>
+          <type>uint32_t</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="396" column="10" bodyfile="src/MessageBus.h" bodystart="396" bodyend="407"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="class_message_bus_1aa0241cd77f7c9fb94ace05a106990f28" prot="private" static="yes" constexpr="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="_bus_types_8h_1a66a9ecf4b4d12e8358a86ce004ccded3" kindref="member">PlatformId</ref></type>
+        <definition>static constexpr PlatformId MessageBus::remotePlatform</definition>
+        <argsstring>()</argsstring>
+        <name>remotePlatform</name>
+        <qualifiedname>MessageBus::remotePlatform</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="411" column="16" bodyfile="src/MessageBus.h" bodystart="411" bodyend="423"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_message_bus_1af3ac4095410e36e5837f6f259c6df82b" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool MessageBus::remoteNeeds</definition>
+        <argsstring>(EndpointId id) const</argsstring>
+        <name>remoteNeeds</name>
+        <qualifiedname>MessageBus::remoteNeeds</qualifiedname>
+        <param>
+          <type><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001" kindref="member">EndpointId</ref></type>
+          <declname>id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="425" column="10" bodyfile="src/MessageBus.h" bodystart="425" bodyend="435"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1af7b2ed7d9b10b6944fd99ef57e2ccdbb" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void MessageBus::dispatchLocal</definition>
+        <argsstring>(const BusMessage &amp;message)</argsstring>
+        <name>dispatchLocal</name>
+        <qualifiedname>MessageBus::dispatchLocal</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_bus_message" kindref="compound">BusMessage</ref> &amp;</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="437" column="10" bodyfile="src/MessageBus.h" bodystart="437" bodyend="456"/>
+      </memberdef>
+      <memberdef kind="function" id="class_message_bus_1ab81a3d4d16b009964e993c6f470d4405" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void MessageBus::receiveRemote</definition>
+        <argsstring>(const BusMessage &amp;message)</argsstring>
+        <name>receiveRemote</name>
+        <qualifiedname>MessageBus::receiveRemote</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_bus_message" kindref="compound">BusMessage</ref> &amp;</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="458" column="10" bodyfile="src/MessageBus.h" bodystart="458" bodyend="466"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>MessageBus</label>
+        <link refid="class_message_bus"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="4">
+        <label>BusMessage</label>
+        <link refid="struct_bus_message"/>
+        <childnode refid="5" relation="usage">
+          <edgelabel>header</edgelabel>
+        </childnode>
+      </node>
+      <node id="6">
+        <label>FixedQueue&lt; BusMessage, 16 &gt;</label>
+        <link refid="class_fixed_queue"/>
+      </node>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>MessageBus</label>
+        <link refid="class_message_bus"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_uart</edgelabel>
+        </childnode>
+        <childnode refid="6" relation="usage">
+          <edgelabel>m_rxQueue</edgelabel>
+        </childnode>
+      </node>
+      <node id="5">
+        <label>MessageHeader</label>
+        <link refid="struct_message_header"/>
+      </node>
+      <node id="3">
+        <label>UARTHandler</label>
+        <link refid="class_u_a_r_t_handler"/>
+        <childnode refid="3" relation="usage">
+          <edgelabel>s_instance</edgelabel>
+        </childnode>
+        <childnode refid="4" relation="usage">
+          <edgelabel>m_callback</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/MessageBus.h" line="272" column="1" bodyfile="src/MessageBus.h" bodystart="273" bodyend="484"/>
+    <listofallmembers>
+      <member refid="class_message_bus_1adf49fadc71e658a087e1ecde85a9ea55" prot="public" virt="non-virtual"><scope>MessageBus</scope><name>addTopic</name></member>
+      <member refid="class_message_bus_1a680847ace437a065c3ede2fe5352bb64" prot="public" virt="non-virtual"><scope>MessageBus</scope><name>begin</name></member>
+      <member refid="class_message_bus_1af7b2ed7d9b10b6944fd99ef57e2ccdbb" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>dispatchLocal</name></member>
+      <member refid="class_message_bus_1ad1c4c287116bd70b2cb93537849d78a9" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>m_handlers</name></member>
+      <member refid="class_message_bus_1ae65db3546c622fe625f47359e55d6fff" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>m_rxQueue</name></member>
+      <member refid="class_message_bus_1aedfaa694030e35c3a42f0dfb515ae334" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>m_sequences</name></member>
+      <member refid="class_message_bus_1a66d726e6fa82476ad8f590969749d088" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>m_uart</name></member>
+      <member refid="class_message_bus_1a8f953f44e0875f0b921d055cf4130185" prot="public" virt="non-virtual"><scope>MessageBus</scope><name>MessageBus</name></member>
+      <member refid="class_message_bus_1a3e39fb1d36c7348038cc26a3290ba9da" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>MessageHandler</name></member>
+      <member refid="class_message_bus_1ad6d2c1a4ed342ae68d7474a09eccf8b3" prot="public" virt="non-virtual"><scope>MessageBus</scope><name>publish</name></member>
+      <member refid="class_message_bus_1ab81a3d4d16b009964e993c6f470d4405" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>receiveRemote</name></member>
+      <member refid="class_message_bus_1af3ac4095410e36e5837f6f259c6df82b" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>remoteNeeds</name></member>
+      <member refid="class_message_bus_1aa0241cd77f7c9fb94ace05a106990f28" prot="private" virt="non-virtual"><scope>MessageBus</scope><name>remotePlatform</name></member>
+      <member refid="class_message_bus_1ad2f806d582621d3e80b93b1d484fc8b9" prot="public" virt="virtual"><scope>MessageBus</scope><name>update</name></member>
+      <member refid="class_i_task_1a3fdb0c69908af669286b0903e0ab9a08" prot="public" virt="virtual"><scope>MessageBus</scope><name>~ITask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_can_bus" kind="class" language="C++" prot="public">
+    <compoundname>CanBus</compoundname>
+    <includes refid="_cube_mars_motor_8h" local="no">CubeMarsMotor.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" prot="private" static="no" mutable="no">
+        <type>FlexCAN_T4&lt; CAN1, RX_SIZE_256, TX_SIZE_16 &gt;</type>
+        <definition>FlexCAN_T4&lt;CAN1, RX_SIZE_256, TX_SIZE_16&gt; CanBus::m_can</definition>
+        <argsstring></argsstring>
+        <name>m_can</name>
+        <qualifiedname>CanBus::m_can</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="170" column="16" bodyfile="src/CubeMarsMotor.h" bodystart="170" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool CanBus::m_isInitialized</definition>
+        <argsstring></argsstring>
+        <name>m_isInitialized</name>
+        <qualifiedname>CanBus::m_isInitialized</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="171" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="171" bodyend="171"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_can_bus_1a1d47eb43125b02a6589599ab39177d4b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool CanBus::begin</definition>
+        <argsstring>()</argsstring>
+        <name>begin</name>
+        <qualifiedname>CanBus::begin</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="104" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="104" bodyend="118"/>
+      </memberdef>
+      <memberdef kind="function" id="class_can_bus_1a088d0c2a4fab75b73247f09160bc2885" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool CanBus::send</definition>
+        <argsstring>(const CanFrame &amp;frame)</argsstring>
+        <name>send</name>
+        <qualifiedname>CanBus::send</qualifiedname>
+        <param>
+          <type>const <ref refid="struct_can_frame" kindref="compound">CanFrame</ref> &amp;</type>
+          <declname>frame</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="120" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="120" bodyend="137"/>
+      </memberdef>
+      <memberdef kind="function" id="class_can_bus_1a5ccc3eaf3c815982e9bee1405d7dd35d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool CanBus::read</definition>
+        <argsstring>(CanFrame &amp;frame)</argsstring>
+        <name>read</name>
+        <qualifiedname>CanBus::read</qualifiedname>
+        <param>
+          <type><ref refid="struct_can_frame" kindref="compound">CanFrame</ref> &amp;</type>
+          <declname>frame</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="139" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="139" bodyend="162"/>
+      </memberdef>
+      <memberdef kind="function" id="class_can_bus_1ac1b7f9dce767c3e1a7ead986762314ed" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool CanBus::isReady</definition>
+        <argsstring>() const</argsstring>
+        <name>isReady</name>
+        <qualifiedname>CanBus::isReady</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="164" column="10" bodyfile="src/CubeMarsMotor.h" bodystart="164" bodyend="167"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/CubeMarsMotor.h" line="101" column="1" bodyfile="src/CubeMarsMotor.h" bodystart="102" bodyend="172"/>
+    <listofallmembers>
+      <member refid="class_can_bus_1a1d47eb43125b02a6589599ab39177d4b" prot="public" virt="non-virtual"><scope>CanBus</scope><name>begin</name></member>
+      <member refid="class_can_bus_1ac1b7f9dce767c3e1a7ead986762314ed" prot="public" virt="non-virtual"><scope>CanBus</scope><name>isReady</name></member>
+      <member refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" prot="private" virt="non-virtual"><scope>CanBus</scope><name>m_can</name></member>
+      <member refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" prot="private" virt="non-virtual"><scope>CanBus</scope><name>m_isInitialized</name></member>
+      <member refid="class_can_bus_1a5ccc3eaf3c815982e9bee1405d7dd35d" prot="public" virt="non-virtual"><scope>CanBus</scope><name>read</name></member>
+      <member refid="class_can_bus_1a088d0c2a4fab75b73247f09160bc2885" prot="public" virt="non-virtual"><scope>CanBus</scope><name>send</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

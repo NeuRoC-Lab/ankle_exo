@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_topic" kind="class" language="C++" prot="public">
+    <compoundname>Topic</compoundname>
+    <includes refid="_message_bus_8h" local="no">MessageBus.h</includes>
+    <templateparamlist>
+      <param>
+        <type>typename T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="class_topic_1aab329cc2a23104fa675d0907d65ce19f" prot="public" static="no">
+        <type>T</type>
+        <definition>using Topic&lt; T &gt;::ValueType = T</definition>
+        <argsstring></argsstring>
+        <name>ValueType</name>
+        <qualifiedname>Topic::ValueType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="108" column="5" bodyfile="src/MessageBus.h" bodystart="108" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_topic_1a2bde4ca41b9482fc8bfaa36714826dd0" prot="private" static="no" mutable="no">
+        <type>T</type>
+        <definition>T Topic&lt; T &gt;::m_value</definition>
+        <argsstring></argsstring>
+        <name>m_value</name>
+        <qualifiedname>Topic::m_value</qualifiedname>
+        <initializer>{}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="152" column="7" bodyfile="src/MessageBus.h" bodystart="152" bodyend="152"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_topic_1a26a82226e3efe9e77cedf58090c2cf10" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t Topic&lt; T &gt;::m_sequence</definition>
+        <argsstring></argsstring>
+        <name>m_sequence</name>
+        <qualifiedname>Topic::m_sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="153" column="14" bodyfile="src/MessageBus.h" bodystart="153" bodyend="153"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_topic_1ac8366debdab1351ba406cdaf01c1c21d" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool Topic&lt; T &gt;::m_valid</definition>
+        <argsstring></argsstring>
+        <name>m_valid</name>
+        <qualifiedname>Topic::m_valid</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="154" column="10" bodyfile="src/MessageBus.h" bodystart="154" bodyend="154"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_topic_1a8a1b652dd46f7da4fa5932819e226807" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Topic&lt; T &gt;::publish</definition>
+        <argsstring>(const T &amp;value)</argsstring>
+        <name>publish</name>
+        <qualifiedname>Topic::publish</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+<para>Publishes a value to the topic (e.g updating a sensor topic from the driver). </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>None </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="115" column="10" bodyfile="src/MessageBus.h" bodystart="115" bodyend="120"/>
+      </memberdef>
+      <memberdef kind="function" id="class_topic_1a834ac893af336fd1c2c84efd8de29e21" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const T &amp;</type>
+        <definition>const T &amp; Topic&lt; T &gt;::latest</definition>
+        <argsstring>() const</argsstring>
+        <name>latest</name>
+        <qualifiedname>Topic::latest</qualifiedname>
+        <briefdescription>
+<para>Returns the latest published value. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Reference to the latest value stored in the topic. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="127" column="13" bodyfile="src/MessageBus.h" bodystart="127" bodyend="130"/>
+      </memberdef>
+      <memberdef kind="function" id="class_topic_1aa32efcc5ee43f9d08d5eb73e6179f9a0" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool Topic&lt; T &gt;::valid</definition>
+        <argsstring>() const</argsstring>
+        <name>valid</name>
+        <qualifiedname>Topic::valid</qualifiedname>
+        <briefdescription>
+<para>Indicates if data is valid. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>booleam </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="136" column="10" bodyfile="src/MessageBus.h" bodystart="136" bodyend="139"/>
+      </memberdef>
+      <memberdef kind="function" id="class_topic_1a406eaa650db2bbd7103f62fc8a054220" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint32_t</type>
+        <definition>uint32_t Topic&lt; T &gt;::sequence</definition>
+        <argsstring>() const</argsstring>
+        <name>sequence</name>
+        <qualifiedname>Topic::sequence</qualifiedname>
+        <briefdescription>
+<para>Sequence index. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>32bit unsigned int </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MessageBus.h" line="146" column="14" bodyfile="src/MessageBus.h" bodystart="146" bodyend="149"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Publishes a new value to the topic. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>Replaces the previously stored value and increments the topic sequence number.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value to publish. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/MessageBus.h" line="105" column="1" bodyfile="src/MessageBus.h" bodystart="106" bodyend="155"/>
+    <listofallmembers>
+      <member refid="class_topic_1a834ac893af336fd1c2c84efd8de29e21" prot="public" virt="non-virtual"><scope>Topic</scope><name>latest</name></member>
+      <member refid="class_topic_1a26a82226e3efe9e77cedf58090c2cf10" prot="private" virt="non-virtual"><scope>Topic</scope><name>m_sequence</name></member>
+      <member refid="class_topic_1ac8366debdab1351ba406cdaf01c1c21d" prot="private" virt="non-virtual"><scope>Topic</scope><name>m_valid</name></member>
+      <member refid="class_topic_1a2bde4ca41b9482fc8bfaa36714826dd0" prot="private" virt="non-virtual"><scope>Topic</scope><name>m_value</name></member>
+      <member refid="class_topic_1a8a1b652dd46f7da4fa5932819e226807" prot="public" virt="non-virtual"><scope>Topic</scope><name>publish</name></member>
+      <member refid="class_topic_1a406eaa650db2bbd7103f62fc8a054220" prot="public" virt="non-virtual"><scope>Topic</scope><name>sequence</name></member>
+      <member refid="class_topic_1aa32efcc5ee43f9d08d5eb73e6179f9a0" prot="public" virt="non-virtual"><scope>Topic</scope><name>valid</name></member>
+      <member refid="class_topic_1aab329cc2a23104fa675d0907d65ce19f" prot="public" virt="non-virtual"><scope>Topic</scope><name>ValueType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

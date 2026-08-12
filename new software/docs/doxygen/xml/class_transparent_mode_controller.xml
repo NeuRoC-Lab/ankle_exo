@@ -1,0 +1,435 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_transparent_mode_controller" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>TransparentModeController</compoundname>
+    <basecompoundref refid="class_i_task" prot="public" virt="non-virtual">ITask</basecompoundref>
+    <includes refid="_motor_controllers_8h" local="no">MotorControllers.h</includes>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a0e736aa66f51e4217ec4f9ef989f45dd" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::KP</definition>
+        <argsstring></argsstring>
+        <name>KP</name>
+        <qualifiedname>TransparentModeController::KP</qualifiedname>
+        <initializer>= 0.5f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="742" column="28" bodyfile="src/MotorControllers.h" bodystart="742" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1aa1af2be775af0c506545d6f68d37532d" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::KD</definition>
+        <argsstring></argsstring>
+        <name>KD</name>
+        <qualifiedname>TransparentModeController::KD</qualifiedname>
+        <initializer>= 0.01f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="743" column="28" bodyfile="src/MotorControllers.h" bodystart="743" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a7909bda2af6335f89b147db2060e6260" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::LOAD_CELL_LEVER_ARM</definition>
+        <argsstring></argsstring>
+        <name>LOAD_CELL_LEVER_ARM</name>
+        <qualifiedname>TransparentModeController::LOAD_CELL_LEVER_ARM</qualifiedname>
+        <initializer>                                       =
+0.055f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="747" column="28" bodyfile="src/MotorControllers.h" bodystart="747" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1ab1d3af69c53168971929f9ad2d8405b8" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::TORQUE_SIGN</definition>
+        <argsstring></argsstring>
+        <name>TORQUE_SIGN</name>
+        <qualifiedname>TransparentModeController::TORQUE_SIGN</qualifiedname>
+        <initializer>                               =
+1.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="751" column="28" bodyfile="src/MotorControllers.h" bodystart="751" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a04ab7e2946e0629745a37303149b666a" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::MAX_TRANSPARENT_TORQUE</definition>
+        <argsstring></argsstring>
+        <name>MAX_TRANSPARENT_TORQUE</name>
+        <qualifiedname>TransparentModeController::MAX_TRANSPARENT_TORQUE</qualifiedname>
+        <initializer>                                          =
+0.4f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="755" column="28" bodyfile="src/MotorControllers.h" bodystart="755" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a4a4f33bf477166287c77a936cf134b9a" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::TORQUE_FILTER_ALPHA</definition>
+        <argsstring></argsstring>
+        <name>TORQUE_FILTER_ALPHA</name>
+        <qualifiedname>TransparentModeController::TORQUE_FILTER_ALPHA</qualifiedname>
+        <initializer>                                       =
+0.15f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="759" column="28" bodyfile="src/MotorControllers.h" bodystart="759" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a035da911532fb8b34856ba3e8188ed69" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::DERIVATIVE_FILTER_ALPHA</definition>
+        <argsstring></argsstring>
+        <name>DERIVATIVE_FILTER_ALPHA</name>
+        <qualifiedname>TransparentModeController::DERIVATIVE_FILTER_ALPHA</qualifiedname>
+        <initializer>                                           =
+0.05f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="762" column="28" bodyfile="src/MotorControllers.h" bodystart="762" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a8d16d62b2fdb8aa3b7f1a2e98f5618b7" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_encoder_positions" kindref="compound">EncoderPositions</ref> &gt; &amp;</type>
+        <definition>Topic&lt;EncoderPositions&gt;&amp; TransparentModeController::m_encoders</definition>
+        <argsstring></argsstring>
+        <name>m_encoders</name>
+        <qualifiedname>TransparentModeController::m_encoders</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="769" column="11" bodyfile="src/MotorControllers.h" bodystart="769" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a10e5966bc688a80d7e11e5c87ba87b02" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref> &gt; &amp;</type>
+        <definition>Topic&lt;LoadCellForces&gt;&amp; TransparentModeController::m_loadcells</definition>
+        <argsstring></argsstring>
+        <name>m_loadcells</name>
+        <qualifiedname>TransparentModeController::m_loadcells</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="770" column="11" bodyfile="src/MotorControllers.h" bodystart="770" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a2b108cb756d812674c4c76a11b4ae794" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_reply" kindref="compound">MotorReply</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorReply&gt;&amp; TransparentModeController::m_leftMotorFeed</definition>
+        <argsstring></argsstring>
+        <name>m_leftMotorFeed</name>
+        <qualifiedname>TransparentModeController::m_leftMotorFeed</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="771" column="11" bodyfile="src/MotorControllers.h" bodystart="771" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1aff9d30e738bae9641984cfd4a96158bd" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorCmd&gt;&amp; TransparentModeController::m_leftMotorCmd</definition>
+        <argsstring></argsstring>
+        <name>m_leftMotorCmd</name>
+        <qualifiedname>TransparentModeController::m_leftMotorCmd</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="772" column="11" bodyfile="src/MotorControllers.h" bodystart="772" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1ae6e5caed2fae2f1f1e68351f81ea0c84" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::m_previousTorque</definition>
+        <argsstring></argsstring>
+        <name>m_previousTorque</name>
+        <qualifiedname>TransparentModeController::m_previousTorque</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="778" column="11" bodyfile="src/MotorControllers.h" bodystart="778" bodyend="778"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1addf680edca868129fa437677e1ce20c8" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::m_filteredTorque</definition>
+        <argsstring></argsstring>
+        <name>m_filteredTorque</name>
+        <qualifiedname>TransparentModeController::m_filteredTorque</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="780" column="11" bodyfile="src/MotorControllers.h" bodystart="780" bodyend="780"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1aa8a6f11f55eab5a82f8e2b0368a7546d" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::m_previousFilteredTorque</definition>
+        <argsstring></argsstring>
+        <name>m_previousFilteredTorque</name>
+        <qualifiedname>TransparentModeController::m_previousFilteredTorque</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="781" column="11" bodyfile="src/MotorControllers.h" bodystart="781" bodyend="781"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1aa43bc758ad14c2c36298c3c8e96894ff" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float TransparentModeController::m_filteredTorqueDerivative</definition>
+        <argsstring></argsstring>
+        <name>m_filteredTorqueDerivative</name>
+        <qualifiedname>TransparentModeController::m_filteredTorqueDerivative</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="783" column="11" bodyfile="src/MotorControllers.h" bodystart="783" bodyend="783"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1a004b6d1a94b5fa4024c76d5aba106100" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t TransparentModeController::m_previousUs</definition>
+        <argsstring></argsstring>
+        <name>m_previousUs</name>
+        <qualifiedname>TransparentModeController::m_previousUs</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="785" column="14" bodyfile="src/MotorControllers.h" bodystart="785" bodyend="785"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1af939c56b5a987d81b4f6aee4002c29d9" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t TransparentModeController::m_previousUpdateUs</definition>
+        <argsstring></argsstring>
+        <name>m_previousUpdateUs</name>
+        <qualifiedname>TransparentModeController::m_previousUpdateUs</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="786" column="14" bodyfile="src/MotorControllers.h" bodystart="786" bodyend="786"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_transparent_mode_controller_1afbdf90b51b62518e95183b9f6d83e5d0" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool TransparentModeController::m_initialized</definition>
+        <argsstring></argsstring>
+        <name>m_initialized</name>
+        <qualifiedname>TransparentModeController::m_initialized</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="788" column="10" bodyfile="src/MotorControllers.h" bodystart="788" bodyend="788"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_transparent_mode_controller_1a7d90e072eb79c3d0a864a36fec841b41" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>TransparentModeController::TransparentModeController</definition>
+        <argsstring>(Topic&lt; EncoderPositions &gt; &amp;encoders, Topic&lt; LoadCellForces &gt; &amp;loadCells, Topic&lt; MotorReply &gt; &amp;leftMotorFeed, Topic&lt; MotorCmd &gt; &amp;leftMotorCmd)</argsstring>
+        <name>TransparentModeController</name>
+        <qualifiedname>TransparentModeController::TransparentModeController</qualifiedname>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_encoder_positions" kindref="compound">EncoderPositions</ref> &gt; &amp;</type>
+          <declname>encoders</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref> &gt; &amp;</type>
+          <declname>loadCells</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_reply" kindref="compound">MotorReply</ref> &gt; &amp;</type>
+          <declname>leftMotorFeed</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+          <declname>leftMotorCmd</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="580" column="5" bodyfile="src/MotorControllers.h" bodystart="580" bodyend="589"/>
+      </memberdef>
+      <memberdef kind="function" id="class_transparent_mode_controller_1a62a5d7d5230c4e96dea3110539326219" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void TransparentModeController::update</definition>
+        <argsstring>(uint32_t nowUs) override</argsstring>
+        <name>update</name>
+        <qualifiedname>TransparentModeController::update</qualifiedname>
+        <reimplements refid="class_i_task_1aa57dc9cc07cfda40d3dcac232f6115af">update</reimplements>
+        <param>
+          <type>uint32_t</type>
+          <declname>nowUs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="591" column="10" bodyfile="src/MotorControllers.h" bodystart="591" bodyend="735"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>TransparentModeController</label>
+        <link refid="class_transparent_mode_controller"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="4">
+        <label>EncoderPositions</label>
+        <link refid="struct_encoder_positions"/>
+      </node>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="9">
+        <label>MotorCmd</label>
+        <link refid="struct_motor_cmd"/>
+      </node>
+      <node id="7">
+        <label>MotorReply</label>
+        <link refid="struct_motor_reply"/>
+      </node>
+      <node id="3">
+        <label>Topic&lt; EncoderPositions &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="4" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+      <node id="5">
+        <label>Topic&lt; LoadCellForces &gt;</label>
+        <link refid="class_topic"/>
+      </node>
+      <node id="8">
+        <label>Topic&lt; MotorCmd &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="9" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+      <node id="6">
+        <label>Topic&lt; MotorReply &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="7" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+      <node id="1">
+        <label>TransparentModeController</label>
+        <link refid="class_transparent_mode_controller"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_encoders</edgelabel>
+        </childnode>
+        <childnode refid="5" relation="usage">
+          <edgelabel>m_loadcells</edgelabel>
+        </childnode>
+        <childnode refid="6" relation="usage">
+          <edgelabel>m_leftMotorFeed</edgelabel>
+        </childnode>
+        <childnode refid="8" relation="usage">
+          <edgelabel>m_leftMotorCmd</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/MotorControllers.h" line="577" column="1" bodyfile="src/MotorControllers.h" bodystart="578" bodyend="789"/>
+    <listofallmembers>
+      <member refid="class_transparent_mode_controller_1a035da911532fb8b34856ba3e8188ed69" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>DERIVATIVE_FILTER_ALPHA</name></member>
+      <member refid="class_transparent_mode_controller_1aa1af2be775af0c506545d6f68d37532d" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>KD</name></member>
+      <member refid="class_transparent_mode_controller_1a0e736aa66f51e4217ec4f9ef989f45dd" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>KP</name></member>
+      <member refid="class_transparent_mode_controller_1a7909bda2af6335f89b147db2060e6260" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>LOAD_CELL_LEVER_ARM</name></member>
+      <member refid="class_transparent_mode_controller_1a8d16d62b2fdb8aa3b7f1a2e98f5618b7" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_encoders</name></member>
+      <member refid="class_transparent_mode_controller_1addf680edca868129fa437677e1ce20c8" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_filteredTorque</name></member>
+      <member refid="class_transparent_mode_controller_1aa43bc758ad14c2c36298c3c8e96894ff" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_filteredTorqueDerivative</name></member>
+      <member refid="class_transparent_mode_controller_1afbdf90b51b62518e95183b9f6d83e5d0" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_initialized</name></member>
+      <member refid="class_transparent_mode_controller_1aff9d30e738bae9641984cfd4a96158bd" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_leftMotorCmd</name></member>
+      <member refid="class_transparent_mode_controller_1a2b108cb756d812674c4c76a11b4ae794" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_leftMotorFeed</name></member>
+      <member refid="class_transparent_mode_controller_1a10e5966bc688a80d7e11e5c87ba87b02" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_loadcells</name></member>
+      <member refid="class_transparent_mode_controller_1aa8a6f11f55eab5a82f8e2b0368a7546d" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_previousFilteredTorque</name></member>
+      <member refid="class_transparent_mode_controller_1ae6e5caed2fae2f1f1e68351f81ea0c84" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_previousTorque</name></member>
+      <member refid="class_transparent_mode_controller_1af939c56b5a987d81b4f6aee4002c29d9" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_previousUpdateUs</name></member>
+      <member refid="class_transparent_mode_controller_1a004b6d1a94b5fa4024c76d5aba106100" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>m_previousUs</name></member>
+      <member refid="class_transparent_mode_controller_1a04ab7e2946e0629745a37303149b666a" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>MAX_TRANSPARENT_TORQUE</name></member>
+      <member refid="class_transparent_mode_controller_1a4a4f33bf477166287c77a936cf134b9a" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>TORQUE_FILTER_ALPHA</name></member>
+      <member refid="class_transparent_mode_controller_1ab1d3af69c53168971929f9ad2d8405b8" prot="private" virt="non-virtual"><scope>TransparentModeController</scope><name>TORQUE_SIGN</name></member>
+      <member refid="class_transparent_mode_controller_1a7d90e072eb79c3d0a864a36fec841b41" prot="public" virt="non-virtual"><scope>TransparentModeController</scope><name>TransparentModeController</name></member>
+      <member refid="class_transparent_mode_controller_1a62a5d7d5230c4e96dea3110539326219" prot="public" virt="virtual"><scope>TransparentModeController</scope><name>update</name></member>
+      <member refid="class_i_task_1a3fdb0c69908af669286b0903e0ab9a08" prot="public" virt="virtual"><scope>TransparentModeController</scope><name>~ITask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

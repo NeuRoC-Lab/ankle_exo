@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="struct_single_ended_load_cell_pins" kind="struct" language="C++" prot="public">
+    <compoundname>SingleEndedLoadCellPins</compoundname>
+    <includes refid="board_8h" local="no">board.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_single_ended_load_cell_pins_1a24e8d985ca51f7d3d57ff41253a2af2d" prot="public" static="no" mutable="no">
+        <type>std::array&lt; <ref refid="board_8h_1a6dcbd4f0606b9edc6335184b508860cf" kindref="member">Pin</ref>, 4 &gt;</type>
+        <definition>std::array&lt;Pin, 4&gt; SingleEndedLoadCellPins::outputs</definition>
+        <argsstring></argsstring>
+        <name>outputs</name>
+        <qualifiedname>SingleEndedLoadCellPins::outputs</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="18" column="16" bodyfile="src/board.h" bodystart="18" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/board.h" line="16" column="1" bodyfile="src/board.h" bodystart="17" bodyend="19"/>
+    <listofallmembers>
+      <member refid="struct_single_ended_load_cell_pins_1a24e8d985ca51f7d3d57ff41253a2af2d" prot="public" virt="non-virtual"><scope>SingleEndedLoadCellPins</scope><name>outputs</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

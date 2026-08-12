@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="struct_i_n_a125_u_params" kind="struct" language="C++" prot="public">
+    <compoundname>INA125UParams</compoundname>
+    <includes refid="board_8h" local="no">board.h</includes>
+    <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="struct_i_n_a125_u_params_1a7c5edc86886dfd1f6f18a2f0ac7c642d" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float INA125UParams::gainR</definition>
+        <argsstring></argsstring>
+        <name>gainR</name>
+        <qualifiedname>INA125UParams::gainR</qualifiedname>
+        <initializer>= 50.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="34" column="25" bodyfile="src/board.h" bodystart="34" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_i_n_a125_u_params_1aa75dd37c5a3f6ef673c11ec4c315b782" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float INA125UParams::ampGain</definition>
+        <argsstring></argsstring>
+        <name>ampGain</name>
+        <qualifiedname>INA125UParams::ampGain</qualifiedname>
+        <initializer>= 4.0f + 60000.0f / <ref refid="struct_i_n_a125_u_params_1a7c5edc86886dfd1f6f18a2f0ac7c642d" kindref="member">gainR</ref></initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="35" column="25" bodyfile="src/board.h" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_i_n_a125_u_params_1acce2f79d47255c9d7dc3bc83db86f740" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float INA125UParams::IAref</definition>
+        <argsstring></argsstring>
+        <name>IAref</name>
+        <qualifiedname>INA125UParams::IAref</qualifiedname>
+        <initializer>= 2.5f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="37" column="25" bodyfile="src/board.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="struct_i_n_a125_u_params_1ae3ed6852b8d7d11e05bf0755ed490157" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float INA125UParams::Vexc</definition>
+        <argsstring></argsstring>
+        <name>Vexc</name>
+        <qualifiedname>INA125UParams::Vexc</qualifiedname>
+        <initializer>= 5.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/board.h" line="38" column="25" bodyfile="src/board.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/board.h" line="33" column="1" bodyfile="src/board.h" bodystart="33" bodyend="40"/>
+    <listofallmembers>
+      <member refid="struct_i_n_a125_u_params_1aa75dd37c5a3f6ef673c11ec4c315b782" prot="public" virt="non-virtual"><scope>INA125UParams</scope><name>ampGain</name></member>
+      <member refid="struct_i_n_a125_u_params_1a7c5edc86886dfd1f6f18a2f0ac7c642d" prot="public" virt="non-virtual"><scope>INA125UParams</scope><name>gainR</name></member>
+      <member refid="struct_i_n_a125_u_params_1acce2f79d47255c9d7dc3bc83db86f740" prot="public" virt="non-virtual"><scope>INA125UParams</scope><name>IAref</name></member>
+      <member refid="struct_i_n_a125_u_params_1ae3ed6852b8d7d11e05bf0755ed490157" prot="public" virt="non-virtual"><scope>INA125UParams</scope><name>Vexc</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

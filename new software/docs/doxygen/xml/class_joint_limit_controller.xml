@@ -1,0 +1,472 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="class_joint_limit_controller" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>JointLimitController</compoundname>
+    <basecompoundref refid="class_i_task" prot="public" virt="non-virtual">ITask</basecompoundref>
+    <includes refid="_motor_controllers_8h" local="no">MotorControllers.h</includes>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="class_joint_limit_controller_1a263f345eef3e44d073abd7a4b033f3bd" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::softwareLimit</definition>
+        <argsstring></argsstring>
+        <name>softwareLimit</name>
+        <qualifiedname>JointLimitController::softwareLimit</qualifiedname>
+        <initializer>= 15.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="531" column="9" bodyfile="src/MotorControllers.h" bodystart="531" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a34a749bfb90d64b2631a5a3ac9d94b5d" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::absoluteLimit</definition>
+        <argsstring></argsstring>
+        <name>absoluteLimit</name>
+        <qualifiedname>JointLimitController::absoluteLimit</qualifiedname>
+        <initializer>= 35.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="534" column="9" bodyfile="src/MotorControllers.h" bodystart="534" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1aaba2bd9e99b79dcfbfeed0bf60bf20fd" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::VELOCITY_ALPHA</definition>
+        <argsstring></argsstring>
+        <name>VELOCITY_ALPHA</name>
+        <qualifiedname>JointLimitController::VELOCITY_ALPHA</qualifiedname>
+        <initializer>= 0.15f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="538" column="9" bodyfile="src/MotorControllers.h" bodystart="538" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a04123c2cefe580c32c738d5cdeaa9c06" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::ACCELERATION_ALPHA</definition>
+        <argsstring></argsstring>
+        <name>ACCELERATION_ALPHA</name>
+        <qualifiedname>JointLimitController::ACCELERATION_ALPHA</qualifiedname>
+        <initializer>= 0.08f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="541" column="9" bodyfile="src/MotorControllers.h" bodystart="541" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1ac414ae5bf00518d248820ad1c836b1e1" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::TORQUE_ALPHA</definition>
+        <argsstring></argsstring>
+        <name>TORQUE_ALPHA</name>
+        <qualifiedname>JointLimitController::TORQUE_ALPHA</qualifiedname>
+        <initializer>= 0.15f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="544" column="9" bodyfile="src/MotorControllers.h" bodystart="544" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1acee9fa02b9a7a67d273c8e5d21768fe6" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::MIN_ACCELERATION_RAD</definition>
+        <argsstring></argsstring>
+        <name>MIN_ACCELERATION_RAD</name>
+        <qualifiedname>JointLimitController::MIN_ACCELERATION_RAD</qualifiedname>
+        <initializer>= 0.2f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="549" column="9" bodyfile="src/MotorControllers.h" bodystart="549" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a6655e67db27ec6d77404c3deb3702e00" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::MAX_REASONABLE_INERTIA</definition>
+        <argsstring></argsstring>
+        <name>MAX_REASONABLE_INERTIA</name>
+        <qualifiedname>JointLimitController::MAX_REASONABLE_INERTIA</qualifiedname>
+        <initializer>= 10.0f</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="554" column="9" bodyfile="src/MotorControllers.h" bodystart="554" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_joint_limit_controller_1af71d0f06bdc2f92a92bc815460e34ac7" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_encoder_positions" kindref="compound">EncoderPositions</ref> &gt; &amp;</type>
+        <definition>Topic&lt;EncoderPositions&gt;&amp; JointLimitController::m_encoders</definition>
+        <argsstring></argsstring>
+        <name>m_encoders</name>
+        <qualifiedname>JointLimitController::m_encoders</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="556" column="11" bodyfile="src/MotorControllers.h" bodystart="556" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1af2d70ccc5c04d0c361fb882bbcd2b8aa" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref> &gt; &amp;</type>
+        <definition>Topic&lt;LoadCellForces&gt;&amp; JointLimitController::m_loadcells</definition>
+        <argsstring></argsstring>
+        <name>m_loadcells</name>
+        <qualifiedname>JointLimitController::m_loadcells</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="557" column="11" bodyfile="src/MotorControllers.h" bodystart="557" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a6fd1957d5b1216375aac8af3754d5265" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_reply" kindref="compound">MotorReply</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorReply&gt;&amp; JointLimitController::m_leftMotorFeed</definition>
+        <argsstring></argsstring>
+        <name>m_leftMotorFeed</name>
+        <qualifiedname>JointLimitController::m_leftMotorFeed</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="558" column="11" bodyfile="src/MotorControllers.h" bodystart="558" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a78b678cee6000b908d8bbe95d7198e11" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorCmd&gt;&amp; JointLimitController::m_leftMotorCmd</definition>
+        <argsstring></argsstring>
+        <name>m_leftMotorCmd</name>
+        <qualifiedname>JointLimitController::m_leftMotorCmd</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="559" column="11" bodyfile="src/MotorControllers.h" bodystart="559" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1aca4fc29fc61928ed756ce10414992315" prot="private" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8" kindref="member">MotorMetaCommand</ref> &gt; &amp;</type>
+        <definition>Topic&lt;MotorMetaCommand&gt;&amp; JointLimitController::m_leftMotorControl</definition>
+        <argsstring></argsstring>
+        <name>m_leftMotorControl</name>
+        <qualifiedname>JointLimitController::m_leftMotorControl</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="560" column="11" bodyfile="src/MotorControllers.h" bodystart="560" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1ad33e152c63f6c1a1101d29ec4e9328de" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::m_previousPosition</definition>
+        <argsstring></argsstring>
+        <name>m_previousPosition</name>
+        <qualifiedname>JointLimitController::m_previousPosition</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="562" column="11" bodyfile="src/MotorControllers.h" bodystart="562" bodyend="562"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a32801da70c1afa273a96f94b1cf38110" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::m_filteredVelocity</definition>
+        <argsstring></argsstring>
+        <name>m_filteredVelocity</name>
+        <qualifiedname>JointLimitController::m_filteredVelocity</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="564" column="11" bodyfile="src/MotorControllers.h" bodystart="564" bodyend="564"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a0c454952a9320388988bee2a1464fe38" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::m_previousFilteredVelocity</definition>
+        <argsstring></argsstring>
+        <name>m_previousFilteredVelocity</name>
+        <qualifiedname>JointLimitController::m_previousFilteredVelocity</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="565" column="11" bodyfile="src/MotorControllers.h" bodystart="565" bodyend="565"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a607fad06ffeaa1dcfbde899e581f1553" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::m_filteredAcceleration</definition>
+        <argsstring></argsstring>
+        <name>m_filteredAcceleration</name>
+        <qualifiedname>JointLimitController::m_filteredAcceleration</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="567" column="11" bodyfile="src/MotorControllers.h" bodystart="567" bodyend="567"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1aa1ab9cd42ce3c6384775b2c3a590b88f" prot="private" static="no" mutable="no">
+        <type>float</type>
+        <definition>float JointLimitController::m_filteredTorque</definition>
+        <argsstring></argsstring>
+        <name>m_filteredTorque</name>
+        <qualifiedname>JointLimitController::m_filteredTorque</qualifiedname>
+        <initializer>{0.0f}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="569" column="11" bodyfile="src/MotorControllers.h" bodystart="569" bodyend="569"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a4b860251a198f10af1af44ff70cf0f9f" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t JointLimitController::m_previousUs</definition>
+        <argsstring></argsstring>
+        <name>m_previousUs</name>
+        <qualifiedname>JointLimitController::m_previousUs</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="571" column="14" bodyfile="src/MotorControllers.h" bodystart="571" bodyend="571"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a5ea7332313742f0c7e25cc035086b916" prot="private" static="no" mutable="no">
+        <type>uint32_t</type>
+        <definition>uint32_t JointLimitController::m_previousUpdateUs</definition>
+        <argsstring></argsstring>
+        <name>m_previousUpdateUs</name>
+        <qualifiedname>JointLimitController::m_previousUpdateUs</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="572" column="14" bodyfile="src/MotorControllers.h" bodystart="572" bodyend="572"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_joint_limit_controller_1a126074ccb42c3d4534a75c265e2c5657" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool JointLimitController::m_initialized</definition>
+        <argsstring></argsstring>
+        <name>m_initialized</name>
+        <qualifiedname>JointLimitController::m_initialized</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="574" column="10" bodyfile="src/MotorControllers.h" bodystart="574" bodyend="574"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_joint_limit_controller_1aee9ee621bd5306ca0e000fc4480278c8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>JointLimitController::JointLimitController</definition>
+        <argsstring>(Topic&lt; EncoderPositions &gt; &amp;encoders, Topic&lt; LoadCellForces &gt; &amp;loadCells, Topic&lt; MotorReply &gt; &amp;leftMotorFeed, Topic&lt; MotorCmd &gt; &amp;leftMotorCmd, Topic&lt; MotorMetaCommand &gt; &amp;leftMotorControl)</argsstring>
+        <name>JointLimitController</name>
+        <qualifiedname>JointLimitController::JointLimitController</qualifiedname>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_encoder_positions" kindref="compound">EncoderPositions</ref> &gt; &amp;</type>
+          <declname>encoders</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref> &gt; &amp;</type>
+          <declname>loadCells</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_reply" kindref="compound">MotorReply</ref> &gt; &amp;</type>
+          <declname>leftMotorFeed</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref> &gt; &amp;</type>
+          <declname>leftMotorCmd</declname>
+        </param>
+        <param>
+          <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8" kindref="member">MotorMetaCommand</ref> &gt; &amp;</type>
+          <declname>leftMotorControl</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="341" column="5" bodyfile="src/MotorControllers.h" bodystart="341" bodyend="352"/>
+      </memberdef>
+      <memberdef kind="function" id="class_joint_limit_controller_1aee6e159becf4fba20b9b8a0b1c2fad58" prot="public" static="no" const="no" explicit="no" inline="yes" virt="virtual">
+        <type>void</type>
+        <definition>void JointLimitController::update</definition>
+        <argsstring>(uint32_t nowUs) override</argsstring>
+        <name>update</name>
+        <qualifiedname>JointLimitController::update</qualifiedname>
+        <reimplements refid="class_i_task_1aa57dc9cc07cfda40d3dcac232f6115af">update</reimplements>
+        <param>
+          <type>uint32_t</type>
+          <declname>nowUs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/MotorControllers.h" line="354" column="10" bodyfile="src/MotorControllers.h" bodystart="354" bodyend="527"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>JointLimitController</label>
+        <link refid="class_joint_limit_controller"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="4">
+        <label>EncoderPositions</label>
+        <link refid="struct_encoder_positions"/>
+      </node>
+      <node id="2">
+        <label>ITask</label>
+        <link refid="class_i_task"/>
+      </node>
+      <node id="1">
+        <label>JointLimitController</label>
+        <link refid="class_joint_limit_controller"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>m_encoders</edgelabel>
+        </childnode>
+        <childnode refid="5" relation="usage">
+          <edgelabel>m_loadcells</edgelabel>
+        </childnode>
+        <childnode refid="6" relation="usage">
+          <edgelabel>m_leftMotorFeed</edgelabel>
+        </childnode>
+        <childnode refid="8" relation="usage">
+          <edgelabel>m_leftMotorCmd</edgelabel>
+        </childnode>
+        <childnode refid="10" relation="usage">
+          <edgelabel>m_leftMotorControl</edgelabel>
+        </childnode>
+      </node>
+      <node id="9">
+        <label>MotorCmd</label>
+        <link refid="struct_motor_cmd"/>
+      </node>
+      <node id="7">
+        <label>MotorReply</label>
+        <link refid="struct_motor_reply"/>
+      </node>
+      <node id="3">
+        <label>Topic&lt; EncoderPositions &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="4" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+      <node id="5">
+        <label>Topic&lt; LoadCellForces &gt;</label>
+        <link refid="class_topic"/>
+      </node>
+      <node id="8">
+        <label>Topic&lt; MotorCmd &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="9" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+      <node id="10">
+        <label>Topic&lt; MotorMetaCommand &gt;</label>
+        <link refid="class_topic"/>
+      </node>
+      <node id="6">
+        <label>Topic&lt; MotorReply &gt;</label>
+        <link refid="class_topic"/>
+        <childnode refid="7" relation="usage">
+          <edgelabel>m_value</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/MotorControllers.h" line="338" column="1" bodyfile="src/MotorControllers.h" bodystart="339" bodyend="575"/>
+    <listofallmembers>
+      <member refid="class_joint_limit_controller_1a34a749bfb90d64b2631a5a3ac9d94b5d" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>absoluteLimit</name></member>
+      <member refid="class_joint_limit_controller_1a04123c2cefe580c32c738d5cdeaa9c06" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>ACCELERATION_ALPHA</name></member>
+      <member refid="class_joint_limit_controller_1aee9ee621bd5306ca0e000fc4480278c8" prot="public" virt="non-virtual"><scope>JointLimitController</scope><name>JointLimitController</name></member>
+      <member refid="class_joint_limit_controller_1af71d0f06bdc2f92a92bc815460e34ac7" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_encoders</name></member>
+      <member refid="class_joint_limit_controller_1a607fad06ffeaa1dcfbde899e581f1553" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_filteredAcceleration</name></member>
+      <member refid="class_joint_limit_controller_1aa1ab9cd42ce3c6384775b2c3a590b88f" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_filteredTorque</name></member>
+      <member refid="class_joint_limit_controller_1a32801da70c1afa273a96f94b1cf38110" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_filteredVelocity</name></member>
+      <member refid="class_joint_limit_controller_1a126074ccb42c3d4534a75c265e2c5657" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_initialized</name></member>
+      <member refid="class_joint_limit_controller_1a78b678cee6000b908d8bbe95d7198e11" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_leftMotorCmd</name></member>
+      <member refid="class_joint_limit_controller_1aca4fc29fc61928ed756ce10414992315" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_leftMotorControl</name></member>
+      <member refid="class_joint_limit_controller_1a6fd1957d5b1216375aac8af3754d5265" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_leftMotorFeed</name></member>
+      <member refid="class_joint_limit_controller_1af2d70ccc5c04d0c361fb882bbcd2b8aa" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_loadcells</name></member>
+      <member refid="class_joint_limit_controller_1a0c454952a9320388988bee2a1464fe38" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_previousFilteredVelocity</name></member>
+      <member refid="class_joint_limit_controller_1ad33e152c63f6c1a1101d29ec4e9328de" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_previousPosition</name></member>
+      <member refid="class_joint_limit_controller_1a5ea7332313742f0c7e25cc035086b916" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_previousUpdateUs</name></member>
+      <member refid="class_joint_limit_controller_1a4b860251a198f10af1af44ff70cf0f9f" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>m_previousUs</name></member>
+      <member refid="class_joint_limit_controller_1a6655e67db27ec6d77404c3deb3702e00" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>MAX_REASONABLE_INERTIA</name></member>
+      <member refid="class_joint_limit_controller_1acee9fa02b9a7a67d273c8e5d21768fe6" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>MIN_ACCELERATION_RAD</name></member>
+      <member refid="class_joint_limit_controller_1a263f345eef3e44d073abd7a4b033f3bd" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>softwareLimit</name></member>
+      <member refid="class_joint_limit_controller_1ac414ae5bf00518d248820ad1c836b1e1" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>TORQUE_ALPHA</name></member>
+      <member refid="class_joint_limit_controller_1aee6e159becf4fba20b9b8a0b1c2fad58" prot="public" virt="virtual"><scope>JointLimitController</scope><name>update</name></member>
+      <member refid="class_joint_limit_controller_1aaba2bd9e99b79dcfbfeed0bf60bf20fd" prot="private" virt="non-virtual"><scope>JointLimitController</scope><name>VELOCITY_ALPHA</name></member>
+      <member refid="class_i_task_1a3fdb0c69908af669286b0903e0ab9a08" prot="public" virt="virtual"><scope>JointLimitController</scope><name>~ITask</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

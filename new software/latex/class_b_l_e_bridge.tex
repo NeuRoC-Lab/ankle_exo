@@ -1,0 +1,63 @@
+\doxysection{BLEBridge Class Reference}
+\hypertarget{class_b_l_e_bridge}{}\label{class_b_l_e_bridge}\index{BLEBridge@{BLEBridge}}
+
+
+{\ttfamily \+\#include $<$BLE.\+h$>$}
+
+Inheritance diagram for BLEBridge:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_b_l_e_bridge}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12}{BLEBridge}} (\doxymbox{\hyperlink{class_message_bus}{Message\+Bus}} \&bus, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&encoder, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&load\+Cells, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&left\+Motor, \doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_power_readings}{Power\+Readings}} $>$ \&power)
+\item 
+bool \doxymbox{\hyperlink{class_b_l_e_bridge_a3afd1aa72f387e442a5f6f463d527ade}{begin}} ()
+\item 
+void \doxymbox{\hyperlink{class_b_l_e_bridge_abf471aea41effc36bbf3185300d2135a}{update}} (uint32\+\_\+t) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{class_i_task}{ITask}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \doxymbox{\hyperlink{class_i_task_a3fdb0c69908af669286b0903e0ab9a08}{\texorpdfstring{$\sim$}{\string~}\+ITask}} ()=default
+\end{DoxyCompactItemize}
+
+
+\label{class_b_l_e_bridge_doc-constructors}
+\Hypertarget{class_b_l_e_bridge_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12}\index{BLEBridge@{BLEBridge}!BLEBridge@{BLEBridge}}
+\index{BLEBridge@{BLEBridge}!BLEBridge@{BLEBridge}}
+\doxysubsubsection{\texorpdfstring{BLEBridge()}{BLEBridge()}}
+{\footnotesize\ttfamily \label{class_b_l_e_bridge_aa44bb6c02f7a44e38a1e17f1e8b89b12} 
+BLEBridge::\+\+BLEBridge (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{class_message_bus}{Message\+Bus}} \&}]{bus}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_encoder_positions}{Encoder\+Positions}} $>$ \&}]{encoder}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} $>$ \&}]{load\+Cells}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_motor_reply}{Motor\+Reply}} $>$ \&}]{left\+Motor}{, }\item[{\doxymbox{\hyperlink{class_topic}{Topic}}$<$ \doxymbox{\hyperlink{struct_power_readings}{Power\+Readings}} $>$ \&}]{power}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{class_b_l_e_bridge_doc-func-members}
+\Hypertarget{class_b_l_e_bridge_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_b_l_e_bridge_a3afd1aa72f387e442a5f6f463d527ade}\index{BLEBridge@{BLEBridge}!begin@{begin}}
+\index{begin@{begin}!BLEBridge@{BLEBridge}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{class_b_l_e_bridge_a3afd1aa72f387e442a5f6f463d527ade} 
+bool BLEBridge::\+begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{class_b_l_e_bridge_abf471aea41effc36bbf3185300d2135a}\index{BLEBridge@{BLEBridge}!update@{update}}
+\index{update@{update}!BLEBridge@{BLEBridge}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{class_b_l_e_bridge_abf471aea41effc36bbf3185300d2135a} 
+void BLEBridge::\+update (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \doxymbox{\hyperlink{class_i_task_aa57dc9cc07cfda40d3dcac232f6115af}{ITask}}.
+
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+src/\+\doxymbox{\hyperlink{_b_l_e_8h}{BLE.\+h}}\end{DoxyCompactItemize}

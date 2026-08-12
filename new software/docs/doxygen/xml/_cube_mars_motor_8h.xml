@@ -1,0 +1,611 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="_cube_mars_motor_8h" kind="file" language="C++">
+    <compoundname>CubeMarsMotor.h</compoundname>
+    <includes local="no">Arduino.h</includes>
+    <includes local="no">algorithm</includes>
+    <includes local="no">array</includes>
+    <includes local="no">cstdint</includes>
+    <includes local="no">cstring</includes>
+    <includes refid="board_8h" local="yes">board.h</includes>
+    <includes local="no">FlexCAN_T4.h</includes>
+    <includedby refid="_driver_8h" local="yes">src/Driver.h</includedby>
+    <includedby refid="_message_bus_8h" local="yes">src/MessageBus.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>src/CubeMarsMotor.h</label>
+        <link refid="_cube_mars_motor_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>board.h</label>
+        <link refid="board_8h"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Arduino.h</label>
+      </node>
+      <node id="9">
+        <label>FlexCAN_T4.h</label>
+      </node>
+      <node id="8">
+        <label>SPI.h</label>
+      </node>
+      <node id="3">
+        <label>algorithm</label>
+      </node>
+      <node id="4">
+        <label>array</label>
+      </node>
+      <node id="5">
+        <label>cstdint</label>
+      </node>
+      <node id="6">
+        <label>cstring</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="3">
+        <label>src/BLE.h</label>
+        <link refid="_b_l_e_8h"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/CubeMarsMotor.h</label>
+        <link refid="_cube_mars_motor_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/Driver.h</label>
+        <link refid="_driver_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/MessageBus.h</label>
+        <link refid="_message_bus_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/MotorControllers.h</label>
+        <link refid="_motor_controllers_8h"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/main.cpp</label>
+        <link refid="main_8cpp"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="struct_motor_reply" prot="public">MotorReply</innerclass>
+    <innerclass refid="struct_motor_cmd" prot="public">MotorCmd</innerclass>
+    <innerclass refid="struct_can_frame" prot="public">CanFrame</innerclass>
+    <innerclass refid="struct_a_k60_params" prot="public">AK60Params</innerclass>
+    <innerclass refid="class_can_bus" prot="public">CanBus</innerclass>
+    <innerclass refid="class_cube_mars_motor" prot="public">CubeMarsMotor</innerclass>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8" prot="public" static="no" strong="yes">
+        <type>uint8_t</type>
+        <name>MotorMetaCommand</name>
+        <enumvalue id="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3" prot="public">
+          <name>EnterMotorMode</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a" prot="public">
+          <name>ExitMotorMode</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24" prot="public">
+          <name>SetZero</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="26" column="1" bodyfile="src/CubeMarsMotor.h" bodystart="27" bodyend="31"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" prot="public" static="no" constexpr="yes" mutable="no">
+        <type><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref></type>
+        <definition>AK60Params MotorParams</definition>
+        <argsstring></argsstring>
+        <name>MotorParams</name>
+        <initializer>{
+    -12.5f, 12.5f,
+    -45.0f, 45.0f,
+    0.0f, 500.0f,
+    0.0f, 5.0f,
+    -15.0f, 15.0f
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="58" column="29" bodyfile="src/CubeMarsMotor.h" bodystart="58" bodyend="64"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>float</type>
+        <definition>float uint_to_float</definition>
+        <argsstring>(uint16_t code, float x_min, float x_max, int bits)</argsstring>
+        <name>uint_to_float</name>
+        <param>
+          <type>uint16_t</type>
+          <declname>code</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x_min</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x_max</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>bits</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="66" column="14" bodyfile="src/CubeMarsMotor.h" bodystart="66" bodyend="80"/>
+      </memberdef>
+      <memberdef kind="function" id="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>uint16_t</type>
+        <definition>uint16_t float_to_uint</definition>
+        <argsstring>(float x, float x_min, float x_max, int bits)</argsstring>
+        <name>float_to_uint</name>
+        <param>
+          <type>float</type>
+          <declname>x</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x_min</declname>
+        </param>
+        <param>
+          <type>float</type>
+          <declname>x_max</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>bits</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/CubeMarsMotor.h" line="82" column="17" bodyfile="src/CubeMarsMotor.h" bodystart="82" bodyend="97"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Arduino.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;algorithm&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;array&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstdint&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstring&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="board_8h" kindref="compound">board.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>defined(PLATFORM_TEENSY)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;FlexCAN_T4.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="comment">//<sp/>======<sp/>Definitions<sp/>=====</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16" refid="struct_motor_reply" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="struct_motor_reply" kindref="compound">MotorReply</ref></highlight></codeline>
+<codeline lineno="17"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="18" refid="struct_motor_reply_1aa5e635614130b4f241f01d19d4f3b37b" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="struct_motor_reply_1aa5e635614130b4f241f01d19d4f3b37b" kindref="member">can_id</ref>{0};</highlight></codeline>
+<codeline lineno="19" refid="struct_motor_reply_1a849d14601400874feab3c51f1f56c264" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_reply_1a849d14601400874feab3c51f1f56c264" kindref="member">position</ref>{0.0f};</highlight></codeline>
+<codeline lineno="20" refid="struct_motor_reply_1afd03beb2a04a0f16c7ba31bd69c9e496" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_reply_1afd03beb2a04a0f16c7ba31bd69c9e496" kindref="member">velocity</ref>{0.0f};</highlight></codeline>
+<codeline lineno="21" refid="struct_motor_reply_1a9dca3aaa143491acf4dd44c711cdcd96" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_reply_1a9dca3aaa143491acf4dd44c711cdcd96" kindref="member">torque</ref>{0.0f};</highlight></codeline>
+<codeline lineno="22" refid="struct_motor_reply_1a4cfe5110bb5f0bf7e4ac5727879fecc5" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="struct_motor_reply_1a4cfe5110bb5f0bf7e4ac5727879fecc5" kindref="member">temperature</ref>{0};</highlight></codeline>
+<codeline lineno="23" refid="struct_motor_reply_1a4005637bebf999df5d0e021575fcb8b9" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="struct_motor_reply_1a4005637bebf999df5d0e021575fcb8b9" kindref="member">error</ref>{0};</highlight></codeline>
+<codeline lineno="24"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26" refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/><ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8" kindref="member">MotorMetaCommand</ref><sp/>:<sp/>uint8_t</highlight></codeline>
+<codeline lineno="27"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="28" refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8a3a34cf06abdb500b14391007b8da20f3" kindref="member">EnterMotorMode</ref>,</highlight></codeline>
+<codeline lineno="29" refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aedc101c05e86d17f7f033d8f8922321a" kindref="member">ExitMotorMode</ref>,</highlight></codeline>
+<codeline lineno="30" refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1afafad627c19c8a6dff8e59522d537ee8aa4219ff8a137e277235d3d078c495f24" kindref="member">SetZero</ref></highlight></codeline>
+<codeline lineno="31"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33" refid="struct_motor_cmd" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref></highlight></codeline>
+<codeline lineno="34"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="35" refid="struct_motor_cmd_1afa86fc36343b2dc87c31516341f4a223" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd_1afa86fc36343b2dc87c31516341f4a223" kindref="member">position</ref>{0.0f};</highlight></codeline>
+<codeline lineno="36" refid="struct_motor_cmd_1a1af8311a626f3650ad164d2765834f57" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd_1a1af8311a626f3650ad164d2765834f57" kindref="member">velocity</ref>{0.0f};</highlight></codeline>
+<codeline lineno="37" refid="struct_motor_cmd_1a8532acf1595bf0c973fef48f688516bb" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd_1a8532acf1595bf0c973fef48f688516bb" kindref="member">torque</ref>{0.0f};</highlight></codeline>
+<codeline lineno="38" refid="struct_motor_cmd_1a9e7f9a41214f33c3eb513ee7b3b194a3" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd_1a9e7f9a41214f33c3eb513ee7b3b194a3" kindref="member">kp</ref>{0.0f};</highlight></codeline>
+<codeline lineno="39" refid="struct_motor_cmd_1ae29e4c24597b1500b6b6e18c9950c7bf" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd_1ae29e4c24597b1500b6b6e18c9950c7bf" kindref="member">kd</ref>{0.0f};</highlight></codeline>
+<codeline lineno="40"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42" refid="struct_can_frame" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="struct_can_frame" kindref="compound">CanFrame</ref></highlight></codeline>
+<codeline lineno="43"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="44" refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint32_t<sp/></highlight><highlight class="keywordtype">id</highlight><highlight class="normal">{0};</highlight></codeline>
+<codeline lineno="45" refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref>{0};</highlight></codeline>
+<codeline lineno="46" refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>std::array&lt;uint8_t,<sp/>8&gt;<sp/><ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>{};</highlight></codeline>
+<codeline lineno="47"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49" refid="struct_a_k60_params" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref></highlight></codeline>
+<codeline lineno="50"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="51" refid="struct_a_k60_params_1aa71117ddd571030fea967e003bbf8720" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params_1a6baed3c71f79dc254ed9215620eed595" kindref="member">p_min</ref>,<sp/><ref refid="struct_a_k60_params_1aa71117ddd571030fea967e003bbf8720" kindref="member">p_max</ref>;</highlight></codeline>
+<codeline lineno="52" refid="struct_a_k60_params_1ae396b78a7db64ac67e36d11c85eed7a5" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params_1aa25bf87f02bf11117f5adaefaaf2d605" kindref="member">v_min</ref>,<sp/><ref refid="struct_a_k60_params_1ae396b78a7db64ac67e36d11c85eed7a5" kindref="member">v_max</ref>;</highlight></codeline>
+<codeline lineno="53" refid="struct_a_k60_params_1a147544f9059382ab1d275bf5edc2dbaf" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params_1a68334639fe544509dbf0f16a2aa07f4d" kindref="member">kp_min</ref>,<sp/><ref refid="struct_a_k60_params_1a147544f9059382ab1d275bf5edc2dbaf" kindref="member">kp_max</ref>;</highlight></codeline>
+<codeline lineno="54" refid="struct_a_k60_params_1a6a628a644f1159825a2d019007e081f7" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params_1a9b6cd51b29c02a95050af3a95b471413" kindref="member">kd_min</ref>,<sp/><ref refid="struct_a_k60_params_1a6a628a644f1159825a2d019007e081f7" kindref="member">kd_max</ref>;</highlight></codeline>
+<codeline lineno="55" refid="struct_a_k60_params_1a55de772ad487b8a03845bd5fc122ba7b" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params_1a58e1cf842b585e369a758daaf2228b55" kindref="member">trq_min</ref>,<sp/><ref refid="struct_a_k60_params_1a55de772ad487b8a03845bd5fc122ba7b" kindref="member">trq_max</ref>;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="58" refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">constexpr</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>{</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/>-12.5f,<sp/>12.5f,</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/>-45.0f,<sp/>45.0f,</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/>0.0f,<sp/>500.0f,</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/>0.0f,<sp/>5.0f,</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/>-15.0f,<sp/>15.0f</highlight></codeline>
+<codeline lineno="64"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66" refid="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" kindref="member">uint_to_float</ref>(</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/>uint16_t<sp/>code,</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x_min,</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x_max,</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>bits)</highlight></codeline>
+<codeline lineno="71"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>span<sp/>=<sp/>x_max<sp/>-<sp/>x_min;</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>max_int<sp/>=</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">((1UL<sp/>&lt;&lt;<sp/>bits)<sp/>-<sp/>1UL);</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(code)<sp/>*</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>span<sp/>/<sp/>max_int<sp/>+</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>x_min;</highlight></codeline>
+<codeline lineno="80"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"></highlight></codeline>
+<codeline lineno="82" refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>uint16_t<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x,</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x_min,</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>x_max,</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>bits)</highlight></codeline>
+<codeline lineno="87"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/>x<sp/>=<sp/>std::clamp(x,<sp/>x_min,<sp/>x_max);</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"></highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>span<sp/>=<sp/>x_max<sp/>-<sp/>x_min;</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>max_int<sp/>=</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="keywordtype">float</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">((1UL<sp/>&lt;&lt;<sp/>bits)<sp/>-<sp/>1UL);</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(x<sp/>-<sp/>x_min)<sp/>*<sp/>max_int<sp/>/<sp/>span</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="97"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>defined(PLATFORM_TEENSY)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="100"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101" refid="class_can_bus" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="class_can_bus" kindref="compound">CanBus</ref></highlight></codeline>
+<codeline lineno="102"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="104" refid="class_can_bus_1a1d47eb43125b02a6589599ab39177d4b" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1a1d47eb43125b02a6589599ab39177d4b" kindref="member">begin</ref>()</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(<ref refid="class_can_bus_1ac1b7f9dce767c3e1a7ead986762314ed" kindref="member">isReady</ref>())<sp/>{</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;<sp/></highlight><highlight class="comment">//<sp/>prevents<sp/>the<sp/>CAN<sp/>controller<sp/>from<sp/>being<sp/>initialized<sp/>more<sp/>than<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.begin();</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.setBaudRate(<ref refid="namespaceboard_1_1teensy41_1ad5a9220861bed90e1a89d13bb50c15c9" kindref="member">board::teensy41::motorCanBaud</ref>);</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.setMaxMB(16);</highlight></codeline>
+<codeline lineno="113"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.enableFIFO();</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"></highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" kindref="member">m_isInitialized</ref><sp/>=<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="116"><highlight class="normal"></highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="120" refid="class_can_bus_1a088d0c2a4fab75b73247f09160bc2885" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1a088d0c2a4fab75b73247f09160bc2885" kindref="member">send</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref>&amp;<sp/>frame)</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!<ref refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" kindref="member">m_isInitialized</ref><sp/>||<sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref><sp/>&gt;<sp/>8)<sp/>{</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"></highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CAN_message_t<sp/>msg{};</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>msg.id<sp/>=<sp/>frame.<ref refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" kindref="member">id</ref>;</highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>msg.len<sp/>=<sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref>;</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::memcpy(</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>msg.buf,</highlight></codeline>
+<codeline lineno="132"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>.data(),</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref></highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"></highlight></codeline>
+<codeline lineno="136"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.write(msg)<sp/>&gt;<sp/>0;</highlight></codeline>
+<codeline lineno="137"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="138"><highlight class="normal"></highlight></codeline>
+<codeline lineno="139" refid="class_can_bus_1a5ccc3eaf3c815982e9bee1405d7dd35d" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1a5ccc3eaf3c815982e9bee1405d7dd35d" kindref="member">read</ref>(<ref refid="struct_can_frame" kindref="compound">CanFrame</ref>&amp;<sp/>frame)</highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>CAN_message_t<sp/>rxMsg{};</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"></highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(<ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>.read(rxMsg))</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(rxMsg.len<sp/>!=<sp/>8)<sp/>{</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">continue</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"></highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" kindref="member">id</ref><sp/>=<sp/>rxMsg.id;</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref><sp/>=<sp/>rxMsg.len;</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"></highlight></codeline>
+<codeline lineno="152"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::memcpy(</highlight></codeline>
+<codeline lineno="153"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>.data(),</highlight></codeline>
+<codeline lineno="154"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>rxMsg.buf,</highlight></codeline>
+<codeline lineno="155"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>rxMsg.len</highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"></highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="159"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="160"><highlight class="normal"></highlight></codeline>
+<codeline lineno="161"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"></highlight></codeline>
+<codeline lineno="164" refid="class_can_bus_1ac1b7f9dce767c3e1a7ead986762314ed" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1ac1b7f9dce767c3e1a7ead986762314ed" kindref="member">isReady</ref>()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="165"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="166"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" kindref="member">m_isInitialized</ref>;</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"></highlight></codeline>
+<codeline lineno="169"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="170" refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>FlexCAN_T4&lt;CAN1,<sp/>RX_SIZE_256,<sp/>TX_SIZE_16&gt;<sp/><ref refid="class_can_bus_1a475ea1e276cefbef3e1f6942fff8d11e" kindref="member">m_can</ref>;</highlight></codeline>
+<codeline lineno="171" refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_can_bus_1ab305cbfa12306c3c7b789e9a6014a90d" kindref="member">m_isInitialized</ref>{</highlight><highlight class="keyword">false</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="172"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"></highlight></codeline>
+<codeline lineno="174"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Cubemars<sp/>protocol<sp/>interface</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="175" refid="class_cube_mars_motor" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="class_cube_mars_motor_1aa0fe323b3932c3b5284f3fd758fc77b8" kindref="member">CubeMarsMotor</ref></highlight></codeline>
+<codeline lineno="176"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="177"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="178" refid="class_cube_mars_motor_1aa0fe323b3932c3b5284f3fd758fc77b8" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1aa0fe323b3932c3b5284f3fd758fc77b8" kindref="member">CubeMarsMotor</ref>(</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" kindref="member">canId</ref>,</highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref>&amp;<sp/>motorSoftwareLimits)</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" kindref="member">m_canId</ref>(<ref refid="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" kindref="member">canId</ref>),</highlight></codeline>
+<codeline lineno="182"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>(motorSoftwareLimits)</highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/>{}</highlight></codeline>
+<codeline lineno="184"><highlight class="normal"></highlight></codeline>
+<codeline lineno="185" refid="class_cube_mars_motor_1afb1198cfacb64218b4da60d942d6543d" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/><ref refid="class_cube_mars_motor_1afb1198cfacb64218b4da60d942d6543d" kindref="member">enterMotorMode</ref>()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="186"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" kindref="member">specialFrame</ref>({</highlight></codeline>
+<codeline lineno="188"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFF,</highlight></codeline>
+<codeline lineno="189"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFC</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>});</highlight></codeline>
+<codeline lineno="191"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="192"><highlight class="normal"></highlight></codeline>
+<codeline lineno="193" refid="class_cube_mars_motor_1a57f61dcbe93f59e03649ea30187d8601" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/><ref refid="class_cube_mars_motor_1a57f61dcbe93f59e03649ea30187d8601" kindref="member">exitMotorMode</ref>()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="194"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="195"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" kindref="member">specialFrame</ref>({</highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFF,</highlight></codeline>
+<codeline lineno="197"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFD</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>});</highlight></codeline>
+<codeline lineno="199"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="200"><highlight class="normal"></highlight></codeline>
+<codeline lineno="201" refid="class_cube_mars_motor_1ac16830d20696d934ab9ec0bdc710fb28" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/><ref refid="class_cube_mars_motor_1ac16830d20696d934ab9ec0bdc710fb28" kindref="member">setZeroPosition</ref>()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="202"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="203"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" kindref="member">specialFrame</ref>({</highlight></codeline>
+<codeline lineno="204"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFF,</highlight></codeline>
+<codeline lineno="205"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>0xFF,<sp/>0xFF,<sp/>0xFF,<sp/>0xFE</highlight></codeline>
+<codeline lineno="206"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>});</highlight></codeline>
+<codeline lineno="207"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"></highlight></codeline>
+<codeline lineno="209" refid="class_cube_mars_motor_1a3dd68f8f9e34ad8e6de3257f06f3d9c7" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="class_cube_mars_motor_1a3dd68f8f9e34ad8e6de3257f06f3d9c7" kindref="member">begin</ref>()</highlight></codeline>
+<codeline lineno="210"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="213"><highlight class="normal"></highlight></codeline>
+<codeline lineno="214" refid="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="class_cube_mars_motor_1a2ced633634dc16b82fa1d7421f8d9499" kindref="member">canId</ref>()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="215"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" kindref="member">m_canId</ref>;</highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="218"><highlight class="normal"></highlight></codeline>
+<codeline lineno="219" refid="class_cube_mars_motor_1ac6fb646ae7c76cc9161168a27a048b11" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/><ref refid="class_cube_mars_motor_1ac6fb646ae7c76cc9161168a27a048b11" kindref="member">packCommand</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="struct_motor_cmd" kindref="compound">MotorCmd</ref>&amp;<sp/>cmd)</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="220"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>position<sp/>=<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::clamp(</highlight></codeline>
+<codeline lineno="223"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cmd.<ref refid="struct_motor_cmd_1afa86fc36343b2dc87c31516341f4a223" kindref="member">position</ref>,</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.p_min,</highlight></codeline>
+<codeline lineno="225"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.p_max</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>),</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.p_min,</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.p_max,</highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>16</highlight></codeline>
+<codeline lineno="230"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="231"><highlight class="normal"></highlight></codeline>
+<codeline lineno="232"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>velocity<sp/>=<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="233"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::clamp(</highlight></codeline>
+<codeline lineno="234"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cmd.<ref refid="struct_motor_cmd_1a1af8311a626f3650ad164d2765834f57" kindref="member">velocity</ref>,</highlight></codeline>
+<codeline lineno="235"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.v_min,</highlight></codeline>
+<codeline lineno="236"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.v_max</highlight></codeline>
+<codeline lineno="237"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>),</highlight></codeline>
+<codeline lineno="238"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.v_min,</highlight></codeline>
+<codeline lineno="239"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.v_max,</highlight></codeline>
+<codeline lineno="240"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="241"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="242"><highlight class="normal"></highlight></codeline>
+<codeline lineno="243"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>kp<sp/>=<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="244"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::clamp(</highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cmd.<ref refid="struct_motor_cmd_1a9e7f9a41214f33c3eb513ee7b3b194a3" kindref="member">kp</ref>,</highlight></codeline>
+<codeline lineno="246"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.kp_min,</highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.kp_max</highlight></codeline>
+<codeline lineno="248"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>),</highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.kp_min,</highlight></codeline>
+<codeline lineno="250"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.kp_max,</highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="253"><highlight class="normal"></highlight></codeline>
+<codeline lineno="254"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>kd<sp/>=<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="255"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::clamp(</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cmd.<ref refid="struct_motor_cmd_1ae29e4c24597b1500b6b6e18c9950c7bf" kindref="member">kd</ref>,</highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.kd_min,</highlight></codeline>
+<codeline lineno="258"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.kd_max</highlight></codeline>
+<codeline lineno="259"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>),</highlight></codeline>
+<codeline lineno="260"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.kd_min,</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.kd_max,</highlight></codeline>
+<codeline lineno="262"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="263"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"></highlight></codeline>
+<codeline lineno="265"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>trq<sp/>=<sp/><ref refid="_cube_mars_motor_8h_1acc2243edd0f77abae4fd6ae94c41d3a0" kindref="member">float_to_uint</ref>(</highlight></codeline>
+<codeline lineno="266"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::clamp(</highlight></codeline>
+<codeline lineno="267"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cmd.<ref refid="struct_motor_cmd_1a8532acf1595bf0c973fef48f688516bb" kindref="member">torque</ref>,</highlight></codeline>
+<codeline lineno="268"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.trq_min,</highlight></codeline>
+<codeline lineno="269"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>.trq_max</highlight></codeline>
+<codeline lineno="270"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>),</highlight></codeline>
+<codeline lineno="271"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.trq_min,</highlight></codeline>
+<codeline lineno="272"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.trq_max,</highlight></codeline>
+<codeline lineno="273"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="274"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="275"><highlight class="normal"></highlight></codeline>
+<codeline lineno="276"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/>frame{};</highlight></codeline>
+<codeline lineno="277"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref><sp/>=<sp/>8;</highlight></codeline>
+<codeline lineno="278"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" kindref="member">id</ref><sp/>=<sp/><ref refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" kindref="member">m_canId</ref>;</highlight></codeline>
+<codeline lineno="279"><highlight class="normal"></highlight></codeline>
+<codeline lineno="280"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[0]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(position<sp/>&gt;&gt;<sp/>8);</highlight></codeline>
+<codeline lineno="281"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[1]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(position<sp/>&amp;<sp/>0xFF);</highlight></codeline>
+<codeline lineno="282"><highlight class="normal"></highlight></codeline>
+<codeline lineno="283"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[2]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(velocity<sp/>&gt;&gt;<sp/>4);</highlight></codeline>
+<codeline lineno="284"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[3]<sp/>=</highlight></codeline>
+<codeline lineno="285"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(</highlight></codeline>
+<codeline lineno="286"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>((velocity<sp/>&amp;<sp/>0x0F)<sp/>&lt;&lt;<sp/>4)<sp/>|</highlight></codeline>
+<codeline lineno="287"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>((kp<sp/>&gt;&gt;<sp/>8)<sp/>&amp;<sp/>0x0F)</highlight></codeline>
+<codeline lineno="288"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="289"><highlight class="normal"></highlight></codeline>
+<codeline lineno="290"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[4]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(kp<sp/>&amp;<sp/>0xFF);</highlight></codeline>
+<codeline lineno="291"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[5]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(kd<sp/>&gt;&gt;<sp/>4);</highlight></codeline>
+<codeline lineno="292"><highlight class="normal"></highlight></codeline>
+<codeline lineno="293"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[6]<sp/>=</highlight></codeline>
+<codeline lineno="294"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(</highlight></codeline>
+<codeline lineno="295"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>((kd<sp/>&amp;<sp/>0x0F)<sp/>&lt;&lt;<sp/>4)<sp/>|</highlight></codeline>
+<codeline lineno="296"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>((trq<sp/>&gt;&gt;<sp/>8)<sp/>&amp;<sp/>0x0F)</highlight></codeline>
+<codeline lineno="297"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="298"><highlight class="normal"></highlight></codeline>
+<codeline lineno="299"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[7]<sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(trq<sp/>&amp;<sp/>0xFF);</highlight></codeline>
+<codeline lineno="300"><highlight class="normal"></highlight></codeline>
+<codeline lineno="301"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>frame;</highlight></codeline>
+<codeline lineno="302"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="303"><highlight class="normal"></highlight></codeline>
+<codeline lineno="304" refid="class_cube_mars_motor_1a6673bd8632b0f6fa1814ff4e08023ff0" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_motor_reply" kindref="compound">MotorReply</ref><sp/><ref refid="class_cube_mars_motor_1a6673bd8632b0f6fa1814ff4e08023ff0" kindref="member">unpackReply</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref>&amp;<sp/>frame)</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="305"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="306"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="struct_motor_reply" kindref="compound">MotorReply</ref><sp/>reply{};</highlight></codeline>
+<codeline lineno="307"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1aa5e635614130b4f241f01d19d4f3b37b" kindref="member">can_id</ref><sp/>=<sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint8_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" kindref="member">id</ref>);</highlight></codeline>
+<codeline lineno="308"><highlight class="normal"></highlight></codeline>
+<codeline lineno="309"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Kept<sp/>from<sp/>your<sp/>current<sp/>reply<sp/>packing<sp/>convention.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="310"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>position_raw<sp/>=</highlight></codeline>
+<codeline lineno="311"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[1])<sp/>&lt;&lt;<sp/>8)<sp/>|</highlight></codeline>
+<codeline lineno="312"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[2]);</highlight></codeline>
+<codeline lineno="313"><highlight class="normal"></highlight></codeline>
+<codeline lineno="314"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>velocity_raw<sp/>=</highlight></codeline>
+<codeline lineno="315"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[3])<sp/>&lt;&lt;<sp/>4)<sp/>|</highlight></codeline>
+<codeline lineno="316"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[4]<sp/>&amp;<sp/>0xF0)<sp/>&gt;&gt;<sp/>4);</highlight></codeline>
+<codeline lineno="317"><highlight class="normal"></highlight></codeline>
+<codeline lineno="318"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint16_t<sp/>trq_raw<sp/>=</highlight></codeline>
+<codeline lineno="319"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>(</highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[4]<sp/>&amp;<sp/>0x0F)<sp/>&lt;&lt;<sp/>8)<sp/>|</highlight></codeline>
+<codeline lineno="320"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">static_cast&lt;</highlight><highlight class="normal">uint16_t</highlight><highlight class="keyword">&gt;</highlight><highlight class="normal">(frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[5]);</highlight></codeline>
+<codeline lineno="321"><highlight class="normal"></highlight></codeline>
+<codeline lineno="322"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1a849d14601400874feab3c51f1f56c264" kindref="member">position</ref><sp/>=<sp/><ref refid="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" kindref="member">uint_to_float</ref>(</highlight></codeline>
+<codeline lineno="323"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>position_raw,</highlight></codeline>
+<codeline lineno="324"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.p_min,</highlight></codeline>
+<codeline lineno="325"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.p_max,</highlight></codeline>
+<codeline lineno="326"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>16</highlight></codeline>
+<codeline lineno="327"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="328"><highlight class="normal"></highlight></codeline>
+<codeline lineno="329"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1afd03beb2a04a0f16c7ba31bd69c9e496" kindref="member">velocity</ref><sp/>=<sp/><ref refid="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" kindref="member">uint_to_float</ref>(</highlight></codeline>
+<codeline lineno="330"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>velocity_raw,</highlight></codeline>
+<codeline lineno="331"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.v_min,</highlight></codeline>
+<codeline lineno="332"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.v_max,</highlight></codeline>
+<codeline lineno="333"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="334"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="335"><highlight class="normal"></highlight></codeline>
+<codeline lineno="336"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1a9dca3aaa143491acf4dd44c711cdcd96" kindref="member">torque</ref><sp/>=<sp/><ref refid="_cube_mars_motor_8h_1a02000d77f07336f84b3ae1b203cdc381" kindref="member">uint_to_float</ref>(</highlight></codeline>
+<codeline lineno="337"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>trq_raw,</highlight></codeline>
+<codeline lineno="338"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.trq_min,</highlight></codeline>
+<codeline lineno="339"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="_cube_mars_motor_8h_1a8ba8251c1e7bb49887515e271c9483ed" kindref="member">MotorParams</ref>.trq_max,</highlight></codeline>
+<codeline lineno="340"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>12</highlight></codeline>
+<codeline lineno="341"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="342"><highlight class="normal"></highlight></codeline>
+<codeline lineno="343"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1a4cfe5110bb5f0bf7e4ac5727879fecc5" kindref="member">temperature</ref><sp/>=<sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[6];</highlight></codeline>
+<codeline lineno="344"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reply.<ref refid="struct_motor_reply_1a4005637bebf999df5d0e021575fcb8b9" kindref="member">error</ref><sp/>=<sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref>[7];</highlight></codeline>
+<codeline lineno="345"><highlight class="normal"></highlight></codeline>
+<codeline lineno="346"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>reply;</highlight></codeline>
+<codeline lineno="347"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="348"><highlight class="normal"></highlight></codeline>
+<codeline lineno="349"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="350"><highlight class="normal"></highlight></codeline>
+<codeline lineno="351" refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/><ref refid="class_cube_mars_motor_1a76201bc2a3371fd23ec2846f40ff3012" kindref="member">specialFrame</ref>(</highlight></codeline>
+<codeline lineno="352"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::array&lt;uint8_t,<sp/>8&gt;&amp;<sp/>data)</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="353"><highlight class="keyword"><sp/><sp/><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="354"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="struct_can_frame" kindref="compound">CanFrame</ref><sp/>frame{};</highlight></codeline>
+<codeline lineno="355"><highlight class="normal"></highlight></codeline>
+<codeline lineno="356"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1aa850629d26a09531d2f40bd2b30b77f7" kindref="member">id</ref><sp/>=<sp/><ref refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" kindref="member">m_canId</ref>;</highlight></codeline>
+<codeline lineno="357"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a5058b21082944c7bdb7db4eb9f7f87d8" kindref="member">length</ref><sp/>=<sp/>8;</highlight></codeline>
+<codeline lineno="358"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>frame.<ref refid="struct_can_frame_1a1e3fcd95f96d5db9ee737a57fab13605" kindref="member">data</ref><sp/>=<sp/>data;</highlight></codeline>
+<codeline lineno="359"><highlight class="normal"></highlight></codeline>
+<codeline lineno="360"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>frame;</highlight></codeline>
+<codeline lineno="361"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="362"><highlight class="normal"></highlight></codeline>
+<codeline lineno="363"><highlight class="normal"></highlight></codeline>
+<codeline lineno="364" refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/><ref refid="class_cube_mars_motor_1ac03deef30f579f35d80fc684f965595e" kindref="member">m_canId</ref>;</highlight></codeline>
+<codeline lineno="365" refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="struct_a_k60_params" kindref="compound">AK60Params</ref><sp/><ref refid="class_cube_mars_motor_1adb76d78eb54410af4ca25ffec15ccc39" kindref="member">m_softwareLimits</ref>;</highlight></codeline>
+<codeline lineno="366"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="367"><highlight class="normal"></highlight></codeline>
+<codeline lineno="368"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/CubeMarsMotor.h"/>
+  </compounddef>
+</doxygen>

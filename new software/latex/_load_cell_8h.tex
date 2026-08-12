@@ -1,0 +1,74 @@
+\doxysection{src/\+\+Load\+Cell.h File Reference}
+\hypertarget{_load_cell_8h}{}\label{_load_cell_8h}\index{src/LoadCell.h@{src/LoadCell.h}}
+{\ttfamily \+\#include $<$Arduino.\+h$>$}\newline
+{\ttfamily \+\#include $<$algorithm$>$}\newline
+{\ttfamily \+\#include $<$array$>$}\newline
+{\ttfamily \+\#include $<$cstddef$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+{\ttfamily \+\#include "{}board.\+h"{}}\newline
+{\ttfamily \+\#include $<$nrf\+\_\+saadc.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{struct_load_cell_params}{Load\+Cell\+Params}}
+\item 
+struct \doxymbox{\hyperlink{struct_nano_load_cell_pins}{Nano\+Load\+Cell\+Pins}}
+\item 
+class \doxymbox{\hyperlink{class_load_cell}{Load\+Cell}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} = std::\+array$<$float, \doxymbox{\hyperlink{board_8h_a79cf27009260690babacedf37f7ffb78}{Load\+Cell\+Count}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr float \doxymbox{\hyperlink{_load_cell_8h_a2d8576229dfe9cd68f79b3660313a41e}{nano\+Saadc\+Reference\+Voltage}} = 0.\+6f
+\item 
+constexpr float \doxymbox{\hyperlink{_load_cell_8h_aaa2fc9bb98b8f9151db4ecae9e7edcca}{nano\+Saadc\+Gain}} = 1.\+0f /\+ 5.\+0f
+\item 
+constexpr float \doxymbox{\hyperlink{_load_cell_8h_a492a74785c43befe8ae872d545adfdf7}{nano\+Saadc\+Differential\+Counts}} = 2048.\+0f
+\item 
+\doxymbox{\hyperlink{struct_load_cell_params}{Load\+Cell\+Params}} \doxymbox{\hyperlink{_load_cell_8h_a430be82f2debfa73e26864c0a44e4ee4}{load\+Cell\+Params}} \{\}
+\end{DoxyCompactItemize}
+
+
+\label{_load_cell_8h_doc-typedef-members}
+\Hypertarget{_load_cell_8h_doc-typedef-members}
+\doxysubsection{Typedef Documentation}
+\Hypertarget{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}\index{LoadCell.h@{LoadCell.h}!LoadCellForces@{LoadCellForces}}
+\index{LoadCellForces@{LoadCellForces}!LoadCell.h@{LoadCell.h}}
+\doxysubsubsection{\texorpdfstring{LoadCellForces}{LoadCellForces}}
+{\footnotesize\ttfamily \label{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d} 
+using \doxymbox{\hyperlink{_load_cell_8h_a7db76ed1010e85a4207179187916ec1d}{Load\+Cell\+Forces}} = std::\+array$<$float, \doxymbox{\hyperlink{board_8h_a79cf27009260690babacedf37f7ffb78}{Load\+Cell\+Count}}$>$}
+
+
+
+\label{_load_cell_8h_doc-var-members}
+\Hypertarget{_load_cell_8h_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{_load_cell_8h_a430be82f2debfa73e26864c0a44e4ee4}\index{LoadCell.h@{LoadCell.h}!loadCellParams@{loadCellParams}}
+\index{loadCellParams@{loadCellParams}!LoadCell.h@{LoadCell.h}}
+\doxysubsubsection{\texorpdfstring{loadCellParams}{loadCellParams}}
+{\footnotesize\ttfamily \label{_load_cell_8h_a430be82f2debfa73e26864c0a44e4ee4} 
+\doxymbox{\hyperlink{struct_load_cell_params}{Load\+Cell\+Params}} load\+Cell\+Params \{\}\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{_load_cell_8h_a492a74785c43befe8ae872d545adfdf7}\index{LoadCell.h@{LoadCell.h}!nanoSaadcDifferentialCounts@{nanoSaadcDifferentialCounts}}
+\index{nanoSaadcDifferentialCounts@{nanoSaadcDifferentialCounts}!LoadCell.h@{LoadCell.h}}
+\doxysubsubsection{\texorpdfstring{nanoSaadcDifferentialCounts}{nanoSaadcDifferentialCounts}}
+{\footnotesize\ttfamily \label{_load_cell_8h_a492a74785c43befe8ae872d545adfdf7} 
+float nano\+Saadc\+Differential\+Counts = 2048.\+0f\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{_load_cell_8h_aaa2fc9bb98b8f9151db4ecae9e7edcca}\index{LoadCell.h@{LoadCell.h}!nanoSaadcGain@{nanoSaadcGain}}
+\index{nanoSaadcGain@{nanoSaadcGain}!LoadCell.h@{LoadCell.h}}
+\doxysubsubsection{\texorpdfstring{nanoSaadcGain}{nanoSaadcGain}}
+{\footnotesize\ttfamily \label{_load_cell_8h_aaa2fc9bb98b8f9151db4ecae9e7edcca} 
+float nano\+Saadc\+Gain = 1.\+0f /\+ 5.\+0f\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{_load_cell_8h_a2d8576229dfe9cd68f79b3660313a41e}\index{LoadCell.h@{LoadCell.h}!nanoSaadcReferenceVoltage@{nanoSaadcReferenceVoltage}}
+\index{nanoSaadcReferenceVoltage@{nanoSaadcReferenceVoltage}!LoadCell.h@{LoadCell.h}}
+\doxysubsubsection{\texorpdfstring{nanoSaadcReferenceVoltage}{nanoSaadcReferenceVoltage}}
+{\footnotesize\ttfamily \label{_load_cell_8h_a2d8576229dfe9cd68f79b3660313a41e} 
+float nano\+Saadc\+Reference\+Voltage = 0.\+6f\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
