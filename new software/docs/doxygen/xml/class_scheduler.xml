@@ -2,6 +2,7 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
   <compounddef id="class_scheduler" kind="class" language="C++" prot="public">
     <compoundname>Scheduler</compoundname>
+    <includes refid="_scheduler_8h" local="no">Scheduler.h</includes>
     <templateparamlist>
       <param>
         <type>size_t</type>
@@ -23,7 +24,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/main.cpp" line="36" column="11" bodyfile="src/main.cpp" bodystart="36" bodyend="36"/>
+        <location file="src/Scheduler.h" line="26" column="11" bodyfile="src/Scheduler.h" bodystart="26" bodyend="26"/>
       </memberdef>
       <memberdef kind="variable" id="class_scheduler_1a544743cc54dec7c984734c24136dfc48" prot="private" static="no" mutable="no">
         <type>size_t</type>
@@ -38,7 +39,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/main.cpp" line="37" column="12" bodyfile="src/main.cpp" bodystart="37" bodyend="37"/>
+        <location file="src/Scheduler.h" line="27" column="12" bodyfile="src/Scheduler.h" bodystart="27" bodyend="27"/>
       </memberdef>
     </sectiondef>
     <sectiondef kind="public-func">
@@ -58,7 +59,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/main.cpp" line="15" column="10" bodyfile="src/main.cpp" bodystart="15" bodyend="23"/>
+        <location file="src/Scheduler.h" line="5" column="10" bodyfile="src/Scheduler.h" bodystart="5" bodyend="13"/>
       </memberdef>
       <memberdef kind="function" id="class_scheduler_1aaf98c789ae5619a62f17c86f108f120f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
         <type>void</type>
@@ -76,7 +77,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/main.cpp" line="25" column="10" bodyfile="src/main.cpp" bodystart="25" bodyend="33"/>
+        <location file="src/Scheduler.h" line="15" column="10" bodyfile="src/Scheduler.h" bodystart="15" bodyend="23"/>
       </memberdef>
     </sectiondef>
     <briefdescription>
@@ -96,7 +97,7 @@
         </childnode>
       </node>
     </collaborationgraph>
-    <location file="src/main.cpp" line="12" column="1" bodyfile="src/main.cpp" bodystart="13" bodyend="38"/>
+    <location file="src/Scheduler.h" line="2" column="1" bodyfile="src/Scheduler.h" bodystart="3" bodyend="28"/>
     <listofallmembers>
       <member refid="class_scheduler_1a906ae5327fbc0421742437be304c2cc8" prot="public" virt="non-virtual"><scope>Scheduler</scope><name>add</name></member>
       <member refid="class_scheduler_1a544743cc54dec7c984734c24136dfc48" prot="private" virt="non-virtual"><scope>Scheduler</scope><name>m_count</name></member>

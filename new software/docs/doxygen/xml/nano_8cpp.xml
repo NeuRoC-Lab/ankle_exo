@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.17.0" xml:lang="en-US">
+  <compounddef id="nano_8cpp" kind="file" language="C++">
+    <compoundname>nano.cpp</compoundname>
+    <includes local="no">functional</includes>
+    <includes local="no">Arduino.h</includes>
+    <includes refid="board_8h" local="yes">board.h</includes>
+    <includes refid="_message_bus_8h" local="yes">MessageBus.h</includes>
+    <includes refid="_driver_8h" local="yes">Driver.h</includes>
+    <includes refid="_b_l_e_8h" local="yes">BLE.h</includes>
+    <includes refid="_motor_controllers_8h" local="yes">MotorControllers.h</includes>
+    <includes refid="_scheduler_8h" local="yes">Scheduler.h</includes>
+    <incdepgraph>
+      <node id="24">
+        <label>BLE.h</label>
+        <link refid="_b_l_e_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>BusTypes.h</label>
+        <link refid="_bus_types_8h"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>CubeMarsMotor.h</label>
+        <link refid="_cube_mars_motor_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>Driver.h</label>
+        <link refid="_driver_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>Encoder.h</label>
+        <link refid="_encoder_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>LoadCell.h</label>
+        <link refid="_load_cell_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>MessageBus.h</label>
+        <link refid="_message_bus_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>MotorControllers.h</label>
+        <link refid="_motor_controllers_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Scheduler.h</label>
+        <link refid="_scheduler_8h"/>
+      </node>
+      <node id="19">
+        <label>UartHandler.h</label>
+        <link refid="_uart_handler_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>board.h</label>
+        <link refid="board_8h"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/nano.cpp</label>
+        <link refid="nano_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>Arduino.h</label>
+      </node>
+      <node id="25">
+        <label>ArduinoBLE.h</label>
+      </node>
+      <node id="18">
+        <label>FlexCAN_T4.h</label>
+      </node>
+      <node id="23">
+        <label>INA_Series_Sensor.h</label>
+      </node>
+      <node id="20">
+        <label>PacketSerial.h</label>
+      </node>
+      <node id="7">
+        <label>SPI.h</label>
+      </node>
+      <node id="22">
+        <label>Wire.h</label>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="6">
+        <label>array</label>
+      </node>
+      <node id="9">
+        <label>cstddef</label>
+      </node>
+      <node id="5">
+        <label>cstdint</label>
+      </node>
+      <node id="10">
+        <label>cstring</label>
+      </node>
+      <node id="2">
+        <label>functional</label>
+      </node>
+      <node id="16">
+        <label>nrf_saadc.h</label>
+      </node>
+      <node id="11">
+        <label>type_traits</label>
+      </node>
+    </incdepgraph>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" prot="public" static="no" mutable="no">
+        <type><ref refid="class_scheduler" kindref="compound">Scheduler</ref>&lt; 12 &gt;</type>
+        <definition>Scheduler&lt;12&gt; scheduler</definition>
+        <argsstring></argsstring>
+        <name>scheduler</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="14" column="11" bodyfile="src/nano.cpp" bodystart="14" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a715eccdd75f9b748e06b1f58b4175566" prot="public" static="no" mutable="no">
+        <type><ref refid="class_u_a_r_t_handler" kindref="compound">UARTHandler</ref></type>
+        <definition>UARTHandler uart(board::nano::teensyUart)</definition>
+        <argsstring>(board::nano::teensyUart)</argsstring>
+        <name>uart</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="16" column="13"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" prot="public" static="no" mutable="no">
+        <type><ref refid="class_message_bus" kindref="compound">MessageBus</ref></type>
+        <definition>MessageBus messageBus(uart)</definition>
+        <argsstring>(uart)</argsstring>
+        <name>messageBus</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="20" column="12"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1afcf3eb5ab3d297f144ff2a1a2e9e207a" prot="public" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="_load_cell_8h_1a7db76ed1010e85a4207179187916ec1d" kindref="member">LoadCellForces</ref> &gt;</type>
+        <definition>Topic&lt;LoadCellForces&gt; loadCellTopic</definition>
+        <argsstring></argsstring>
+        <name>loadCellTopic</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="22" column="7" bodyfile="src/nano.cpp" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a8a47c1f04ae79535aa082951e8e1b7af" prot="public" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_encoder_positions" kindref="compound">EncoderPositions</ref> &gt;</type>
+        <definition>Topic&lt;EncoderPositions&gt; encoderTopic</definition>
+        <argsstring></argsstring>
+        <name>encoderTopic</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="25" column="7" bodyfile="src/nano.cpp" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a4a53a8d4a67e8f0899fcf7377a9815bc" prot="public" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_motor_reply" kindref="compound">MotorReply</ref> &gt;</type>
+        <definition>Topic&lt;MotorReply&gt; leftMotorTopic</definition>
+        <argsstring></argsstring>
+        <name>leftMotorTopic</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="26" column="7" bodyfile="src/nano.cpp" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a6833283966bd3bc2b9c92440715ece6b" prot="public" static="no" mutable="no">
+        <type><ref refid="class_topic" kindref="compound">Topic</ref>&lt; <ref refid="struct_power_readings" kindref="compound">PowerReadings</ref> &gt;</type>
+        <definition>Topic&lt;PowerReadings&gt; ina232Topic</definition>
+        <argsstring></argsstring>
+        <name>ina232Topic</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="27" column="7" bodyfile="src/nano.cpp" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1ad2d59cada5413071f61a1be1451a93c9" prot="public" static="no" mutable="no">
+        <type><ref refid="class_load_cell_driver" kindref="compound">LoadCellDriver</ref></type>
+        <definition>LoadCellDriver loadCellDriver</definition>
+        <argsstring></argsstring>
+        <name>loadCellDriver</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="29" column="16" bodyfile="src/nano.cpp" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a617d748af80800c0ebfffbccc10584f2" prot="public" static="no" mutable="no">
+        <type><ref refid="class_polling_publisher" kindref="compound">PollingPublisher</ref>&lt; <ref refid="class_load_cell_driver" kindref="compound">LoadCellDriver</ref>, <ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a" kindref="member">EndpointId::LoadCellSnapshot</ref>, 5 &apos;000 &gt;</type>
+        <definition>PollingPublisher&lt; LoadCellDriver, EndpointId::LoadCellSnapshot, 5 &apos;000 &gt; loadCellPublisher(loadCellDriver, messageBus)</definition>
+        <argsstring>(loadCellDriver, messageBus)</argsstring>
+        <name>loadCellPublisher</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="35" column="2"/>
+      </memberdef>
+      <memberdef kind="variable" id="nano_8cpp_1a2d6cabf6de0f8e3c017153203b8dc73b" prot="public" static="no" mutable="no">
+        <type><ref refid="class_b_l_e_bridge" kindref="compound">BLEBridge</ref></type>
+        <definition>BLEBridge bleBridge(messageBus, encoderTopic, loadCellTopic, leftMotorTopic, ina232Topic)</definition>
+        <argsstring>(messageBus, encoderTopic, loadCellTopic, leftMotorTopic, ina232Topic)</argsstring>
+        <name>bleBridge</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="40" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="nano_8cpp_1a4fc01d736fe50cf5b977f755b675f11d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void setup</definition>
+        <argsstring>()</argsstring>
+        <name>setup</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="48" column="6" bodyfile="src/nano.cpp" bodystart="48" bodyend="87"/>
+      </memberdef>
+      <memberdef kind="function" id="nano_8cpp_1afe461d27b9c48d5921c00d521181f12f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void loop</definition>
+        <argsstring>()</argsstring>
+        <name>loop</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/nano.cpp" line="89" column="6" bodyfile="src/nano.cpp" bodystart="89" bodyend="92"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Created<sp/>by<sp/>Oscar<sp/>Tesniere<sp/>on<sp/>11/08/2026.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="comment">//</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;functional&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Arduino.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="board_8h" kindref="compound">board.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="_message_bus_8h" kindref="compound">MessageBus.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="_driver_8h" kindref="compound">Driver.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="_b_l_e_8h" kindref="compound">BLE.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="_motor_controllers_8h" kindref="compound">MotorControllers.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;<ref refid="_scheduler_8h" kindref="compound">Scheduler.h</ref>&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"><ref refid="class_scheduler" kindref="compound">Scheduler&lt;12&gt;</ref><sp/><ref refid="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" kindref="member">scheduler</ref>;</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><ref refid="class_u_a_r_t_handler" kindref="compound">UARTHandler</ref><sp/><ref refid="nano_8cpp_1a715eccdd75f9b748e06b1f58b4175566" kindref="member">uart</ref>(</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/>board::nano::teensyUart</highlight></codeline>
+<codeline lineno="18"><highlight class="normal">);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><ref refid="class_message_bus" kindref="compound">MessageBus</ref><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>(<ref refid="nano_8cpp_1a715eccdd75f9b748e06b1f58b4175566" kindref="member">uart</ref>);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><ref refid="class_topic" kindref="compound">Topic&lt;LoadCellForces&gt;</ref><sp/><ref refid="nano_8cpp_1afcf3eb5ab3d297f144ff2a1a2e9e207a" kindref="member">loadCellTopic</ref>;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="comment">//<sp/>make<sp/>a<sp/>virtual<sp/>copy<sp/>/<sp/>&quot;mirror&quot;<sp/>of<sp/>the<sp/>topics<sp/>that<sp/>are<sp/>on<sp/>the<sp/>teensy<sp/>to<sp/>forward<sp/>the<sp/>communications<sp/>to/from<sp/>the<sp/>BLE</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><ref refid="class_topic" kindref="compound">Topic&lt;EncoderPositions&gt;</ref><sp/><ref refid="nano_8cpp_1a8a47c1f04ae79535aa082951e8e1b7af" kindref="member">encoderTopic</ref>;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><ref refid="class_topic" kindref="compound">Topic&lt;MotorReply&gt;</ref><sp/><ref refid="nano_8cpp_1a4a53a8d4a67e8f0899fcf7377a9815bc" kindref="member">leftMotorTopic</ref>;</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><ref refid="class_topic" kindref="compound">Topic&lt;PowerReadings&gt;</ref><sp/><ref refid="nano_8cpp_1a6833283966bd3bc2b9c92440715ece6b" kindref="member">ina232Topic</ref>;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><ref refid="class_load_cell_driver" kindref="compound">LoadCellDriver</ref><sp/><ref refid="nano_8cpp_1ad2d59cada5413071f61a1be1451a93c9" kindref="member">loadCellDriver</ref>;</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><ref refid="class_polling_publisher" kindref="compound">PollingPublisher</ref>&lt;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="class_load_cell_driver" kindref="compound">LoadCellDriver</ref>,</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a" kindref="member">EndpointId::LoadCellSnapshot</ref>,</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>5&apos;000</highlight></codeline>
+<codeline lineno="35"><highlight class="normal">&gt;<sp/><ref refid="nano_8cpp_1a617d748af80800c0ebfffbccc10584f2" kindref="member">loadCellPublisher</ref>(</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ad2d59cada5413071f61a1be1451a93c9" kindref="member">loadCellDriver</ref>,</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref></highlight></codeline>
+<codeline lineno="38"><highlight class="normal">);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><ref refid="class_b_l_e_bridge" kindref="compound">BLEBridge</ref><sp/><ref refid="nano_8cpp_1a2d6cabf6de0f8e3c017153203b8dc73b" kindref="member">bleBridge</ref>(</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>,</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a8a47c1f04ae79535aa082951e8e1b7af" kindref="member">encoderTopic</ref>,</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1afcf3eb5ab3d297f144ff2a1a2e9e207a" kindref="member">loadCellTopic</ref>,</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a4a53a8d4a67e8f0899fcf7377a9815bc" kindref="member">leftMotorTopic</ref>,</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a6833283966bd3bc2b9c92440715ece6b" kindref="member">ina232Topic</ref></highlight></codeline>
+<codeline lineno="46"><highlight class="normal">);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="nano_8cpp_1a4fc01d736fe50cf5b977f755b675f11d" kindref="member">setup</ref>()</highlight></codeline>
+<codeline lineno="49"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/>Serial.begin(230400);</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>startTime<sp/>=<sp/>millis();</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(!Serial<sp/>&amp;&amp;<sp/>(millis()<sp/>-<sp/>startTime<sp/>&lt;<sp/>3000))<sp/>{</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>wait</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/>Serial.println(</highlight><highlight class="stringliteral">&quot;Nano<sp/>:<sp/>beginning<sp/>peripherals<sp/>initialization&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/>board::nano::teensyUart.begin(</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>board::nano::teensyUartBaudrate</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!<ref refid="nano_8cpp_1ad2d59cada5413071f61a1be1451a93c9" kindref="member">loadCellDriver</ref>.begin())</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">true</highlight><highlight class="normal">)<sp/>{}</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.addTopic&lt;<ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a46a26f011cec6e5e3f450f43dde27405" kindref="member">EndpointId::EncoderSnapshot</ref>&gt;(<ref refid="nano_8cpp_1a8a47c1f04ae79535aa082951e8e1b7af" kindref="member">encoderTopic</ref>);</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.addTopic&lt;<ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a45231e836beb8e7f587dabb6627daa5a" kindref="member">EndpointId::LoadCellSnapshot</ref>&gt;(<ref refid="nano_8cpp_1afcf3eb5ab3d297f144ff2a1a2e9e207a" kindref="member">loadCellTopic</ref>);</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.addTopic&lt;<ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a5959150f4ff2594503769b643af4fa27" kindref="member">EndpointId::LeftMotorSnapshot</ref>&gt;(<ref refid="nano_8cpp_1a4a53a8d4a67e8f0899fcf7377a9815bc" kindref="member">leftMotorTopic</ref>);</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.addTopic&lt;<ref refid="_bus_types_8h_1aebcfb632701bb32dd023e3c88612d001a8c99a5712043d8e47153c68493861dad" kindref="member">EndpointId::Ina232Snapshot</ref>&gt;(<ref refid="nano_8cpp_1a6833283966bd3bc2b9c92440715ece6b" kindref="member">ina232Topic</ref>);</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.begin();</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!<ref refid="nano_8cpp_1a2d6cabf6de0f8e3c017153203b8dc73b" kindref="member">bleBridge</ref>.begin())</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Serial.println(</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;BLE<sp/>initialization<sp/>failed&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>);</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">true</highlight><highlight class="normal">)<sp/>{}</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>.begin();</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" kindref="member">scheduler</ref>.add(<ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>);</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" kindref="member">scheduler</ref>.add(<ref refid="nano_8cpp_1a617d748af80800c0ebfffbccc10584f2" kindref="member">loadCellPublisher</ref>);</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" kindref="member">scheduler</ref>.add(<ref refid="nano_8cpp_1a2d6cabf6de0f8e3c017153203b8dc73b" kindref="member">bleBridge</ref>);</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/>Serial.println(</highlight><highlight class="stringliteral">&quot;Nano<sp/>:<sp/>ready&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="87"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="nano_8cpp_1afe461d27b9c48d5921c00d521181f12f" kindref="member">loop</ref>()</highlight></codeline>
+<codeline lineno="90"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="nano_8cpp_1a2525ad6fd9361e5ef6dcef1b3ad2e35e" kindref="member">scheduler</ref>.run(micros());</highlight></codeline>
+<codeline lineno="92"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="src/nano.cpp"/>
+  </compounddef>
+</doxygen>

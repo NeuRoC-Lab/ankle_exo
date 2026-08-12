@@ -6,7 +6,8 @@
     <includes local="no">ArduinoBLE.h</includes>
     <includes refid="_driver_8h" local="yes">Driver.h</includes>
     <includes refid="_message_bus_8h" local="yes">MessageBus.h</includes>
-    <includedby refid="main_8cpp" local="yes">src/main.cpp</includedby>
+    <includedby refid="nano_8cpp" local="yes">src/nano.cpp</includedby>
+    <includedby refid="teensy_8cpp" local="yes">src/teensy.cpp</includedby>
     <incdepgraph>
       <node id="1">
         <label>src/BLE.h</label>
@@ -212,10 +213,16 @@
         <link refid="_b_l_e_8h"/>
         <childnode refid="2" relation="include">
         </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
       </node>
       <node id="2">
-        <label>src/main.cpp</label>
-        <link refid="main_8cpp"/>
+        <label>src/nano.cpp</label>
+        <link refid="nano_8cpp"/>
+      </node>
+      <node id="3">
+        <label>src/teensy.cpp</label>
+        <link refid="teensy_8cpp"/>
       </node>
     </invincdepgraph>
     <innerclass refid="class_b_l_e_bridge" prot="public">BLEBridge</innerclass>
@@ -372,13 +379,13 @@
 <codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_message_bus" kindref="compound">MessageBus</ref>&amp;<sp/>bus,</highlight></codeline>
 <codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;EncoderPositions&gt;</ref>&amp;<sp/>encoder,</highlight></codeline>
 <codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;LoadCellForces&gt;</ref>&amp;<sp/>loadCells,</highlight></codeline>
-<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;MotorReply&gt;</ref>&amp;<sp/><ref refid="main_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>,</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;MotorReply&gt;</ref>&amp;<sp/><ref refid="teensy_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>,</highlight></codeline>
 <codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;PowerReadings&gt;</ref>&amp;<sp/>power)</highlight></codeline>
 <codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>:</highlight></codeline>
 <codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1af763b0be81c365644f4cc8d49902fc1d" kindref="member">m_bus</ref>(bus),</highlight></codeline>
 <codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1afabe00a3e07d3fca5e3272604f382c6a" kindref="member">m_encoder</ref>(encoder),</highlight></codeline>
 <codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1a9dde714034ef0b041cdca8e5718d7268" kindref="member">m_loadCells</ref>(loadCells),</highlight></codeline>
-<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1a02e426d48fcd4afddd8d2ff6c4f7f489" kindref="member">m_leftMotor</ref>(<ref refid="main_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>),</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1a02e426d48fcd4afddd8d2ff6c4f7f489" kindref="member">m_leftMotor</ref>(<ref refid="teensy_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>),</highlight></codeline>
 <codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1aa70c9596ec763c82083818480007174c" kindref="member">m_power</ref>(power),</highlight></codeline>
 <codeline lineno="50"><highlight class="normal"></highlight></codeline>
 <codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_b_l_e_bridge_1a7eccb1e15d096bfe4e6447860b88079a" kindref="member">m_service</ref>(</highlight></codeline>

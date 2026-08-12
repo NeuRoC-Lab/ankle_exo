@@ -16,7 +16,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="5" column="1" bodyfile="src/regression.py" bodystart="5" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="5" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="5" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1ae44be12c78b8519b86d48b797fec5019" prot="public" static="no" mutable="no">
         <type>list</type>
@@ -31,7 +31,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="7" column="1" bodyfile="src/regression.py" bodystart="7" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="7" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="7" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1ac2611f4c5b61b9bb2f70e723ba0517f8" prot="public" static="no" mutable="no">
         <type>list</type>
@@ -46,7 +46,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="8" column="1" bodyfile="src/regression.py" bodystart="8" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="8" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="8" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1ac79ecbd6461e7901582156a2229c8f73" prot="public" static="no" mutable="no">
         <type></type>
@@ -63,7 +63,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="10" column="1" bodyfile="src/regression.py" bodystart="10" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="10" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="10" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a4c105be1528c52d1229b0de19db24d96" prot="public" static="no" mutable="no">
         <type></type>
@@ -78,7 +78,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="16" column="1" bodyfile="src/regression.py" bodystart="16" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="16" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="16" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a0c951216eaa8414d51f6e8b5cb7d0143" prot="public" static="no" mutable="no">
         <type></type>
@@ -93,7 +93,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="19" column="1" bodyfile="src/regression.py" bodystart="19" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="19" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="19" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a94e3a5ce8a29e4740acea58d5d150002" prot="public" static="no" mutable="no">
         <type></type>
@@ -108,7 +108,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="20" column="1" bodyfile="src/regression.py" bodystart="20" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="20" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="20" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a96f2cc243beb8397f598a949faa8055d" prot="public" static="no" mutable="no">
         <type></type>
@@ -122,7 +122,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="36" column="1" bodyfile="src/regression.py" bodystart="36" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="36" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="36" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1adfb5aef5c9712e655056d218e5cc28a9" prot="public" static="no" mutable="no">
         <type></type>
@@ -136,7 +136,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="36" column="1" bodyfile="src/regression.py" bodystart="36" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="36" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="36" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a6ffc0891daa8dff8d9f1d597f11c18fc" prot="public" static="no" mutable="no">
         <type>tuple</type>
@@ -153,7 +153,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="42" column="1" bodyfile="src/regression.py" bodystart="42" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="42" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="42" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a501a17ae0b566116927f69bc5eaeb5ea" prot="public" static="no" mutable="no">
         <type></type>
@@ -170,7 +170,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="47" column="1" bodyfile="src/regression.py" bodystart="47" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="47" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="47" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a69fba063cb8eb08a67de2d21333be1b1" prot="public" static="no" mutable="no">
         <type></type>
@@ -187,7 +187,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="51" column="1" bodyfile="src/regression.py" bodystart="51" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="51" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="51" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1ae70bd3e9ef233a8339108ff2bbcd7a66" prot="public" static="no" mutable="no">
         <type>float</type>
@@ -202,7 +202,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="55" column="1" bodyfile="src/regression.py" bodystart="55" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="55" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="55" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a5b9cda97b0525fdc6d790fee9902a87f" prot="public" static="no" mutable="no">
         <type></type>
@@ -216,7 +216,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="69" column="1" bodyfile="src/regression.py" bodystart="69" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="69" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="69" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="namespaceregression_1a4d2b52bf78aa53e328640d785cd5920b" prot="public" static="no" mutable="no">
         <type></type>
@@ -231,13 +231,13 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="src/regression.py" line="73" column="1" bodyfile="src/regression.py" bodystart="73" bodyend="-1"/>
+        <location file="src/inertia measurements/regression.py" line="73" column="1" bodyfile="src/inertia measurements/regression.py" bodystart="73" bodyend="-1"/>
       </memberdef>
     </sectiondef>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="src/regression.py" line="1" column="1"/>
+    <location file="src/inertia measurements/regression.py" line="1" column="1"/>
   </compounddef>
 </doxygen>

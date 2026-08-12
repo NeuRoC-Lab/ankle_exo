@@ -5,7 +5,8 @@
     <includes local="no">Arduino.h</includes>
     <includes refid="_message_bus_8h" local="yes">MessageBus.h</includes>
     <includes refid="board_8h" local="yes">Board.h</includes>
-    <includedby refid="main_8cpp" local="yes">src/main.cpp</includedby>
+    <includedby refid="nano_8cpp" local="yes">src/nano.cpp</includedby>
+    <includedby refid="teensy_8cpp" local="yes">src/teensy.cpp</includedby>
     <incdepgraph>
       <node id="10">
         <label>BusTypes.h</label>
@@ -206,10 +207,16 @@
         <link refid="_motor_controllers_8h"/>
         <childnode refid="2" relation="include">
         </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
       </node>
       <node id="2">
-        <label>src/main.cpp</label>
-        <link refid="main_8cpp"/>
+        <label>src/nano.cpp</label>
+        <link refid="nano_8cpp"/>
+      </node>
+      <node id="3">
+        <label>src/teensy.cpp</label>
+        <link refid="teensy_8cpp"/>
       </node>
     </invincdepgraph>
     <innerclass refid="class_motor_command_task" prot="public">MotorCommandTask</innerclass>
@@ -304,11 +311,11 @@
 <codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_can_bus" kindref="compound">CanBus</ref>&amp;<sp/>bus,</highlight></codeline>
 <codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_motor_driver" kindref="compound">MotorDriver</ref>&amp;<sp/>left,</highlight><highlight class="comment">/*</highlight></codeline>
 <codeline lineno="81"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>MotorDriver&amp;<sp/>right,*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_message_bus" kindref="compound">MessageBus</ref>&amp;<sp/><ref refid="main_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>)</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_message_bus" kindref="compound">MessageBus</ref>&amp;<sp/><ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>)</highlight></codeline>
 <codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="class_motor_can_receiver_1a7d5c6ba561b4fc52a6ad82270c7b0ca9" kindref="member">m_bus</ref>(bus),</highlight></codeline>
 <codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_motor_can_receiver_1aded511938d6d4328c38fd7e3e54ab1a5" kindref="member">m_left</ref>(left),</highlight></codeline>
 <codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*m_right(right),*/</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_motor_can_receiver_1a283be6006bd427e34e57a8d5f597db7d" kindref="member">m_messageBus</ref>(<ref refid="main_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>)</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_motor_can_receiver_1a283be6006bd427e34e57a8d5f597db7d" kindref="member">m_messageBus</ref>(<ref refid="nano_8cpp_1ab2793e9beaf7252835efef0b7cca5763" kindref="member">messageBus</ref>)</highlight></codeline>
 <codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/>{}</highlight></codeline>
 <codeline lineno="88"><highlight class="normal"></highlight></codeline>
 <codeline lineno="89" refid="class_motor_can_receiver_1afc0dc4281e83f7e61b13e07c2e7c270c" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="class_motor_can_receiver_1afc0dc4281e83f7e61b13e07c2e7c270c" kindref="member">update</ref>(uint32_t)</highlight><highlight class="keyword"><sp/>override</highlight></codeline>
@@ -403,11 +410,11 @@
 <codeline lineno="178" refid="class_dummy_controller_1a4c3cabf9004bd75839eb0e9021e1945a" refkind="member"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="class_dummy_controller_1a4c3cabf9004bd75839eb0e9021e1945a" kindref="member">DummyController</ref>(</highlight></codeline>
 <codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;EncoderPositions&gt;</ref>&amp;<sp/>encoders,</highlight></codeline>
 <codeline lineno="180"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;LoadCellForces&gt;</ref>&amp;<sp/>loadCells,</highlight></codeline>
-<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;MotorReply&gt;</ref>&amp;<sp/><ref refid="main_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>,</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;MotorReply&gt;</ref>&amp;<sp/><ref refid="teensy_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>,</highlight></codeline>
 <codeline lineno="182"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_topic" kindref="compound">Topic&lt;PowerReadings&gt;</ref>&amp;<sp/>power)</highlight></codeline>
 <codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/><ref refid="class_dummy_controller_1a312649a658f4189e06d39bdec111866d" kindref="member">m_encoders</ref>(encoders),</highlight></codeline>
 <codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_dummy_controller_1ae38af241bce6f43cdf3915528e69a88d" kindref="member">m_loadCells</ref>(loadCells),</highlight></codeline>
-<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_dummy_controller_1aced4ebcf98df064fd833e59ec524c1a0" kindref="member">m_leftMotor</ref>(<ref refid="main_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>),</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_dummy_controller_1aced4ebcf98df064fd833e59ec524c1a0" kindref="member">m_leftMotor</ref>(<ref refid="teensy_8cpp_1a809392b8050614028e546585505304e0" kindref="member">leftMotor</ref>),</highlight></codeline>
 <codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="class_dummy_controller_1aacefbe06586d89f9698fd08951227d4e" kindref="member">m_power</ref>(power)</highlight></codeline>
 <codeline lineno="187"><highlight class="normal"><sp/><sp/><sp/><sp/>{}</highlight></codeline>
 <codeline lineno="188"><highlight class="normal"></highlight></codeline>

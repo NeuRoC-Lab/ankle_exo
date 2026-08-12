@@ -11,7 +11,8 @@
     <includedby refid="_encoder_8h" local="yes">src/Encoder.h</includedby>
     <includedby refid="_load_cell_8h" local="yes">src/LoadCell.h</includedby>
     <includedby refid="_motor_controllers_8h" local="yes">src/MotorControllers.h</includedby>
-    <includedby refid="main_8cpp" local="yes">src/main.cpp</includedby>
+    <includedby refid="nano_8cpp" local="yes">src/nano.cpp</includedby>
+    <includedby refid="teensy_8cpp" local="yes">src/teensy.cpp</includedby>
     <incdepgraph>
       <node id="1">
         <label>src/board.h</label>
@@ -44,13 +45,15 @@
         <link refid="_b_l_e_8h"/>
         <childnode refid="5" relation="include">
         </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
       </node>
       <node id="2">
         <label>src/CubeMarsMotor.h</label>
         <link refid="_cube_mars_motor_8h"/>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="6" relation="include">
+        <childnode refid="7" relation="include">
         </childnode>
       </node>
       <node id="3">
@@ -58,41 +61,47 @@
         <link refid="_driver_8h"/>
         <childnode refid="4" relation="include">
         </childnode>
-        <childnode refid="6" relation="include">
+        <childnode refid="7" relation="include">
         </childnode>
         <childnode refid="5" relation="include">
-        </childnode>
-      </node>
-      <node id="8">
-        <label>src/Encoder.h</label>
-        <link refid="_encoder_8h"/>
-        <childnode refid="3" relation="include">
         </childnode>
         <childnode refid="6" relation="include">
         </childnode>
       </node>
       <node id="9">
+        <label>src/Encoder.h</label>
+        <link refid="_encoder_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
         <label>src/LoadCell.h</label>
         <link refid="_load_cell_8h"/>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="6" relation="include">
+        <childnode refid="7" relation="include">
         </childnode>
       </node>
-      <node id="6">
+      <node id="7">
         <label>src/MessageBus.h</label>
         <link refid="_message_bus_8h"/>
         <childnode refid="4" relation="include">
         </childnode>
-        <childnode refid="7" relation="include">
+        <childnode refid="8" relation="include">
         </childnode>
         <childnode refid="5" relation="include">
         </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
       </node>
-      <node id="7">
+      <node id="8">
         <label>src/MotorControllers.h</label>
         <link refid="_motor_controllers_8h"/>
         <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
         </childnode>
       </node>
       <node id="1">
@@ -102,18 +111,24 @@
         </childnode>
         <childnode refid="3" relation="include">
         </childnode>
-        <childnode refid="8" relation="include">
-        </childnode>
         <childnode refid="9" relation="include">
         </childnode>
-        <childnode refid="7" relation="include">
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
         </childnode>
         <childnode refid="5" relation="include">
         </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
       </node>
       <node id="5">
-        <label>src/main.cpp</label>
-        <link refid="main_8cpp"/>
+        <label>src/nano.cpp</label>
+        <link refid="nano_8cpp"/>
+      </node>
+      <node id="6">
+        <label>src/teensy.cpp</label>
+        <link refid="teensy_8cpp"/>
       </node>
     </invincdepgraph>
     <innerclass refid="struct_single_ended_load_cell_pins" prot="public">SingleEndedLoadCellPins</innerclass>
