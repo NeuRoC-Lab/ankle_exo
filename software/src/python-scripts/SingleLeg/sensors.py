@@ -18,7 +18,6 @@ def clamp(value, minimum=-1000.0, maximum=1000.0):
     return max(minimum, min(value, maximum))
 
 
-
 class Encoder:
     def __init__(self):
         self.raw_count = 0
@@ -83,20 +82,20 @@ class Encoder:
 
             self.ankle_velocity = self.filtered_vel
 
-    def set_zero(self):
+    def set_zero(self): # zero the encoder
         with self.lock:
             self.first_value = self.raw_count
             self.angle_deg = 0.0
 
-    def get_angle_deg(self):
+    def get_angle_deg(self): # returns the encoder angle in degrees
         with self.lock:
             return self.angle_deg
 
-    def get_raw_count(self):
+    def get_raw_count(self): # returns the raw encoder count (debugging purpose in case angle conversion doesnt work)
         with self.lock:
             return self.raw_count
 
-    def get_ankle_vel(self):
+    def get_ankle_vel(self): # returns the ankle velocity in deg/s
         with self.lock:
             return self.ankle_velocity
 
@@ -138,7 +137,7 @@ class LoadCells:
                 self.right2
             )
 
-    def get_cable_tensions(self):
+    def get_cable_tensions(self): # returns the cable tension on the current single leg exo setup
         with self.lock:
             return(self.left1, self.right2)
 
@@ -175,6 +174,7 @@ class MotorCommand:
             self.kd,
         )
 
+# import libraries for motor classes
 from dataclasses import dataclass
 from enum import IntEnum
 import struct

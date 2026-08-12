@@ -94,7 +94,7 @@ def connect_to_arduino(
 
 def setup_csv():
     csv_logger = CSVLogger(
-        "../../SingleLegData_BLE_Test.csv"
+        "../../SingleLegData_BLE_Test.csv" # CSV file name
     )
 
     csv_logger.open()

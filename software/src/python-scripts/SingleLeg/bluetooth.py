@@ -7,6 +7,7 @@ This file handles:
 - Sending motor commands
 """
 
+# import libraries
 import asyncio
 import queue
 import struct
@@ -16,6 +17,7 @@ from dataclasses import dataclass
 
 from bleak import BleakClient, BleakScanner
 
+# import sensors.py
 from sensors import (
     COMMAND_PACKET_SIZE,
     Encoder,
@@ -156,6 +158,7 @@ class BluetoothManager:
             TelemetrySnapshot(
                 sample_time=time.perf_counter(),
 
+                # uses sensors.py to get sensor data
                 encoder=self.encoder.get_raw_count(),
                 ankle_angle=self.encoder.get_angle_deg(),
                 ankle_velocity=self.encoder.get_ankle_vel(),
@@ -172,6 +175,8 @@ class BluetoothManager:
 
 
     # BLE packet decoding
+    # Callback functions for motor and sensors to read their respective data
+    # Add to telemetry snapshot
 
     def _motor_callback(self, sender, data):
         """

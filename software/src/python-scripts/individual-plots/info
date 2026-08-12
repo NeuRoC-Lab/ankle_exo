@@ -1,0 +1,4 @@
+The individual-plots folder contains python scripts for testing individual sensors and motors
+It reads data over serial in a specific format, refer to how each script decodes serial lines sent into sensor data
+
+For individual sensor testing purposes
