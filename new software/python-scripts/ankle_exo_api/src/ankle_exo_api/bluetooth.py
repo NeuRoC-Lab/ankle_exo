@@ -561,7 +561,7 @@ class BluetoothManager:
 
 
     async def _bluetooth_connection(self):
-        
+
         print("Searching for Bluetooth device... (15s timeout)")
 
         device = await BleakScanner.find_device_by_name(
