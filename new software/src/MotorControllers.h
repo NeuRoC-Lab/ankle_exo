@@ -77,12 +77,12 @@ class MotorCanReceiver final :
 public:
     MotorCanReceiver(
         CanBus& bus,
-        MotorDriver& left,/*
-        MotorDriver& right,*/
+        MotorDriver& left,
+        MotorDriver& right,
         MessageBus& messageBus)
         : m_bus(bus),
           m_left(left),
-          /*m_right(right),*/
+          m_right(right),
           m_messageBus(messageBus)
     {}
 
@@ -100,7 +100,6 @@ public:
                     m_left.decode(frame)
                 );
             }
-            /*
             else if (
                 m_right.accepts(frame))
             {
@@ -110,14 +109,13 @@ public:
                     m_right.decode(frame)
                 );
             }
-            */
         }
     }
 
 private:
     CanBus& m_bus;
     MotorDriver& m_left;
-    //MotorDriver& m_right;
+    MotorDriver& m_right;
     MessageBus& m_messageBus;
 };
 
@@ -139,6 +137,7 @@ public:
             return;
 
         if (m_command.sequence() == m_lastSequence)
+            // to make this task event-driven we only take action on changing data
             return;
 
         m_lastSequence = m_command.sequence();
@@ -179,10 +178,12 @@ public:
         Topic<EncoderPositions>& encoders,
         Topic<LoadCellForces>& loadCells,
         Topic<MotorReply>& leftMotor,
+		Topic<MotorReply>& rightMotor,
         Topic<PowerReadings>& power)
         : m_encoders(encoders),
           m_loadCells(loadCells),
           m_leftMotor(leftMotor),
+		  m_rightMotor(rightMotor),
           m_power(power)
     {}
 
@@ -211,12 +212,11 @@ public:
             m_leftMotor
         );
         printPower();
-            /*
+
         printMotor(
             "RIGHT",
             m_rightMotor
         );
-    */
 
         Serial.println();
     }
@@ -330,307 +330,267 @@ private:
     Topic<LoadCellForces>& m_loadCells;
     Topic<MotorReply>& m_leftMotor;
     Topic<PowerReadings>& m_power;
-    /*Topic<MotorReply>& m_rightMotor;*/
+    Topic<MotorReply>& m_rightMotor;
 
     uint32_t m_previousPrintUs{0};
 };
 
-class JointLimitController final : public ITask
+enum class ExoSide : uint8_t
+{
+    Left,
+    Right
+};
+
+template<ExoSide Side>
+class JointLimitController final :
+    public ITask
 {
 public:
     JointLimitController(
         Topic<EncoderPositions>& encoders,
-        Topic<LoadCellForces>& loadCells,
-        Topic<MotorReply>& leftMotorFeed,
-        Topic<MotorCmd>& leftMotorCmd,
-        Topic<MotorMetaCommand>& leftMotorControl)
-        : m_encoders(encoders),
-          m_loadcells(loadCells),
-          m_leftMotorFeed(leftMotorFeed),
-          m_leftMotorCmd(leftMotorCmd),
-          m_leftMotorControl(leftMotorControl)
+        Topic<MotorMetaCommand>& motorControl)
+        :
+        m_encoders(encoders),
+        m_motorControl(motorControl)
     {}
+
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t PERIOD_US = 5'000;
+        static constexpr uint32_t
+            PERIOD_US = 5'000; // 200 Hz
 
-        if (nowUs - m_previousUpdateUs < PERIOD_US)
+        if (
+            nowUs - m_previousUpdateUs <
+            PERIOD_US
+        )
+        {
             return;
+        }
 
         m_previousUpdateUs = nowUs;
 
-        if (!m_encoders.valid() ||
-            !m_loadcells.valid())
+
+        if (!m_encoders.valid())
         {
             return;
         }
+
 
         const float position =
-            m_encoders.latest().left;
+            getPosition(
+                m_encoders.latest()
+            );
 
-        const auto& loadcellSnapshot =
-            m_loadcells.latest();
 
-        const float LC_left1 =
-            loadcellSnapshot[
-                static_cast<size_t>(LoadCellId::Left1)
-            ];
-
-        const float LC_left2 =
-            loadcellSnapshot[
-                static_cast<size_t>(LoadCellId::Left2)
-            ];
-
-        // -------------------------------------------------
-        // Initialization
-        // -------------------------------------------------
-
-        if (!m_initialized)
+        /*
+         * Absolute limit:
+         * immediately request that the
+         * selected motor exits motor mode.
+         */
+        if (
+            fabsf(position) >=
+            ABSOLUTE_LIMIT
+        )
         {
-            m_previousPosition = position;
-            m_previousUs = nowUs;
-
-            m_initialized = true;
-            return;
-        }
-
-        const float dt =
-            static_cast<float>(
-                nowUs - m_previousUs
-            ) * 1e-6f;
-
-        if (dt <= 0.0f)
-            return;
-
-        // -------------------------------------------------
-        // Joint limits
-        // -------------------------------------------------
-
-        if (fabsf(position) >= absoluteLimit)
-        {
-            /*Serial.println(
-                "ABSOLUTE JOINT LIMIT BREACHED!"
-            );*/
-            m_leftMotorControl.publish(MotorMetaCommand::ExitMotorMode);
-        }
-        else if (fabsf(position) >= softwareLimit)
-        {
-            /*Serial.println(
-                "Software joint limit breached!"
-            );*/
-        }
-        // -------------------------------------------------
-        // Raw velocity
-        // deg/s
-        // -------------------------------------------------
-
-        const float rawVelocity =
-            (position - m_previousPosition)
-            / dt;
-
-        // -------------------------------------------------
-        // Low-pass velocity
-        // -------------------------------------------------
-
-        m_filteredVelocity =
-            VELOCITY_ALPHA * rawVelocity +
-            (1.0f - VELOCITY_ALPHA)
-                * m_filteredVelocity;
-
-        // -------------------------------------------------
-        // Acceleration from FILTERED velocity
-        // deg/s^2
-        // -------------------------------------------------
-
-        const float rawAcceleration =
-            (m_filteredVelocity -
-             m_previousFilteredVelocity)
-            / dt;
-
-        // -------------------------------------------------
-        // Low-pass acceleration
-        // -------------------------------------------------
-
-        m_filteredAcceleration =
-            ACCELERATION_ALPHA *
-                rawAcceleration +
-            (1.0f - ACCELERATION_ALPHA) *
-                m_filteredAcceleration;
-
-        // Convert deg/s^2 -> rad/s^2
-        const float accelerationRad =
-            m_filteredAcceleration *
-            PI / 180.0f;
-
-        // -------------------------------------------------
-        // Torque
-        // -------------------------------------------------
-
-        const float rawTorque =
-            (LC_left2 - LC_left1)
-            * 0.055f;
-
-        // Optional torque filtering
-        m_filteredTorque =
-            TORQUE_ALPHA *
-                rawTorque +
-            (1.0f - TORQUE_ALPHA) *
-                m_filteredTorque;
-
-        // -------------------------------------------------
-        // Inertia estimate
-        //
-        // I = tau / alpha
-        // -------------------------------------------------
-
-        if (fabsf(accelerationRad) >
-            MIN_ACCELERATION_RAD)
-        {
-            const float inertia =
-                m_filteredTorque /
-                accelerationRad;
-
-            // Reject obviously unreasonable spikes.
-            if (inertia > 0 && fabsf(inertia) <
-                MAX_REASONABLE_INERTIA)
+            if (!m_limitTriggered)
             {
-                //Serial.print("Position: ");
-                //Serial.print(position);
+                m_motorControl.publish(
+                    MotorMetaCommand::
+                        ExitMotorMode
+                );
 
-                //Serial.print(" Vel: ");
-                //Serial.print(m_filteredVelocity);
+                m_limitTriggered = true;
 
-                Serial.print(" Accel: ");
-                Serial.print(accelerationRad);
+                Serial.print(
+                    sideName()
+                );
 
-                Serial.print(" Torque: ");
-                Serial.println(m_filteredTorque);
-
-                //Serial.print(" Inertia: ");
-                //Serial.println(inertia);
+                Serial.println(
+                    " absolute joint limit breached"
+                );
             }
+
+            return;
         }
 
-        // -------------------------------------------------
-        // Save state
-        // -------------------------------------------------
 
-        m_previousPosition =
-            position;
+        /*
+         * Once the joint returns inside the
+         * absolute limit, allow the safety
+         * event to trigger again later.
+         */
+        m_limitTriggered = false;
 
-        m_previousFilteredVelocity =
-            m_filteredVelocity;
 
-        m_previousUs =
-            nowUs;
+        /*
+         * Software limit.
+         *
+         * Currently only detects the condition.
+         * You can later use this region for
+         * torque limiting / soft-stop behavior.
+         */
+        if (
+            fabsf(position) >=
+            SOFTWARE_LIMIT
+        )
+        {
+            // Optional:
+            //
+            // Serial.print(sideName());
+            // Serial.println(
+            //     " software joint limit reached"
+            // );
+        }
     }
 
+
 private:
-    static constexpr float
-        softwareLimit = 15.0f;
+
+    static float getPosition(
+        const EncoderPositions& encoders)
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return static_cast<float>(
+                encoders.left
+            );
+        }
+        else
+        {
+            return static_cast<float>(
+                encoders.right
+            );
+        }
+    }
+
+
+    static constexpr const char*
+    sideName()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return "LEFT";
+        }
+        else
+        {
+            return "RIGHT";
+        }
+    }
+
+
+private:
 
     static constexpr float
-        absoluteLimit = 35.0f;
-
-    // Smaller = more smoothing.
-    static constexpr float
-        VELOCITY_ALPHA = 0.15f;
+        SOFTWARE_LIMIT = 15.0f;
 
     static constexpr float
-        ACCELERATION_ALPHA = 0.08f;
+        ABSOLUTE_LIMIT = 35.0f;
 
-    static constexpr float
-        TORQUE_ALPHA = 0.15f;
 
-    // Don't estimate inertia when acceleration
-    // is too close to zero.
-    static constexpr float
-        MIN_ACCELERATION_RAD = 0.2f;
+    Topic<EncoderPositions>&
+        m_encoders;
 
-    // Example sanity filter.
-    // Tune this based on your real mechanism.
-    static constexpr float
-        MAX_REASONABLE_INERTIA = 10.0f;
+    Topic<MotorMetaCommand>&
+        m_motorControl;
 
-    Topic<EncoderPositions>& m_encoders;
-    Topic<LoadCellForces>& m_loadcells;
-    Topic<MotorReply>& m_leftMotorFeed;
-    Topic<MotorCmd>& m_leftMotorCmd;
-    Topic<MotorMetaCommand>& m_leftMotorControl;
 
-    float m_previousPosition{0.0f};
+    uint32_t
+        m_previousUpdateUs{0};
 
-    float m_filteredVelocity{0.0f};
-    float m_previousFilteredVelocity{0.0f};
-
-    float m_filteredAcceleration{0.0f};
-
-    float m_filteredTorque{0.0f};
-
-    uint32_t m_previousUs{0};
-    uint32_t m_previousUpdateUs{0};
-
-    bool m_initialized{false};
+    bool
+        m_limitTriggered{false};
 };
 
-class TransparentModeController final : public ITask
+#include <cmath>
+#include <cstdint>
+
+
+
+template<ExoSide Side>
+class TransparentModeController final :
+    public ITask
 {
 public:
     TransparentModeController(
         Topic<EncoderPositions>& encoders,
         Topic<LoadCellForces>& loadCells,
-        Topic<MotorReply>& leftMotorFeed,
-        Topic<MotorCmd>& leftMotorCmd)
-        : m_encoders(encoders),
-          m_loadcells(loadCells),
-          m_leftMotorFeed(leftMotorFeed),
-          m_leftMotorCmd(leftMotorCmd)
+        Topic<MotorReply>& motorFeed,
+        Topic<MotorCmd>& motorCmd)
+        :
+        m_encoders(encoders),
+        m_loadcells(loadCells),
+        m_motorFeed(motorFeed),
+        m_motorCmd(motorCmd)
     {}
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t PERIOD_US = 5'000; // 200 Hz
+        static constexpr uint32_t
+            PERIOD_US = 1'000;
 
-        if (nowUs - m_previousUpdateUs < PERIOD_US)
+        if (
+            nowUs - m_previousUpdateUs <
+            PERIOD_US
+        )
+        {
             return;
+        }
 
         m_previousUpdateUs = nowUs;
 
         if (!m_loadcells.valid())
+        {
             return;
+        }
 
         const auto& loadcellSnapshot =
             m_loadcells.latest();
 
-        const float left1 =
+        const float force1 =
             loadcellSnapshot[
-                static_cast<size_t>(LoadCellId::Left1)
+                static_cast<size_t>(
+                    firstLoadCell()
+                )
             ];
 
-        const float left2 =
+        const float force2 =
             loadcellSnapshot[
-                static_cast<size_t>(LoadCellId::Left2)
+                static_cast<size_t>(
+                    secondLoadCell()
+                )
             ];
-
-        // -------------------------------------------------
-        // Interaction torque measured by load cells
-        // -------------------------------------------------
 
         const float measuredTorque =
-            TORQUE_SIGN *
-            (left1 - left2) *
+            torqueSign()
+            *
+            (force1 - force2)
+            *
             LOAD_CELL_LEVER_ARM;
-
-        // -------------------------------------------------
-        // First sample
-        // -------------------------------------------------
 
         if (!m_initialized)
         {
-            m_previousTorque = measuredTorque;
-            m_previousUs = nowUs;
-            m_initialized = true;
+            m_filteredTorque =
+                measuredTorque;
+
+            m_previousFilteredTorque =
+                measuredTorque;
+
+            m_filteredTorqueDerivative =
+                0.0f;
+
+            m_filteredFrictionComp =
+                0.0f;
+
+            m_previousUs =
+                nowUs;
+
+            m_initialized =
+                true;
 
             return;
         }
@@ -641,42 +601,38 @@ public:
             ) * 1e-6f;
 
         if (dt <= 0.0f)
+        {
             return;
-
-        // -------------------------------------------------
-        // Low-pass the measured interaction torque
-        // -------------------------------------------------
+        }
 
         m_filteredTorque =
             TORQUE_FILTER_ALPHA *
-                measuredTorque +
-            (1.0f - TORQUE_FILTER_ALPHA) *
+                measuredTorque
+            +
+            (1.0f -
+                TORQUE_FILTER_ALPHA)
+                *
                 m_filteredTorque;
 
-        // -------------------------------------------------
-        // Derivative of interaction torque
-        //
-        // Units: N.m / s
-        // -------------------------------------------------
-
-        const float rawTorqueDerivative =
-            (m_filteredTorque -
-             m_previousFilteredTorque)
-            / dt;
+        const float
+            rawTorqueDerivative =
+                (
+                    m_filteredTorque
+                    -
+                    m_previousFilteredTorque
+                ) / dt;
 
         m_filteredTorqueDerivative =
-            DERIVATIVE_FILTER_ALPHA *
-                rawTorqueDerivative +
-            (1.0f - DERIVATIVE_FILTER_ALPHA) *
+            DERIVATIVE_FILTER_ALPHA
+                *
+                rawTorqueDerivative
+            +
+            (
+                1.0f -
+                DERIVATIVE_FILTER_ALPHA
+            )
+                *
                 m_filteredTorqueDerivative;
-
-        // -------------------------------------------------
-        // PD transparent controller
-        //
-        // Desired interaction torque = 0
-        //
-        // error = 0 - measuredTorque
-        // -------------------------------------------------
 
         const float error =
             -m_filteredTorque;
@@ -684,48 +640,77 @@ public:
         const float errorDerivative =
             -m_filteredTorqueDerivative;
 
-        float commandedTorque =
-            KP * error +
+        const float feedbackTorque =
+            KP * error
+            +
             KD * errorDerivative;
 
-        // -------------------------------------------------
-        // Limit commanded assistance
-        // -------------------------------------------------
+        updateFrictionDirection(
+            feedbackTorque
+        );
+
+        float targetFrictionComp =
+            0.0f;
+
+        if (
+            m_frictionDirection > 0
+        )
+        {
+            targetFrictionComp =
+                STATIC_FRICTION_COMP_TORQUE;
+        }
+        else if (
+            m_frictionDirection < 0
+        )
+        {
+            targetFrictionComp =
+                -STATIC_FRICTION_COMP_TORQUE;
+        }
+
+        m_filteredFrictionComp =
+            FRICTION_FILTER_ALPHA
+                *
+                targetFrictionComp
+            +
+            (
+                1.0f -
+                FRICTION_FILTER_ALPHA
+            )
+                *
+                m_filteredFrictionComp;
+
+        float commandedTorque =
+            feedbackTorque
+            +
+            m_filteredFrictionComp;
 
         commandedTorque =
             constrain(
                 commandedTorque,
                 -MAX_TRANSPARENT_TORQUE,
-                 MAX_TRANSPARENT_TORQUE
+                MAX_TRANSPARENT_TORQUE
             );
-
-        // -------------------------------------------------
-        // MIT command:
-        //
-        // no position control
-        // no velocity control
-        // torque only
-        // -------------------------------------------------
 
         MotorCmd command{};
 
-        command.position = 0.0f;
-        command.velocity = 0.0f;
+        command.position =
+            0.0f;
 
-        command.kp = 0.0f;
-        command.kd = 0.0f;
+        command.velocity =
+            0.0f;
+
+        command.kp =
+            0.0f;
+
+        command.kd =
+            0.0f;
 
         command.torque =
             commandedTorque;
 
-        m_leftMotorCmd.publish(command);
-
-        // -------------------------------------------------
-        // Save state
-        // -------------------------------------------------
-
-        m_previousTorque =
-            measuredTorque;
+        m_motorCmd.publish(
+            command
+        );
 
         m_previousFilteredTorque =
             m_filteredTorque;
@@ -734,55 +719,165 @@ public:
             nowUs;
     }
 
+
 private:
-    // -----------------------------------------------------
-    // Controller tuning
-    // -----------------------------------------------------
 
-    static constexpr float KP = 0.5f;
-    static constexpr float KD = 0.01f;
+    static constexpr LoadCellId
+    firstLoadCell()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return LoadCellId::Left1;
+        }
+        else
+        {
+            return LoadCellId::Right1;
+        }
+    }
 
-    // Distance between load-cell force line of action
-    // and joint axis.
-    static constexpr float LOAD_CELL_LEVER_ARM =
-        0.055f;
 
-    // Flip to -1.0f if your torque sign is backwards.
-    static constexpr float TORQUE_SIGN =
-        1.0f;
+    static constexpr LoadCellId
+    secondLoadCell()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return LoadCellId::Left2;
+        }
+        else
+        {
+            return LoadCellId::Right2;
+        }
+    }
 
-    // Start VERY conservatively.
-    static constexpr float MAX_TRANSPARENT_TORQUE =
-        0.4f;
 
-    // Low-pass filters.
-    static constexpr float TORQUE_FILTER_ALPHA =
-        0.15f;
+    static constexpr float
+    torqueSign()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return LEFT_TORQUE_SIGN;
+        }
+        else
+        {
+            return RIGHT_TORQUE_SIGN;
+        }
+    }
 
-    static constexpr float DERIVATIVE_FILTER_ALPHA =
-        0.05f;
 
-    // -----------------------------------------------------
-    // Topics
-    // -----------------------------------------------------
+    void updateFrictionDirection(
+        float feedbackTorque)
+    {
+        if (
+            feedbackTorque >
+            FRICTION_TRIGGER_ON_TORQUE
+        )
+        {
+            m_frictionDirection = +1;
+            return;
+        }
 
-    Topic<EncoderPositions>& m_encoders;
-    Topic<LoadCellForces>& m_loadcells;
-    Topic<MotorReply>& m_leftMotorFeed;
-    Topic<MotorCmd>& m_leftMotorCmd;
+        if (
+            feedbackTorque <
+            -FRICTION_TRIGGER_ON_TORQUE
+        )
+        {
+            m_frictionDirection = -1;
+            return;
+        }
 
-    // -----------------------------------------------------
-    // Controller state
-    // -----------------------------------------------------
+        if (
+            std::abs(feedbackTorque) <
+            FRICTION_TRIGGER_OFF_TORQUE
+        )
+        {
+            m_frictionDirection = 0;
+        }
+    }
 
-    float m_previousTorque{0.0f};
+
+private:
+
+    static constexpr float KP =
+        0.5f;
+
+    static constexpr float KD =
+        0.01f;
+
+    static constexpr float
+        LOAD_CELL_LEVER_ARM =
+            0.055f;
+
+    static constexpr float
+        LEFT_TORQUE_SIGN =
+            1.0f;
+
+    static constexpr float
+        RIGHT_TORQUE_SIGN =
+            -1.0f;
+
+    static constexpr float
+        STATIC_FRICTION_COMP_TORQUE =
+            0.08f;
+
+    static constexpr float
+        FRICTION_TRIGGER_ON_TORQUE =
+            0.025f;
+
+    static constexpr float
+        FRICTION_TRIGGER_OFF_TORQUE =
+            0.010f;
+
+    static constexpr float
+        FRICTION_FILTER_ALPHA =
+            0.10f;
+
+    static constexpr float
+        MAX_TRANSPARENT_TORQUE =
+            0.4f;
+
+    static constexpr float
+        TORQUE_FILTER_ALPHA =
+            0.15f;
+
+    static constexpr float
+        DERIVATIVE_FILTER_ALPHA =
+            0.05f;
+
+
+    Topic<EncoderPositions>&
+        m_encoders;
+
+    Topic<LoadCellForces>&
+        m_loadcells;
+
+    Topic<MotorReply>&
+        m_motorFeed;
+
+    Topic<MotorCmd>&
+        m_motorCmd;
+
 
     float m_filteredTorque{0.0f};
-    float m_previousFilteredTorque{0.0f};
 
-    float m_filteredTorqueDerivative{0.0f};
+    float
+        m_previousFilteredTorque{0.0f};
+
+    float
+        m_filteredTorqueDerivative{0.0f};
+
+    float
+        m_filteredFrictionComp{0.0f};
+
+    int m_frictionDirection{0};
 
     uint32_t m_previousUs{0};
+
     uint32_t m_previousUpdateUs{0};
 
     bool m_initialized{false};

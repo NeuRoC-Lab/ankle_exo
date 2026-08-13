@@ -25,17 +25,21 @@ Topic<LoadCellForces> loadCellTopic;
 Topic<EncoderPositions> encoderTopic;
 Topic<MotorReply> leftMotorTopic;
 Topic<PowerReadings> ina232Topic;
+Topic<LoggingState> loggingStateTopic;
 
 LoadCellDriver loadCellDriver;
 
 PollingPublisher<
     LoadCellDriver,
     EndpointId::LoadCellSnapshot,
-    5'000
+    1'000
 > loadCellPublisher(
     loadCellDriver,
     messageBus
 );
+
+
+
 
 BLEBridge bleBridge(
     messageBus,
@@ -67,6 +71,7 @@ void setup()
     messageBus.addTopic<EndpointId::LoadCellSnapshot>(loadCellTopic);
     messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
+	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.begin();
 
     if (!bleBridge.begin())
@@ -78,7 +83,6 @@ void setup()
         while (true) {}
     }
 
-    messageBus.begin();
 
     scheduler.add(messageBus);
     scheduler.add(loadCellPublisher);

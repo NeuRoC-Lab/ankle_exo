@@ -29,9 +29,13 @@ MessageBus messageBus(uart);
 Topic<EncoderPositions> encoderTopic;
 Topic<LoadCellForces> loadCellTopic;
 Topic<MotorReply> leftMotorTopic;
+Topic<MotorReply> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
 Topic<MotorCmd> leftMotorCommandTopic;
+Topic<MotorCmd> rightMotorCommandTopic;
 Topic<MotorMetaCommand> leftMotorMetaCommandTopic;
+Topic<MotorMetaCommand> rightMotorMetaCommandTopic;
+Topic<LoggingState> loggingStateTopic;
 
 //*** ENCODER INITIALISATION **//
 
@@ -40,7 +44,7 @@ EncoderDriver encoderDriver;
 PollingPublisher<
     EncoderDriver,
     EndpointId::EncoderSnapshot,
-    5'000
+    1'000
 > encoderPublisher(
     encoderDriver,
     messageBus
@@ -54,10 +58,26 @@ INA232Driver ina232Driver;
 PollingPublisher<
     INA232Driver,
     EndpointId::Ina232Snapshot,
-    10'000
+    1'000
 > ina232Publisher(
     ina232Driver,
     messageBus
+);
+
+//SD CARD Driver initialization
+
+SDCardDriver sdCard(
+    "loadcell.csv"
+);
+
+
+SDLogger sdLogger(
+    sdCard,
+    loadCellTopic,
+    encoderTopic,
+    leftMotorTopic,
+    rightMotorTopic,
+    loggingStateTopic
 );
 
 //** CAN BUS definitions **//
@@ -68,6 +88,8 @@ constexpr uint8_t LEFT_MOTOR_CAN_ID = 0x02;
 constexpr uint8_t RIGHT_MOTOR_CAN_ID = 0x03;
 
 AK60Params leftMotorLimits = MotorParams;
+AK60Params rightMotorLimits = MotorParams;
+//todo check whether we need to customize each motor's limits. Here we make them equal to the nominal limits
 
 MotorDriver leftMotor(
     LEFT_MOTOR_CAN_ID,
@@ -75,24 +97,27 @@ MotorDriver leftMotor(
     canBus
 );
 
-//TODO implement second motor (right)
-/*
+
 MotorDriver rightMotor(
     RIGHT_MOTOR_CAN_ID,
     rightMotorLimits,
     canBus
 );
-*/
 
 MotorCommandTask leftMotorCommandTask(
     leftMotor,
     leftMotorCommandTopic
 );
 
+MotorCommandTask rightMotorCommandTask(
+    rightMotor,
+    rightMotorCommandTopic
+);
+
 MotorCanReceiver motorReceiver(
     canBus,
     leftMotor,
-    //rightMotor,
+    rightMotor,
     messageBus
 );
 
@@ -103,28 +128,55 @@ MotorMetaCommandTask
         leftMotorCommandTask
 );
 
+MotorMetaCommandTask
+    rightMotorMetaCommandTask(
+        rightMotor,
+        rightMotorMetaCommandTopic,
+        rightMotorCommandTask
+);
+
 /* DEBUG : prints sensor and motor data to Serial continuously
+*/
 DummyController dummyController(
     encoderTopic,
     loadCellTopic,
     leftMotorTopic,
+    rightMotorTopic,
     ina232Topic
 );
-*/
 
-JointLimitController jointController(
+
+JointLimitController<
+    ExoSide::Left
+> leftJointLimitController(
     encoderTopic,
-    loadCellTopic,
-    leftMotorTopic,
-    leftMotorCommandTopic,
     leftMotorMetaCommandTopic
 );
 
-TransparentModeController transparentModeController(
+
+JointLimitController<
+    ExoSide::Right
+> rightJointLimitController(
+    encoderTopic,
+    rightMotorMetaCommandTopic
+);
+
+TransparentModeController<
+    ExoSide::Left
+> leftTransparentModeController(
     encoderTopic,
     loadCellTopic,
     leftMotorTopic,
     leftMotorCommandTopic
+);
+
+TransparentModeController<
+    ExoSide::Right
+> rightTransparentModeController(
+    encoderTopic,
+    loadCellTopic,
+    rightMotorTopic,
+    rightMotorCommandTopic
 );
 
 void setup()
@@ -154,29 +206,55 @@ void setup()
     Serial.println("Left motor initialization failed");
     while (true) {}
     }
+	if (!rightMotor.begin())
+	{
+    Serial.println(
+        "Right motor initialization failed"
+    );
+    while (true) {}
+	}
     if (!ina232Driver.begin())
     {
     Serial.println("INA232 initialization failed");
     while (true) {}
     }
+	if (!sdCard.begin())
+	{
+    Serial.println("SD card initialization failed");
+	}
+	else{
+	Serial.println("SD card initialization successful");
+	}
     //TODO initialise right motor later
 
     messageBus.addTopic<EndpointId::EncoderSnapshot>(encoderTopic);
     messageBus.addTopic<EndpointId::LoadCellSnapshot>(loadCellTopic);
     messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
+    messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
     messageBus.addTopic<EndpointId::LeftMotorCommand>(leftMotorCommandTopic);
     messageBus.addTopic<EndpointId::LeftMotorMetaCommand>(leftMotorMetaCommandTopic);
+    messageBus.addTopic<EndpointId::RightMotorCommand>(rightMotorCommandTopic);
+    messageBus.addTopic<EndpointId::RightMotorMetaCommand>(rightMotorMetaCommandTopic);
+	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.begin();
 
     scheduler.add(messageBus);
     scheduler.add(encoderPublisher);
     scheduler.add(ina232Publisher);
+	scheduler.add(dummyController); //TODO debug only
+   	scheduler.add(leftTransparentModeController);
+	scheduler.add(rightTransparentModeController);
+   	scheduler.add(leftJointLimitController);
+	scheduler.add(rightJointLimitController);
+
     scheduler.add(motorReceiver);
-    scheduler.add(transparentModeController);
-    scheduler.add(jointController);
     scheduler.add(leftMotorCommandTask);
     scheduler.add(leftMotorMetaCommandTask);
+    scheduler.add(rightMotorCommandTask);
+    scheduler.add(rightMotorMetaCommandTask);
+
+	scheduler.add(sdLogger);
     Serial.println("Teensy: ready");
 }
 

@@ -7,6 +7,7 @@
 
 #include "Driver.h"
 #include "MessageBus.h"
+#include "BusTypes.h"
 
 constexpr char dataServiceUUID[] =
     "CF45813E-4358-4903-B961-09996BB081FB";
@@ -28,6 +29,18 @@ constexpr char motorFeedbackCharacteristicUUID[] =
 
 constexpr char motorControlCharacteristicUUID[] =
     "99F02A66-065C-41BE-B05E-4BE2B9035A8B";
+
+constexpr char loggingControlCharacteristicUUID[] =
+"A06EE428-0AB6-4CD4-AA8A-91619F1AF577";
+
+constexpr char rightMotorFeedbackCharacteristicUUID[] =
+"2E38C871-902C-425F-8D3B-181CB21F0B67";
+
+constexpr char rightMotorCommandCharacteristicUUID[] =
+"09DC04D0-BFC0-4D7C-A88D-96D60857FE64";
+
+constexpr char rightMotorControlCharacteristicUUID[] =
+ "12E89431-F2D4-4495-B984-A127A79D1591";
 
 
 class BLEBridge final :
@@ -86,7 +99,13 @@ public:
             motorControlCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
             sizeof(MotorMetaCommand)
-        )
+        ),
+
+		m_loggingControlCharacteristic(
+    		loggingControlCharacteristicUUID,
+    		BLEWrite | BLEWriteWithoutResponse,
+    		sizeof(LoggingState)
+		)
     {
         s_instance = this;
     }
@@ -138,6 +157,10 @@ public:
             m_motorControlCharacteristic
         );
 
+		m_service.addCharacteristic(
+   			 m_loggingControlCharacteristic
+		);
+
 
         /*
          * BLE write callbacks
@@ -154,6 +177,12 @@ public:
                 BLEWritten,
                 motorControlWrittenCallback
             );
+
+		m_loggingControlCharacteristic
+    		.setEventHandler(
+        		BLEWritten,
+       		    loggingControlWrittenCallback
+    		);
 
 
         BLE.addService(
@@ -262,6 +291,7 @@ private:
             characteristic
         );
     }
+
 
 
     void handleMotorCommand(
@@ -397,6 +427,65 @@ private:
         );
     }
 
+static void loggingControlWrittenCallback(
+    BLEDevice central,
+    BLECharacteristic characteristic)
+{
+    (void)central;
+
+    if (s_instance == nullptr)
+    {
+        return;
+    }
+
+    s_instance->handleLoggingControl(
+        characteristic
+    );
+}
+void handleLoggingControl(
+    BLECharacteristic& characteristic)
+{
+    uint8_t rawState{};
+
+    const int bytesRead =
+        characteristic.readValue(
+            &rawState,
+            sizeof(rawState)
+        );
+
+    if (bytesRead != 1)
+    {
+        return;
+    }
+
+    if (
+        rawState >
+        static_cast<uint8_t>(
+            LoggingState::Recording
+        )
+    )
+    {
+        return;
+    }
+
+    const auto state =
+        static_cast<LoggingState>(
+            rawState
+        );
+
+    m_bus.publish<
+        EndpointId::LoggingState
+    >(state);
+
+    Serial.print(
+        "Logging state sent: "
+    );
+
+    Serial.println(
+        rawState
+    );
+}
+
 
 private:
 
@@ -452,6 +541,9 @@ private:
 
     BLECharacteristic
         m_motorControlCharacteristic;
+
+	BLECharacteristic
+    	m_loggingControlCharacteristic;
 };
 
 #endif

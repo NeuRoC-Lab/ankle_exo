@@ -11,6 +11,12 @@ enum class PlatformId : uint8_t
     Nano
 };
 
+enum class LoggingState : uint8_t
+{
+    Stopped = 0,
+    Recording = 1
+};
+
 enum class EndpointId : uint8_t
 {
     EncoderSnapshot, // encoder positions (left/right) snapshot
@@ -21,7 +27,7 @@ enum class EndpointId : uint8_t
 
     LeftMotorCommand, // left motor command buffer (MotorCmd)
     LeftMotorMetaCommand, // to start,stop, zero the motor (MotorMetaCommand)
-    //RightMotorCommand, // right motor command buffer (MotorCmd)
+    RightMotorCommand, // right motor command buffer (MotorCmd)
     RightMotorMetaCommand, // to start,stop, zero the motor (MotorMetaCommand)
 
     SafetyCommand,
@@ -29,6 +35,7 @@ enum class EndpointId : uint8_t
     SystemCommand,
 
     Ina232Snapshot, // PCB voltage and current readings from INA232
+	LoggingState,
 
     Count // DONT TOUCH
 };

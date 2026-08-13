@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.oscartesniere.com/software/Serial%20communication/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Serial Communication Protocol - AnkleExo documentation webpage</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Serial Communication Protocol";
+        var mkdocs_page_input_path = "software/Serial communication.md";
+        var mkdocs_page_url = "/software/Serial%20communication/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> AnkleExo documentation webpage
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Electrical</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/current_test_assembly/">CURRENT TEST ASSEMBLY (while Im away)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/pcb/">PCB</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/wiring.md">Wiring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/power.md">Power</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/encoder_debug.md">Encoder debug</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/encoder_wiring/">Encoder wiring</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Software</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../CANMotor/">CAN Motor Interfaces</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../CAN%20Motor%20API/">CAN Motor API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../api.md">API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../encoder/">Encoder testing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../plotting/">Sensors Plotting</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Serial Communication Protocol</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mechanical</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/parts/">Parts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/assembly/">Assembly</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">AnkleExo documentation webpage</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Software</li>
+      <li class="breadcrumb-item active">Serial Communication Protocol</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="serial-communication-between-the-teensy-41-and-the-host-computer">Serial communication between the Teensy 4.1 and the host computer</h3>
+<div class="admonition info">
+<p class="admonition-title">Note for later iterations</p>
+<p>The use of Serial communication (UART) seemed like an ideal choicen for us because 1) it is easier to implement than SPI 2) we can easily transpose it to Bluetooth later on</p>
+</div>
+<h2 id="teensy-payload-formating">Teensy payload formating</h2>
+<p>A typical packet from the Teensy looks like this, as seen from the Serial Monitor</p>
+<p><div class="highlight"><pre><span></span><code> <span class="p">{</span>
+    <span class="s2">&quot;LLC1&quot;</span><span class="p">:</span><span class="mf">2.512674</span><span class="p">,</span>
+    <span class="s2">&quot;LLC2&quot;</span><span class="p">:</span><span class="mf">2.532015</span><span class="p">,</span>
+    <span class="s2">&quot;RLC1&quot;</span><span class="p">:</span><span class="mf">0.032234</span><span class="p">,</span>
+    <span class="s2">&quot;RLC2&quot;</span><span class="p">:</span><span class="mf">0.030623</span><span class="p">,</span>
+    <span class="s2">&quot;LENC&quot;</span><span class="p">:</span><span class="mi">28671</span><span class="p">,</span>
+    <span class="s2">&quot;RENC&quot;</span><span class="p">:</span><span class="mi">65295</span><span class="p">,</span>
+    <span class="s2">&quot;MOTORS&quot;</span><span class="p">:[{</span><span class="s2">&quot;MTR_ID_DEC&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s2">&quot;MTR_POS_RAD&quot;</span><span class="p">:</span><span class="mf">0.476654</span><span class="p">,</span><span class="s2">&quot;MTR_VEL_RADS&quot;</span><span class="p">:</span><span class="mf">0.032967</span><span class="p">,</span><span class="s2">&quot;MTR_TRQ_NM&quot;</span><span class="p">:</span><span class="o">-</span><span class="mf">0.032967</span><span class="p">,</span><span class="s2">&quot;MTR_TEMP_DEG&quot;</span><span class="p">:</span><span class="mi">64</span><span class="p">,</span><span class="s2">&quot;MTR_ERR_DEC&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">}]</span>
+<span class="p">}</span>
+</code></pre></div>
+the main fields are : </p>
+<ul>
+<li><code>LLCx</code> : left load cell x (1 or 2)</li>
+<li><code>RLCx</code> : right load cell x (1 or 2)</li>
+<li><code>LENC</code> : left encoder count</li>
+<li><code>RENC</code> : right encoder count</li>
+<li><code>MOTORS</code> : motors field, contains a list of motor telemetry data (one per each) with keys <code>MTR_ID_DEC</code>, <code>MTR_POS_RAD</code>, <code>MTR_VEL_RADS</code>, <code>MTR_TEMP_DEG</code>, <code>MTR_ERR_DEC</code></li>
+</ul>
+<p>On python, you need to do the following to retrieve data (See <code>testUart.py</code> for an application)</p>
+<ol>
+<li>Parse the line from the Serial with <code>line = Serial.readLines('\n')</code> </li>
+<li>Parse the JSON to convert the string into a dictionnary-like array with <code>packet = json.loads(line)</code></li>
+<li>Extract individual fields with <code>.get()</code> method. For example :
+<div class="highlight"><pre><span></span><code><span class="n">left_load_cell</span> <span class="o">=</span> <span class="n">packet</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LLC1&quot;</span><span class="p">)</span>  <span class="c1"># left load cell 1 voltage</span>
+<span class="n">right_encoder</span> <span class="o">=</span> <span class="n">packet</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LENC&quot;</span><span class="p">)</span> <span class="c1"># left encoder count</span>
+</code></pre></div></li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../plotting/" class="btn btn-neutral float-left" title="Sensors Plotting"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../mechanical/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../plotting/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../mechanical/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/mathjax.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

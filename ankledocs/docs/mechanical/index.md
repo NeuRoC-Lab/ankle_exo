@@ -1,1 +1,0 @@
-Here is the information about the parts printed for the test bench and updates on the mechanical design of the ankle exoskeleton designed by the capstone team.

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.oscartesniere.com/software/CANMotor/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>CAN Motor Interfaces - AnkleExo documentation webpage</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CAN Motor Interfaces";
+        var mkdocs_page_input_path = "software/CANMotor.md";
+        var mkdocs_page_url = "/software/CANMotor/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> AnkleExo documentation webpage
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Electrical</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/current_test_assembly/">CURRENT TEST ASSEMBLY (while Im away)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/pcb/">PCB</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/wiring.md">Wiring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/power.md">Power</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../electrical/encoder_debug.md">Encoder debug</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../electrical/encoder_wiring/">Encoder wiring</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Software</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">CAN Motor Interfaces</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#canmotor-class">CANMotor class</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#design-update-2506">Design update (25/06)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#serial-communication">Serial communication</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#mit-mode">MIT mode</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#servo-mode">Servo Mode</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../CAN%20Motor%20API/">CAN Motor API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../api.md">API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../encoder/">Encoder testing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../plotting/">Sensors Plotting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../Serial%20communication/">Serial Communication Protocol</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mechanical</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/parts/">Parts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../mechanical/assembly/">Assembly</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">AnkleExo documentation webpage</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Software</li>
+      <li class="breadcrumb-item active">CAN Motor Interfaces</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="software-layout-for-the-project">Software layout for the project</h2>
+<h3 id="canmotor-class">CANMotor class</h3>
+<p>The <code>CANMotor</code> class is the main class used to interface the motor. </p>
+<p>As of now because we are having issues interfacing the encoders with the Teensy over SPI (voltage conversion related) I gave the possibility 
+for the user to control the AnkleExo PCB using 1) the Teensy and 2) with the Arduino Uno R4. It is necessary to split the implementation for the Uno R4 and the Teensy 4.1 because these two boards use different CAN Controller libraries.
+The Arduino uses <code>Arduino_CAN.h</code> while the Teensy currently uses <code>FlexCAN_T4</code>. For that reason I created two subclasses for each board so that one can use one or the other board as they wish.</p>
+<p>Note that because only the Teensy 4.1 and Arduino UNO R4 boards have an integrated CAN controller other regular boards like the Arduino UNO R3 <em>cannot</em> be used for this class.</p>
+<p>For the wiring, please refer to <code>board.h</code> and the <code>electrical</code> section of this documentation. It differs from board to board.</p>
+<p>A representative OOP diagram of the <code>CANMotor</code> class and it's two subclasses <code>CANMotor_Teensy41</code>, <code>CANMotor_Renesas</code> is shown below</p>
+<p><img alt="OOP Diagram" src="../images/CANMotor_OOP.png" /></p>
+<p>To run the unified CAN controller example code (<code>CAN_unified.cpp</code>) you will need to run the pio environment <code>CAN_teensy41</code> or <code>CAN_uno_r4</code> depending on which board you are using. 
+As a reminder, the general format to run an environment in platformio is <code>pio run -e yourenvname</code> where <code>yourenvname</code> is the target environment. </p>
+<h4 id="design-update-2506">Design update (25/06)</h4>
+<p>After the Servo mode was successfully tested on June 24th we are now implementing a separate class for the MIT and Servo mode. Those supercless are <code>CANMotorMIT</code> (MIT mode) and <code>ServoCANMotor</code> (Servo mode). Note that these two classes need to been validated again </p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th style="text-align: right;">Mode</th>
+<th style="text-align: left;">Board</th>
+<th>Platformio Environment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CANMotorMIT_Teensy</code></td>
+<td style="text-align: right;">MIT</td>
+<td style="text-align: left;">Teensy 4.1</td>
+<td><code>pio run -e MIT_CAN_teensy41</code></td>
+</tr>
+<tr>
+<td><code>CANMotorMIT_Renesas</code></td>
+<td style="text-align: right;">MIT</td>
+<td style="text-align: left;">Arduino Uno R4</td>
+<td><code>pio run -e MIT_CAN_uno_r4</code></td>
+</tr>
+<tr>
+<td><code>ServoCANMotor_Renesas</code></td>
+<td style="text-align: right;">Servo</td>
+<td style="text-align: left;">Arduino Uno R4</td>
+<td><code>pio run -e Servo_CAN_uno_r4</code></td>
+</tr>
+<tr>
+<td><code>ServoCANMotor_Teensy</code></td>
+<td style="text-align: right;">Servo</td>
+<td style="text-align: left;">Teensy 4.1</td>
+<td>NOT IMPLEMENTED YET</td>
+</tr>
+</tbody>
+</table>
+<p>The following commands can be run (rightmost command) to execute the MIT/Servo demo code on the Teensy/Arduino Uno R4. 
+Note the following : </p>
+<ul>
+<li>
+<p>You must wire the CANTX/CANRX wires accordingly to the Teensy or Arduino UNO R4.</p>
+</li>
+<li>
+<p>For the Arduino </p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>OpenExo PCB</th>
+<th style="text-align: right;">Arduino</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CANTX <em>through voltage divider</em></td>
+<td style="text-align: right;">D10</td>
+</tr>
+<tr>
+<td>CANRX</td>
+<td style="text-align: right;">D13</td>
+</tr>
+<tr>
+<td>GND</td>
+<td style="text-align: right;">GND</td>
+</tr>
+<tr>
+<td>3.3V</td>
+<td style="text-align: right;">3.3V</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>For the Teensy</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>OpenExo PCB</th>
+<th style="text-align: right;">Arduino</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CANTX</td>
+<td style="text-align: right;">D22</td>
+</tr>
+<tr>
+<td>CANRX</td>
+<td style="text-align: right;">D23</td>
+</tr>
+<tr>
+<td>GND</td>
+<td style="text-align: right;">GND</td>
+</tr>
+<tr>
+<td>3.3V</td>
+<td style="text-align: right;">3.3V</td>
+</tr>
+</tbody>
+</table>
+<h4 id="serial-communication">Serial communication</h4>
+<p>The serial communication to control the motor works as follow : </p>
+<h5 id="mit-mode">MIT mode</h5>
+<p><img alt="MIT control law from SITODRIVE" src="../images/MIT mode control law.jpeg" /></p>
+<p><span class="arithmatex">\(c_{ff}\)</span> value is usually the sum of the current required to offset the friction of the actuator and the current value calculated by the robot dynamics</p>
+<p>When the kp and kd values are both 0, the rotational stiffness and damping are both 0, which is equivalent to the current mode, and the phase current can be directly controlled:</p>
+<p>Increasing the feedforward torque <span class="arithmatex">\(c_{ff}\)</span> will offset the necessary torque to overcome the static friction. As a consequence the motor is set into motion easier. </p>
+<p>References from <a href="https://docs.sitodrive.com/Joint_Actuator_User_Documentation/Detailed_explanation_of_control_mode/MIT_mode">sito drive for the MIT actuator control mode</a></p>
+<p>Note : setting kd to wero will make the motor oscillate about the target position which is not recommended</p>
+<ul>
+<li><code>start id xx</code> : start the motor </li>
+<li>
+<p>To enable the control loop, after a "crash" wherein the motor disables itself after a fault was detected</p>
+</li>
+<li>
+<p><code>stop id xx</code> : disable the control loop (the motor is in idle mode, and keeps sending telemetry data but there is no actuation. note you can still set MIT parameters)</p>
+</li>
+<li>
+<p>To exit idle mode, enter the <code>start</code> command. </p>
+</li>
+<li>
+<p><code>zero id xx</code> : resets the motor's encoder position to 0 at the current position. </p>
+</li>
+</ul>
+<p><code>set</code> | <code>id xx</code>: </p>
+<ul>
+<li><code>pos x.x</code> : position (in radians from -12.0 to +12.0)</li>
+<li><code>vel x.x</code> : velocity (in radians/s from -45.0 to +45.0)</li>
+<li><code>kp x.x</code> : proportional gain (for position)</li>
+<li><code>kd x.x</code> : derivative gain (for velocity)</li>
+<li><code>trq x.x</code>  : feedforward torque (be careful with it when using the motor with no load attached to the shaft as it will spin freely while accelerating)</li>
+</ul>
+<p><em>Note that the order the parameters are given does not matter. One / more parameter can be updated at once</em></p>
+<h5 id="servo-mode">Servo Mode</h5>
+<p><code>set</code> | <code>id xx</code>  :</p>
+<ul>
+<li><code>duty x.x</code> : set duty cycle mode</li>
+<li><code>current x.x</code> : set current mode (proportional to torque T = kI)</li>
+<li><code>brake x.x</code> : set brake current mode</li>
+<li><code>rpm x.x</code> : set rpm mode</li>
+<li><code>pos x.x</code> : set position mode</li>
+<li><code>pos x.x rpm x.x acc x.x</code> : set position velocity acceleration loop mode</li>
+<li>
+<p><code>origin 0</code> : set encoder origin</p>
+</li>
+<li>
+<p><em>Note that only ONE mode can be active at a time</em> (WAIT MAYBE NO ACTUALLY?)</p>
+</li>
+</ul>
+<p><img alt="OOP Diagram" src="../images/LoadCells_OOP.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../CAN%20Motor%20API/" class="btn btn-neutral float-right" title="CAN Motor API">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../CAN%20Motor%20API/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/mathjax.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

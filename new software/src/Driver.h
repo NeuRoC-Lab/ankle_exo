@@ -232,7 +232,7 @@ public:
     {
         m_sensor.begin(18, 19);
 
-        m_sensor.setRshunt(0.015f); //TODO fine tune it
+        m_sensor.setRshunt(0.002f); //TODO fine tune it
         m_sensor.setImax(10.0f);
 
         return true;
@@ -243,7 +243,7 @@ public:
         if (m_sensor.dataReady())
         {
             return {
-                m_sensor.readBusVoltage(),
+                m_sensor.readBusVoltage()*(1.6f / 1.25f), //TODO TEST THAT THE CONVERSION FACTOR WORKS
                 m_sensor.readCurrent(),
                 m_sensor.readPower()
             };
@@ -257,6 +257,10 @@ public:
     }
 
 private:
+//TODO
+/*
+    INA226 assumes 1.25mV/LSB. But according to TI, the INA232 bus-voltage register is 1.6 mV/LSB, not 1.25 mV/LSB. TI explicitly specifies a bus-voltage resolution of 1.6 mV/LSB, with bus voltage measured at the IN− pin.
+*/
     InaBridge226 m_sensor{
         "INA232",
         0x40
@@ -347,6 +351,110 @@ public:
 private:
     CubeMarsMotor m_motor;
     CanBus& m_canBus;
+};
+
+#include <SD.h>
+
+//driver class for the SD card. note to distinguish that driver from other sensor drivers that support bidirectional flow we are not subclassing the Driver abstract class
+class SDCardDriver
+{
+public:
+    explicit SDCardDriver(
+        const char* filename = "recording.csv")
+        : m_filename(filename)
+    {}
+
+
+    bool begin()
+    {
+        if (!SD.begin(BUILTIN_SDCARD))
+        {
+            return false;
+        }
+
+        m_file = SD.open(
+            m_filename,
+            FILE_WRITE
+        );
+
+        if (!m_file)
+        {
+            return false;
+        }
+
+        /*
+         * Optional CSV header.
+         *
+         * For now this will be added every time
+         * the system boots and opens the file.
+         * We can improve that later.
+         */
+        m_file.println(
+            "time_us,left_1,left_2,right_1,right_2"
+        );
+
+        m_file.flush();
+
+        m_ready = true;
+
+        return true;
+    }
+
+
+    bool append(
+        const uint8_t* data,
+        size_t size)
+    {
+        if (!m_ready || !m_file)
+        {
+            return false;
+        }
+
+        const size_t written =
+            m_file.write(
+                data,
+                size
+            );
+
+        return written == size;
+    }
+
+
+    bool appendLine(
+        const char* line)
+    {
+        if (!m_ready || !m_file)
+        {
+            return false;
+        }
+
+        m_file.println(line);
+
+        return true;
+    }
+
+
+    void flush()
+    {
+        if (m_ready && m_file)
+        {
+            m_file.flush();
+        }
+    }
+
+
+    bool ready() const
+    {
+        return m_ready;
+    }
+
+
+private:
+    const char* m_filename;
+
+    File m_file;
+
+    bool m_ready{false};
 };
 
 #endif

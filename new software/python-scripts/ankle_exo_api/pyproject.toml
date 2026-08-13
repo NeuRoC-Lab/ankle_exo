@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ankle_exo_api"
+version = "1.0.0"
+description = "Python API for controlling the ankle exoskeleton. Supports Single and Double exo setup for 1 or 2 standalone exo for each leg"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]

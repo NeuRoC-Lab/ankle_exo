@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: ankle_exo_api
+Version: 1.0.0
+Summary: Python API for controlling the ankle exoskeleton. Supports Single and Double exo setup for 1 or 2 standalone exo for each leg
+Requires-Python: >=3.10

@@ -24,9 +24,9 @@ enum class LoadCellId : std::uint8_t
 {
  Left1, // 0
  Left2, // 1
- Right1, // 2
- Right2 // 3
-};
+ Right2, // 2
+ Right1 // 3
+}; //FLIPPED HERE
 
 // these are now FIXED
 

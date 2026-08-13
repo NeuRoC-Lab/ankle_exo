@@ -91,6 +91,27 @@ struct EndpointTraits<
 {
     using Payload = MotorMetaCommand;
 };
+template<>
+struct EndpointTraits<
+    EndpointId::LoggingState>
+{
+    using Payload = LoggingState;
+};
+
+template<>
+struct EndpointTraits<
+    EndpointId::RightMotorCommand>
+{
+    using Payload = MotorCmd;
+};
+
+template<>
+struct EndpointTraits<
+    EndpointId::RightMotorMetaCommand>
+{
+    using Payload = MotorMetaCommand;
+};
+
 
 
 template<typename T>
@@ -205,6 +226,24 @@ inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
         )
     ].subscribers = both;
 
+	routes[
+    static_cast<size_t>(
+        EndpointId::RightMotorCommand
+    )
+	].subscribers =
+    platformBit(
+        PlatformId::Teensy
+    );
+
+	routes[
+    static_cast<size_t>(
+        EndpointId::RightMotorMetaCommand
+    )
+	].subscribers =
+    platformBit(
+        PlatformId::Teensy
+    );
+
     routes[
         static_cast<size_t>(
             EndpointId::LeftMotorCommand
@@ -226,6 +265,14 @@ inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
         )
     ].subscribers =
         platformBit(PlatformId::Teensy);
+
+	routes[
+    	static_cast<size_t>(
+        	EndpointId::LoggingState
+    	)
+	].subscribers =
+    	platformBit(PlatformId::Teensy) |
+		platformBit(PlatformId::Nano);
 
     return routes;
 }();
@@ -530,3 +577,375 @@ private:
 
     uint32_t m_previousUs{0};
 };
+
+#if defined(PLATFORM_TEENSY)
+
+
+class SDLogger final :
+    public ITask
+{
+public:
+    SDLogger(
+        SDCardDriver& sdCard,
+        Topic<LoadCellForces>& loadCells,
+        Topic<EncoderPositions>& encoders,
+        Topic<MotorReply>& leftMotor,
+        Topic<MotorReply>& rightMotor,
+        Topic<LoggingState>& loggingState)
+        :
+        m_sdCard(sdCard),
+        m_loadCells(loadCells),
+        m_encoders(encoders),
+        m_leftMotor(leftMotor),
+        m_rightMotor(rightMotor),
+        m_loggingState(loggingState)
+    {}
+
+
+    void update(
+        uint32_t nowUs) override
+    {
+        if (!m_sdCard.ready())
+        {
+            return;
+        }
+
+        if (!m_loggingState.valid())
+        {
+            return;
+        }
+
+        const LoggingState state =
+            m_loggingState.latest();
+
+        if (state != m_previousState)
+        {
+            handleStateChange(state);
+
+            m_previousState = state;
+        }
+
+        if (
+            state !=
+            LoggingState::Recording
+        )
+        {
+            return;
+        }
+
+        /*
+         * Wait until all data sources have
+         * produced at least one valid sample.
+         */
+        if (
+            !m_loadCells.valid() ||
+            !m_encoders.valid() ||
+            !m_leftMotor.valid() ||
+            !m_rightMotor.valid()
+        )
+        {
+            return;
+        }
+
+
+        /*
+         * Check whether any input has changed
+         * since the previous log entry.
+         */
+        const uint32_t loadCellSequence =
+            m_loadCells.sequence();
+
+        const uint32_t encoderSequence =
+            m_encoders.sequence();
+
+        const uint32_t leftMotorSequence =
+            m_leftMotor.sequence();
+
+        const uint32_t rightMotorSequence =
+            m_rightMotor.sequence();
+
+
+        const bool dataChanged =
+            loadCellSequence !=
+                m_lastLoadCellSequence
+            ||
+            encoderSequence !=
+                m_lastEncoderSequence
+            ||
+            leftMotorSequence !=
+                m_lastLeftMotorSequence
+            ||
+            rightMotorSequence !=
+                m_lastRightMotorSequence;
+
+
+        if (!dataChanged)
+        {
+            return;
+        }
+
+
+        /*
+         * Store current sequence numbers.
+         */
+        m_lastLoadCellSequence =
+            loadCellSequence;
+
+        m_lastEncoderSequence =
+            encoderSequence;
+
+        m_lastLeftMotorSequence =
+            leftMotorSequence;
+
+        m_lastRightMotorSequence =
+            rightMotorSequence;
+
+
+        /*
+         * Read latest state.
+         */
+        const auto& forces =
+            m_loadCells.latest();
+
+        const auto& encoders =
+            m_encoders.latest();
+
+        const auto& leftMotor =
+            m_leftMotor.latest();
+
+        const auto& rightMotor =
+            m_rightMotor.latest();
+
+
+        /*
+         * CSV format:
+         *
+         * time_us,
+         *
+         * loadcell_0,
+         * loadcell_1,
+         * loadcell_2,
+         * loadcell_3,
+         *
+         * encoder_left,
+         * encoder_right,
+         *
+         * left_motor_position,
+         * left_motor_velocity,
+         * left_motor_torque,
+         * left_motor_temperature,
+         * left_motor_error,
+         *
+         * right_motor_position,
+         * right_motor_velocity,
+         * right_motor_torque,
+         * right_motor_temperature,
+         * right_motor_error
+         */
+
+        char line[256];
+
+        const int length =
+            snprintf(
+                line,
+                sizeof(line),
+
+                "%lu,"
+                "%.4f,%.4f,%.4f,%.4f,"
+                "%u,%u,"
+                "%.4f,%.4f,%.4f,%u,%u,"
+                "%.4f,%.4f,%.4f,%u,%u",
+
+                static_cast<unsigned long>(
+                    nowUs
+                ),
+
+                static_cast<double>(
+                    forces[0]
+                ),
+
+                static_cast<double>(
+                    forces[1]
+                ),
+
+                static_cast<double>(
+                    forces[2]
+                ),
+
+                static_cast<double>(
+                    forces[3]
+                ),
+
+                static_cast<unsigned int>(
+                    encoders.left
+                ),
+
+                static_cast<unsigned int>(
+                    encoders.right
+                ),
+
+                static_cast<double>(
+                    leftMotor.position
+                ),
+
+                static_cast<double>(
+                    leftMotor.velocity
+                ),
+
+                static_cast<double>(
+                    leftMotor.torque
+                ),
+
+                static_cast<unsigned int>(
+                    leftMotor.temperature
+                ),
+
+                static_cast<unsigned int>(
+                    leftMotor.error
+                ),
+
+                static_cast<double>(
+                    rightMotor.position
+                ),
+
+                static_cast<double>(
+                    rightMotor.velocity
+                ),
+
+                static_cast<double>(
+                    rightMotor.torque
+                ),
+
+                static_cast<unsigned int>(
+                    rightMotor.temperature
+                ),
+
+                static_cast<unsigned int>(
+                    rightMotor.error
+                )
+            );
+
+
+        if (
+            length <= 0 ||
+            static_cast<size_t>(length)
+                >= sizeof(line)
+        )
+        {
+            Serial.println(
+                "SD log line too long"
+            );
+
+            return;
+        }
+
+
+        if (!m_sdCard.appendLine(line))
+        {
+            Serial.println(
+                "SD logging failed"
+            );
+        }
+
+
+        if (
+            nowUs - m_lastFlushUs
+            >= FLUSH_PERIOD_US
+        )
+        {
+            m_sdCard.flush();
+
+            m_lastFlushUs =
+                nowUs;
+        }
+    }
+
+
+private:
+
+    void handleStateChange(
+        LoggingState newState)
+    {
+        switch (newState)
+        {
+            case LoggingState::Recording:
+            {
+                Serial.println(
+                    "SD logging started"
+                );
+
+                /*
+                 * Force the current state to be
+                 * written at the beginning of a
+                 * new recording session.
+                 */
+                m_lastLoadCellSequence = 0;
+                m_lastEncoderSequence = 0;
+                m_lastLeftMotorSequence = 0;
+                m_lastRightMotorSequence = 0;
+
+                break;
+            }
+
+
+            case LoggingState::Stopped:
+            {
+                Serial.println(
+                    "SD logging stopped"
+                );
+
+                m_sdCard.flush();
+
+                break;
+            }
+        }
+    }
+
+
+private:
+
+    static constexpr uint32_t
+        FLUSH_PERIOD_US =
+            100'000;
+
+
+    SDCardDriver& m_sdCard;
+
+    Topic<LoadCellForces>&
+        m_loadCells;
+
+    Topic<EncoderPositions>&
+        m_encoders;
+
+    Topic<MotorReply>&
+        m_leftMotor;
+
+    Topic<MotorReply>&
+        m_rightMotor;
+
+    Topic<LoggingState>&
+        m_loggingState;
+
+
+    uint32_t
+        m_lastLoadCellSequence{0};
+
+    uint32_t
+        m_lastEncoderSequence{0};
+
+    uint32_t
+        m_lastLeftMotorSequence{0};
+
+    uint32_t
+        m_lastRightMotorSequence{0};
+
+    uint32_t
+        m_lastFlushUs{0};
+
+
+    LoggingState m_previousState{
+        LoggingState::Stopped
+    };
+};
+
+#endif
