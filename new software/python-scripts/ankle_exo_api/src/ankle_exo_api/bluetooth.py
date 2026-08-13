@@ -203,6 +203,16 @@ class BluetoothManager:
                 "<B3x3fBB2x",
                 data
             )
+            """
+            B  3x  3f  B  B  2x
+            │  │   │   │  │  │
+            │  │   │   │  │  └── skip 2 bytes
+            │  │   │   │  └───── 1-byte unsigned int
+            │  │   │   └──────── 1-byte unsigned int
+            │  │   └──────────── 3 floats (4 bytes each)
+            │  └──────────────── skip 3 bytes
+            └─────────────────── 1-byte unsigned int
+            """
             (
                 can_id,
                 position,
@@ -225,7 +235,7 @@ class BluetoothManager:
             print("Motor decode error:", e)
 
 
-    def _loadcell_callback(self, sender, data):
+    def _loadcell_callback(self, sender, data): # unpack load cell data
         """
         Load cell packet:
 
@@ -400,7 +410,7 @@ class BluetoothManager:
             try:
                 packet = command.to_bytes()
 
-                if len(packet) != COMMAND_PACKET_SIZE:
+                if len(packet) != COMMAND_PACKET_SIZE: # motor packet needs to be same size and command packet
                     raise RuntimeError(
                         f"Incorrect MotorCommand size: "
                         f"{len(packet)}, "
@@ -486,7 +496,6 @@ class BluetoothManager:
                     exc
                 )
         # Bluetooth connection
-
     async def _send_pending_sd_controls(
             self,
             client: BleakClient
@@ -552,6 +561,7 @@ class BluetoothManager:
 
 
     async def _bluetooth_connection(self):
+        
         print("Searching for Bluetooth device... (15s timeout)")
 
         device = await BleakScanner.find_device_by_name(
