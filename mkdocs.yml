@@ -48,6 +48,5 @@ extra_javascript:
   - javascripts/mathjax.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
-repo_url: https://github.com/NeuRoC-Lab/ankle_exo
 use_directory_urls: true
 # to upload to the server : `rsync -avz ankledocs root@192.168.0.88:/root/ankledocs/ankledocs/`
