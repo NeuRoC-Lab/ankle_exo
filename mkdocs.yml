@@ -1,5 +1,6 @@
 site_name: AnkleExo documentation webpage
 
+site_url: https://neuroc-lab.github.io/ankle_exo/
 
 nav:
   - Home: index.md
