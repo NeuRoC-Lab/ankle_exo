@@ -13,8 +13,9 @@ from collections import deque
 
 import matplotlib
 matplotlib.use("QtAgg")
-
 import matplotlib.pyplot as plt
+
+# for motor control panel
 from matplotlib.widgets import TextBox, Button
 
 
@@ -39,7 +40,7 @@ class CSVLogger:
         self.csv_file = None
         self.writer = None
 
-    def open(self):
+    def open(self): # open csv file
         print("CSV will save at:", self.path)
 
         self.csv_file = open(
@@ -50,7 +51,7 @@ class CSVLogger:
 
         self.writer = csv.writer(self.csv_file)
 
-        self.writer.writerow(
+        self.writer.writerow( # sheet column labels
             [
                 "Time (s)",
                 "Ankle Position (deg)",
@@ -64,7 +65,7 @@ class CSVLogger:
             ]
         )
 
-    def write(
+    def write( # write csv file
             self,
             current_time,
             snapshot,
@@ -100,6 +101,7 @@ class PlotManager:
         self.fig = None
         self.axes_list = []
 
+        # real time plots
         self.line1 = None
         self.line2 = None
         self.line3 = None
@@ -107,6 +109,7 @@ class PlotManager:
         self.line5 = None
         self.line6 = None
 
+        # ui for motor control panel
         self.command_box = None
         self.send_button = None
         self.start_button = None
