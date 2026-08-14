@@ -1,0 +1,47 @@
+site_name: AnkleExo documentation webpage
+
+repo_url: https://github.com/NeuRoC-Lab/ankle_exo
+
+docs_dir: ../docs/user
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+
+  - Electrical:
+      - CURRENT TEST ASSEMBLY (while Im away): electrical/current_test_assembly.md
+      - Overview: electrical/index.md
+      - PCB: electrical/pcb.md
+      - CAN Testing: electrical/CANtesting.md
+      - Encoder wiring: electrical/encoder_wiring.md
+
+  - Software:
+      - Overview: software/index.md
+      - C++ coding guidelines: software/cppguidelines.md
+      - Motor control system: software/MotorControl.md
+      - CAN Motor Interfaces: software/CANMotor.md
+      - CAN Motor API: software/CAN Motor API.md
+      - Encoder testing: software/encoder.md
+      - Sensors Plotting: software/plotting.md
+      - Serial Communication Protocol: software/Serial communication.md
+      - Python Bluetooth API: software/Python-API.md
+
+  - Mechanical:
+      - Overview: mechanical/index.md
+      - Parts: mechanical/parts.md
+      - Assembly: mechanical/assembly.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+use_directory_urls: true

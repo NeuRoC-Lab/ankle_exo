@@ -4,3 +4,22 @@ __pycache__/
 .gitignore\]
 *.pyc
 docs/index.html
+
+# MkDocs output
+site/
+
+# Sphinx output
+docs/firmware/build/
+
+# Doxygen generated XML
+docs/firmware/doxygen/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# PlatformIO
+.pio/
+
+# macOS
+.DS_Store

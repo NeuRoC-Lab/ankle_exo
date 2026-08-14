@@ -1,0 +1,2 @@
+/usr/bin/ar qc libankle_exo_teensy_headers.a CMakeFiles/ankle_exo_teensy_headers.dir/header_check_dummy.cpp.o
+/usr/bin/ranlib libankle_exo_teensy_headers.a

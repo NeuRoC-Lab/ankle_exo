@@ -1,0 +1,7 @@
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/ankle_exo_teensy_headers.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/ankle_exo_nordic_headers.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/edit_cache.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/rebuild_cache.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/ankle_exo_teensy_headers_verify_interface_header_sets.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/ankle_exo_nordic_headers_verify_interface_header_sets.dir
+/Users/oscartesniere/Downloads/sEMG project/ankle_exo/software/src/build/CMakeFiles/all_verify_interface_header_sets.dir
