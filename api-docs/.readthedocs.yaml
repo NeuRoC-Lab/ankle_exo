@@ -15,7 +15,7 @@ build:
       - pip install sphinx breathe sphinx-rtd-theme
 
     pre_build:
-      - doxygen Doxyfile
+      - cd "new software" && doxygen Doxyfile
 
 sphinx:
   configuration: "new software/docs/source/conf.py"
