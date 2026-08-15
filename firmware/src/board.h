@@ -61,6 +61,7 @@ namespace board::teensy41
  {
   EncoderPins encoders;
   LevelShifterPins levelShifters;
+  Pin stopPin;
  };
 
  inline constexpr TeensyPins pins{
@@ -73,6 +74,7 @@ namespace board::teensy41
    .oe1 = 6,
    .oe2 = 3
 },
+ .stopPin = 9, // used to restart the Teensy 4.1
  };
  //inline SPIClass& nanoSpi = SPI;
  inline HardwareSerial& nanoUart = Serial8;

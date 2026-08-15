@@ -1,422 +1,313 @@
-"""
-Bluetooth communication for the ankle exoskeleton.
-
-This file handles:
-- Connecting to Arduino Nano through Bluetooth
-- Receiving motor, encoder, and load cell packets
-- Sending motor commands
-"""
-
-# import libraries
-import asyncio
 import queue
-import struct
 import threading
-import time
-from dataclasses import dataclass
+import struct
+import asyncio
+from enum import  Enum
 
 from bleak import BleakClient, BleakScanner
 
-# import sensors.py
-from sensors import (
-    COMMAND_PACKET_SIZE,
-    Encoder,
+from .sensors import (
+    Encoders,
     LoadCells,
     Motor,
     MotorCommand,
-    MotorControl,
-    SDControl,
-    LoggingState,
+    MotorControlCmd,
+    SDLoggerControlCmd,
+    Power,
 )
 
+class Side(Enum):
+    #a class that acts as an access modifier to distinguish between left/right motor, as well as encoders and load cells
+    LEFT = "left"
+    RIGHT = "right"
 
-# Bluetooth configuration
+class CanId(Enum):
+    LEFT = 3
+    RIGHT = 2
+
 
 DEVICE_NAME = "AnkleExo"
 SERVICE_UUID = "CF45813E-4358-4903-B961-09996BB081FB"
 
 LOAD_CELL_UUID = "CA87289F-102B-4078-AD8C-8F53063547A6"
-MOTOR_FEEDBACK_UUID = "81DC2896-1B27-4195-A391-99A637FA50A4"
 ENCODER_UUID = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB"
-MOTOR_COMMAND_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E"
-MOTOR_CONTROL_UUID = "99F02A66-065C-41BE-B05E-4BE2B9035A8B"
-SD_LOGGING_UUID = "A06EE428-0AB6-4CD4-AA8A-91619F1AF577" # NEW
+POWER_UUID = "4D92C3F7-848C-42C2-B26A-9D1D15CB361A"
+
+RIGHT_MOTOR_FEEDBACK_UUID = "2E38C871-902C-425F-8D3B-181CB21F0B67"
+LEFT_MOTOR_FEEDBACK_UUID = "81DC2896-1B27-4195-A391-99A637FA50A4"
+
+RIGHT_MOTOR_COMMAND_UUID = "09DC04D0-BFC0-4D7C-A88D-96D60857FE64"
+LEFT_MOTOR_COMMAND_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E"
+
+RIGHT_MOTOR_CONTROL_UUID = "12E89431-F2D4-4495-B984-A127A79D1591"
+LEFT_MOTOR_CONTROL_UUID = "99F02A66-065C-41BE-B05E-4BE2B9035A8B"
+
+SD_LOGGER_UUID = "A06EE428-0AB6-4CD4-AA8A-91619F1AF577"
+
+MOTOR_FEEDBACK_UUIDS = {
+    Side.LEFT:
+        LEFT_MOTOR_FEEDBACK_UUID,
+
+    Side.RIGHT:
+        RIGHT_MOTOR_FEEDBACK_UUID,
+}
 
 
-@dataclass(frozen=True)
-class TelemetrySnapshot:
-    sample_time: float
+MOTOR_COMMAND_UUIDS = {
+    Side.LEFT:
+        LEFT_MOTOR_COMMAND_UUID,
 
-    encoder: int
-    ankle_angle: float
-    ankle_velocity: float
+    Side.RIGHT:
+        RIGHT_MOTOR_COMMAND_UUID,
+}
 
-    loadcell1: float
-    loadcell2: float
 
-    motor_position: float
-    motor_velocity: float
-    motor_torque: float
-    motor_temperature: int
+MOTOR_CONTROL_UUIDS = {
+    Side.LEFT:
+        LEFT_MOTOR_CONTROL_UUID,
 
+    Side.RIGHT:
+        RIGHT_MOTOR_CONTROL_UUID,
+}
 
 class BluetoothManager:
-
-    def __init__(
-            self,
-            encoder: Encoder,
+    """Owns the BLE connection with the Arduino Nano"""
+    def __init__(self,
+            encoders: Encoders,
             loadcells: LoadCells,
-            motor: Motor,
-            stop_event,
-    ):
-        self.encoder = encoder
-        self.loadcells = loadcells
-        self.motor = motor
+            power: Power,
+            left_motor: Motor,
+            right_motor: Motor,
+            stop_event):
+
+        self.encoders = encoders # two encoders
+        self.loadcells = loadcells # four load cells
+        self.power = power
+        self.motors = {
+            Side.LEFT :left_motor,
+            Side.RIGHT : right_motor,
+        }
+
+
         self.stop_event = stop_event
 
-        # Queue containing every BLE update.
-        # CSV logging drains this queue independently of plot refresh rate.
-        self.data_queue = queue.Queue()
 
-        # Motor commands entered in the plot window are placed here.
-        # The BLE thread sends them without blocking Matplotlib.
-        self.command_queue = queue.Queue()
-        self.control_queue = queue.Queue()
+        self.command_queues = {
+            Side.LEFT: queue.Queue(),
+            Side.RIGHT: queue.Queue(),
+        }
+
+        self.control_queues = {
+            Side.LEFT: queue.Queue(),
+            Side.RIGHT: queue.Queue(),
+        }
+
         self.sd_queue = queue.Queue()
 
-        # Writable BLE command characteristic detected after connecting.
-        self.command_characteristic_uuid = None
+        self.data_queue = queue.Queue()
+        #TODO determine if that is really necessary
 
-        self.thread = None
+        self.ble_thread = None
 
-
-    # Bluetooth connection controls
 
     def connect(self):
-        if self.thread is not None and self.thread.is_alive():
+        if (self.ble_thread is not None and self.ble_thread.is_alive()):
             return
 
-        self.thread = threading.Thread(
+        self.stop_event.clear()
+
+        self.ble_thread = threading.Thread(
             target=self._run_bluetooth,
-            daemon=True
+            daemon=True,
         )
 
-        self.thread.start()
+        self.ble_thread.start()
+
+
+
 
     def disconnect(self):
+
         self.stop_event.set()
 
+        if self.ble_thread is not None:
 
-    # Motor command queue
+            self.ble_thread.join(
+                timeout=2.0
+            )
 
-    def queue_motor_command(self, command: MotorCommand):
-        self.command_queue.put(command)
+        self.ble_thread = None
 
-    def queue_motor_control(self, command: MotorCommand):
-        self.control_queue.put(command)
-
-    def queue_sd_control(self, command: LoggingState):
+    def _queue_motor_command(self,side: Side,command: MotorCommand):
+        self.command_queues[side].put(command)
+    def _queue_motor_control(self,side: Side,command: MotorControlCmd):
+        self.control_queues[side].put(command)
+    def _queue_sd_command(self, command : SDLoggerControlCmd):
         self.sd_queue.put(command)
-
-    def has_pending_commands(self):
+    def _has_pending_commands(self):
         return (
-                not self.command_queue.empty()
-                or not self.control_queue.empty()
-                or not self.sd_queue.empty()
+            not self.command_queues[Side.LEFT].empty()
+            or not self.command_queues[Side.RIGHT].empty()
+            or not self.control_queues[Side.LEFT].empty()
+            or not self.control_queues[Side.RIGHT].empty()
+            or not self.sd_queue.empty()
         )
 
-    # Bluetooth data queue
+    def _fetch_motor(self,sender,data,side:Side):
 
-    def get_pending_snapshots(self):
-        snapshots = []
+        values = struct.unpack("<B3x3fBB2x",data)
+
+        """
+        if can_id == CanId.LEFT:
+            side = Side.LEFT
+        elif can_id == CanId.RIGHT:
+            side = Side.RIGHT
+        else:
+            print("Invalid CAN ID")
+            return
+        """
+        # determine the side from the CAN ID
+        if self.motors[side] is None:
+            print("Motor is undefined")
+            return
+        #finally update the motor
+        self.motors[side]._update(*values)
+
+    def _fetch_loadcells(self, sender, data):
+        values = struct.unpack("<4f", data)
+        if self.loadcells is not None:
+            self.loadcells._update(*values)
+    def _fetch_power(self, sender, data):
+        values = struct.unpack("<3f", data)
+        if self.power is None:
+            print("power is undefined")
+            return
+        self.power._update(*values)
+
+    def _fetch_encoders(self,sender,data):
+        values = struct.unpack("<2f",data)
+        if self.encoders is None:
+            print("power is undefined")
+            return
+        self.encoders._update(*values)
+
+    def queue_motor_command(
+            self,
+            side: Side,
+            command: MotorCommand,
+    ):
+        self.command_queues[
+            side
+        ].put(
+            command
+        )
+
+    def queue_motor_control(
+            self,
+            side: Side,
+            command: MotorControlCmd,
+    ):
+        self.control_queues[
+            side
+        ].put(
+            command
+        )
+
+    def queue_sd_command(
+            self,
+            command: SDLoggerControlCmd,
+    ):
+        self.sd_queue.put(
+            command
+        )
+
+    def has_pending_commands(self):
+
+        return (
+                any(
+                    not q.empty()
+                    for q in
+                    self.command_queues.values()
+                )
+                or
+                any(
+                    not q.empty()
+                    for q in
+                    self.control_queues.values()
+                )
+                or
+                not self.sd_queue.empty()
+        )
+
+    def clear_pending_commands(self):
+
+        for q in self.command_queues.values():
+            self._clear_queue(q)
+
+        for q in self.control_queues.values():
+            self._clear_queue(q)
+
+        self._clear_queue(
+            self.sd_queue
+        )
+
+    @staticmethod
+    def _clear_queue(q):
 
         while True:
+
             try:
-                snapshots.append(
-                    self.data_queue.get_nowait()
-                )
+                q.get_nowait()
 
             except queue.Empty:
                 break
 
-        return snapshots
+    def _make_motor_callback(self,side: Side):
 
-
-    # Queue latest telemetry snapshot
-
-    def _queue_telemetry_snapshot(self):
-        (
-            loadcell1,
-            loadcell2,
-            #TODO understand why you can't unpack the other two load cell values
-            #_,
-            #_,
-        ) = self.loadcells.get_cable_tensions()
-
-
-        (
-            motor_position,
-            motor_velocity,
-            motor_torque,
-            motor_temperature,
-            motor_error,
-        ) = self.motor.get_values()
-
-        self.data_queue.put(
-            TelemetrySnapshot(
-                sample_time=time.perf_counter(),
-
-                # uses sensors.py to get sensor data
-                encoder=self.encoder.get_raw_count(),
-                ankle_angle=self.encoder.get_angle_deg(),
-                ankle_velocity=self.encoder.get_ankle_vel(),
-
-                loadcell1=loadcell1,
-                loadcell2=loadcell2,
-
-                motor_position=motor_position,
-                motor_velocity=motor_velocity,
-                motor_torque=motor_torque,
-                motor_temperature=motor_temperature,
-            )
-        )
-
-
-    # BLE packet decoding
-    # Callback functions for motor and sensors to read their respective data
-    # Add to telemetry snapshot
-
-    def _motor_callback(self, sender, data):
-        """
-        Motor packet:
-
-        uint8_t can_id
-        float position
-        float velocity
-        float torque
-        uint8_t temperature
-        uint8_t error
-        """
-
-        try:
-            values = struct.unpack(
-                "<B3x3fBB2x",
-                data
-            )
-            """
-            B  3x  3f  B  B  2x
-            │  │   │   │  │  │
-            │  │   │   │  │  └── skip 2 bytes
-            │  │   │   │  └───── 1-byte unsigned int
-            │  │   │   └──────── 1-byte unsigned int
-            │  │   └──────────── 3 floats (4 bytes each)
-            │  └──────────────── skip 3 bytes
-            └─────────────────── 1-byte unsigned int
-            """
-            (
-                can_id,
-                position,
-                velocity,
-                torque,
-                temperature,
-                error
-            ) = values
-
-            self.motor.update(
-                position=position,
-                velocity=velocity,
-                torque=torque,
-                temperature=temperature,
-                error=error,
-            )
-            self._queue_telemetry_snapshot()
-
-        except Exception as e:
-            print("Motor decode error:", e)
-
-
-    def _loadcell_callback(self, sender, data): # unpack load cell data
-        """
-        Load cell packet:
-
-        float left_1
-        float left_2
-        float right_1
-        float right_2
-        """
-
-        try:
-            values = struct.unpack(
-                "<4f", # < for little endian, 4f meaning a struct of 4 floats
-                data
+        def callback(
+                sender,
+                data,
+        ):
+            self._fetch_motor(
+                sender,
+                data,
+                side,
             )
 
-            (
-                left1,
-                left2,
-                right1,
-                right2
-            ) = values
-
-            self.loadcells.update(
-                left1,
-                left2,
-                right1,
-                right2,
-            )
-
-            self._queue_telemetry_snapshot()
-
-        except Exception as e:
-            print("Load cell decode error:", e)
-
-
-    def _encoder_callback(self, sender, data):
-        """
-        Encoder packet:
-
-        uint16_t left
-        uint16_t right
-        """
-
-        try:
-            values = struct.unpack(
-                "<2f",
-                data
-            )
-
-            (
-                left,
-                right
-            ) = values
-
-            # Existing single-leg code uses the left encoder.
-            self.encoder.update(left, time.perf_counter())
-
-            self._queue_telemetry_snapshot()
-
-        except Exception as e:
-            print("Encoder decode error:", e)
-
-
-    # Find writable BLE command characteristic
-
-    def _find_command_characteristic(self, client):
-        """
-        Find a writable GATT characteristic in the AnkleExo service.
-
-        Telemetry characteristics are excluded first. If MOTOR_FEEDBACK_UUID itself is
-        writable, it is accepted as a fallback.
-        """
-
-        telemetry_uuids = {
-            LOAD_CELL_UUID.lower(),
-            MOTOR_FEEDBACK_UUID.lower(),
-            ENCODER_UUID.lower(),
-        }
-
-        writable = []
-        motor_fallback = None
-
-        for service in client.services:
-            if service.uuid.lower() != SERVICE_UUID.lower():
-                continue
-
-            for characteristic in service.characteristics:
-                properties = {
-                    prop.lower()
-                    for prop in characteristic.properties
-                }
-
-                can_write = (
-                        "write" in properties
-                        or
-                        "write-without-response" in properties
-                )
-
-                if not can_write:
-                    continue
-
-                if characteristic.uuid.lower() == MOTOR_FEEDBACK_UUID.lower():
-                    motor_fallback = characteristic.uuid
-                    continue
-
-                if characteristic.uuid.lower() not in telemetry_uuids:
-                    writable.append(characteristic.uuid)
-
-        if len(writable) == 1:
-            return writable[0]
-
-        if len(writable) > 1:
-            print("Multiple writable BLE characteristics found:")
-
-            for characteristic_uuid in writable:
-                print("  ", characteristic_uuid)
-
-            print(
-                "Using the first writable characteristic. "
-                "Set the command UUID explicitly if needed."
-            )
-
-            return writable[0]
-
-        if motor_fallback is not None:
-            print(
-                "No separate command characteristic found; "
-                "using MOTOR_FEEDBACK_UUID because it is writable."
-            )
-
-            return motor_fallback
-
-        return None
-
-
-    # Bluetooth motor command sending
+        return callback
 
     async def _send_pending_motor_commands(
             self,
-            client: BleakClient
+            client: BleakClient,
+            side: Side,
     ):
         characteristic = (
-            client.services.get_characteristic(
-                MOTOR_COMMAND_UUID
+            client.services
+            .get_characteristic(
+                MOTOR_COMMAND_UUIDS[
+                    side
+                ]
             )
         )
-
-        if characteristic is None:
-            print(
-                "Motor command characteristic not found"
-            )
-            return
-
         properties = {
             prop.lower()
-            for prop in characteristic.properties
+            for prop
+            in characteristic.properties
         }
 
         use_response = (
-                "write" in properties
+            "write" in properties
         )
 
+        command_queue = (self.command_queues[side])
         while True:
             try:
-                command = (
-                    self.command_queue.get_nowait()
-                )
-
+                command = (command_queue.get_nowait())
             except queue.Empty:
                 break
-
             try:
-                packet = command.to_bytes()
 
-                if len(packet) != COMMAND_PACKET_SIZE: # motor packet needs to be same size and command packet
-                    raise RuntimeError(
-                        f"Incorrect MotorCommand size: "
-                        f"{len(packet)}, "
-                        f"expected "
-                        f"{COMMAND_PACKET_SIZE}"
-                    )
+                packet = (command.to_bytes())
 
                 await client.write_gatt_char(
                     characteristic,
@@ -424,59 +315,55 @@ class BluetoothManager:
                     response=use_response,
                 )
 
+            except Exception as exc:
+
                 print(
-                    "Motor command sent:",
-                    f"size={len(packet)}",
+                    f"Could not send "
+                    f"{side.value} "
+                    f"motor command:",
+                    exc,
                 )
 
-            except Exception as exc:
-                print(
-                    "Could not send motor command:",
-                    exc
-                )
+
     async def _send_pending_motor_controls(
             self,
-            client: BleakClient
+            client: BleakClient,
+            side: Side,
     ):
         characteristic = (
-            client.services.get_characteristic(
-                MOTOR_CONTROL_UUID
+            client.services
+            .get_characteristic(
+                MOTOR_CONTROL_UUIDS[
+                    side
+                ]
             )
         )
 
-        if characteristic is None:
-            print(
-                "Motor control characteristic not found"
-            )
-            return
 
         properties = {
             prop.lower()
-            for prop in characteristic.properties
+            for prop
+            in characteristic.properties
         }
 
         use_response = (
                 "write" in properties
         )
 
+
+        control_queue = (
+            self.control_queues[
+                side
+            ]
+        )
+
         while True:
             try:
-                command = (
-                    self.control_queue.get_nowait()
-                )
-
+                command = (control_queue.get_nowait())
             except queue.Empty:
                 break
-
             try:
-                packet = command.to_bytes()
-
-                # Your MotorControl packet is one byte.
-                if len(packet) != 1:
-                    raise RuntimeError(
-                        f"Incorrect MotorControl size: "
-                        f"{len(packet)}, expected 1"
-                    )
+                packet = (command.to_bytes())
 
                 await client.write_gatt_char(
                     characteristic,
@@ -484,161 +371,127 @@ class BluetoothManager:
                     response=use_response,
                 )
 
-                print(
-                    "Motor control sent:",
-                    command.command.name,
-                    f"size={len(packet)}",
-                )
-
             except Exception as exc:
+
                 print(
-                    "Could not send motor control:",
-                    exc
-                )
-        # Bluetooth connection
-    async def _send_pending_sd_controls(
-            self,
-            client: BleakClient
-    ):
-        characteristic = (
-            client.services.get_characteristic(
-                SD_LOGGING_UUID
-            )
-        )
-
-        if characteristic is None:
-            print(
-                "SD control characteristic not found"
-            )
-            return
-
-        properties = {
-            prop.lower()
-            for prop in characteristic.properties
-        }
-
-        use_response = (
-                "write" in properties
-        )
-
-        while True:
-            try:
-                command = (
-                    self.sd_queue.get_nowait()
+                    f"Could not send "
+                    f"{side.value} "
+                    f"motor control:",
+                    exc,
                 )
 
-            except queue.Empty:
-                break
 
-            try:
-                packet = command.to_bytes()
+    async def _send_pending_sd_commands(
+                self,
+                client: BleakClient,
+        ):
+            characteristic = (
+                client.services
+                .get_characteristic(
+                    SD_LOGGER_UUID
+                )
+            )
 
-                #  LoggingState packet is one byte.
-                if len(packet) != 1:
-                    raise RuntimeError(
-                        f"Incorrect LoggingState size: "
-                        f"{len(packet)}, expected 1"
+            properties = {
+                prop.lower()
+                for prop
+                in characteristic.properties
+            }
+
+            use_response = ("write" in properties)
+
+            while True:
+
+                try:
+                    command = (self.sd_queue.get_nowait())
+
+                except queue.Empty:
+                    break
+                try:
+                    packet = (command.to_bytes())
+
+                    await client.write_gatt_char(
+                        characteristic,
+                        packet,
+                        response=use_response,
                     )
 
-                await client.write_gatt_char(
-                    characteristic,
-                    packet,
-                    response=use_response,
-                )
+                except Exception as exc:
 
-                print(
-                    "sd control sent:",
-                    command.command.name,
-                    f"size={len(packet)}",
-                )
-
-            except Exception as exc:
-                print(
-                    "Could not send SD control:",
-                    exc
-                )
-        # Bluetooth connection
-
+                    print(
+                        "Could not send "
+                        "SD logger control:",
+                        exc,
+                    )
 
     async def _bluetooth_connection(self):
-
-        print("Searching for Bluetooth device... (15s timeout)")
-
-        device = await BleakScanner.find_device_by_name(
-            DEVICE_NAME,
-            timeout=15.0
-        )
-
-        if device is None:
-            print("Bluetooth device not found")
-            self.stop_event.set()
-            return
-
-        async with BleakClient(device) as client:
-            print("Connected to Bluetooth")
-
-            await client.start_notify(
-                MOTOR_FEEDBACK_UUID,
-                self._motor_callback
+            print("Searching for Bluetooth device...")
+            device = (
+                await
+                BleakScanner.find_device_by_name(
+                    DEVICE_NAME,
+                    timeout=15.0,
+                )
             )
+            if device is None:
+                print("Bluetooth device not found")
+                self.stop_event.set()
+                return
 
-            await client.start_notify(
-                ENCODER_UUID,
-                self._encoder_callback
-            )
+            async with BleakClient(device) as client:
+                print("Connected to Bluetooth")
 
-            await client.start_notify(
-                LOAD_CELL_UUID,
-                self._loadcell_callback
-            )
-
-            self.command_characteristic_uuid = (
-                self._find_command_characteristic(client)
-            )
-
-            if self.command_characteristic_uuid is None:
-                print(
-                    "WARNING: No writable BLE command characteristic "
-                    "was found in the AnkleExo service."
+                await client.start_notify(
+                    ENCODER_UUID,
+                    self._fetch_encoders,
                 )
 
-                print(
-                    "Plotting and CSV logging will still work, "
-                    "but motor commands cannot be sent over BLE."
+                await client.start_notify(
+                    LOAD_CELL_UUID,
+                    self._fetch_loadcells,
                 )
 
-            else:
-                print(
-                    "Motor command characteristic:",
-                    self.command_characteristic_uuid
+                await client.start_notify(
+                    POWER_UUID,
+                    self._fetch_power,
                 )
 
-            print("Receiving Bluetooth data...")
+                for side in Side:
+                    await client.start_notify(
+                        MOTOR_FEEDBACK_UUIDS[
+                            side
+                        ],
+                        self._make_motor_callback(
+                            side
+                        ),
+                    )
+                print("Receiving Bluetooth data...")
 
-            while not self.stop_event.is_set():
 
-                await self._send_pending_motor_commands(
-                    client
-                )
+                while not self.stop_event.is_set():
+                    for side in Side:
+                        await self._send_pending_motor_commands(
+                        client,
+                        side,
+                        )
 
-                await self._send_pending_motor_controls(
-                    client
-                )
-                await self._send_pending_sd_controls(
-                    client
-                )
 
-                # Small sleep keeps command latency low while allowing
-                # BLE notification callbacks to run normally.
-                await asyncio.sleep(0.01)
+                        await  self._send_pending_motor_controls(
+                        client,
+                        side,
+                        )
+
+                    await self._send_pending_sd_commands(
+                    client)
+
+
+
+                    await asyncio.sleep(0.01)
 
 
     def _run_bluetooth(self):
         try:
-            asyncio.run(
-                self._bluetooth_connection()
-            )
-
+            asyncio.run(self._bluetooth_connection())
         except Exception as exc:
-            print("Bluetooth error:", exc)
+            print("Bluetooth error:",exc)
             self.stop_event.set()

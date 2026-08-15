@@ -585,12 +585,15 @@ class SDLogger final :
     public ITask
 {
 public:
+
     SDLogger(
         SDCardDriver& sdCard,
         Topic<LoadCellForces>& loadCells,
         Topic<EncoderPositions>& encoders,
         Topic<MotorReply>& leftMotor,
         Topic<MotorReply>& rightMotor,
+        Topic<MotorCmd>& leftMotorCommand,
+        Topic<MotorCmd>& rightMotorCommand,
         Topic<LoggingState>& loggingState)
         :
         m_sdCard(sdCard),
@@ -598,6 +601,8 @@ public:
         m_encoders(encoders),
         m_leftMotor(leftMotor),
         m_rightMotor(rightMotor),
+        m_leftMotorCommand(leftMotorCommand),
+        m_rightMotorCommand(rightMotorCommand),
         m_loggingState(loggingState)
     {}
 
@@ -615,15 +620,21 @@ public:
             return;
         }
 
+
         const LoggingState state =
             m_loggingState.latest();
 
+
         if (state != m_previousState)
         {
-            handleStateChange(state);
+            handleStateChange(
+                state
+            );
 
-            m_previousState = state;
+            m_previousState =
+                state;
         }
+
 
         if (
             state !=
@@ -633,25 +644,11 @@ public:
             return;
         }
 
-        /*
-         * Wait until all data sources have
-         * produced at least one valid sample.
-         */
-        if (
-            !m_loadCells.valid() ||
-            !m_encoders.valid() ||
-            !m_leftMotor.valid() ||
-            !m_rightMotor.valid()
-        )
-        {
-            return;
-        }
 
+        // =================================================
+        // CURRENT TOPIC SEQUENCES
+        // =================================================
 
-        /*
-         * Check whether any input has changed
-         * since the previous log entry.
-         */
         const uint32_t loadCellSequence =
             m_loadCells.sequence();
 
@@ -664,6 +661,16 @@ public:
         const uint32_t rightMotorSequence =
             m_rightMotor.sequence();
 
+        const uint32_t leftCommandSequence =
+            m_leftMotorCommand.sequence();
+
+        const uint32_t rightCommandSequence =
+            m_rightMotorCommand.sequence();
+
+
+        // =================================================
+        // LOG WHEN ANY RELEVANT TOPIC CHANGES
+        // =================================================
 
         const bool dataChanged =
             loadCellSequence !=
@@ -676,7 +683,13 @@ public:
                 m_lastLeftMotorSequence
             ||
             rightMotorSequence !=
-                m_lastRightMotorSequence;
+                m_lastRightMotorSequence
+            ||
+            leftCommandSequence !=
+                m_lastLeftCommandSequence
+            ||
+            rightCommandSequence !=
+                m_lastRightCommandSequence;
 
 
         if (!dataChanged)
@@ -685,9 +698,10 @@ public:
         }
 
 
-        /*
-         * Store current sequence numbers.
-         */
+        // =================================================
+        // SAVE CURRENT SEQUENCES
+        // =================================================
+
         m_lastLoadCellSequence =
             loadCellSequence;
 
@@ -700,10 +714,17 @@ public:
         m_lastRightMotorSequence =
             rightMotorSequence;
 
+        m_lastLeftCommandSequence =
+            leftCommandSequence;
 
-        /*
-         * Read latest state.
-         */
+        m_lastRightCommandSequence =
+            rightCommandSequence;
+
+
+        // =================================================
+        // LATEST VALUES
+        // =================================================
+
         const auto& forces =
             m_loadCells.latest();
 
@@ -716,34 +737,28 @@ public:
         const auto& rightMotor =
             m_rightMotor.latest();
 
+        const auto& leftCommand =
+            m_leftMotorCommand.latest();
 
-        /*
-         * CSV format:
-         *
-         * time_us,
-         *
-         * loadcell_0,
-         * loadcell_1,
-         * loadcell_2,
-         * loadcell_3,
-         *
-         * encoder_left,
-         * encoder_right,
-         *
-         * left_motor_position,
-         * left_motor_velocity,
-         * left_motor_torque,
-         * left_motor_temperature,
-         * left_motor_error,
-         *
-         * right_motor_position,
-         * right_motor_velocity,
-         * right_motor_torque,
-         * right_motor_temperature,
-         * right_motor_error
-         */
+        const auto& rightCommand =
+            m_rightMotorCommand.latest();
 
-        char line[256];
+
+        // =================================================
+        // CSV
+        //
+        // time_us,
+        //
+        // load cells,
+        // encoders,
+        //
+        // commanded torque,
+        //
+        // motor feedback
+        // =================================================
+
+        char line[320];
+
 
         const int length =
             snprintf(
@@ -751,14 +766,30 @@ public:
                 sizeof(line),
 
                 "%lu,"
+
                 "%.4f,%.4f,%.4f,%.4f,"
-                "%u,%u,"
+
+                "%.4f,%.4f,"
+
+                "%.4f,%.4f,"
+
                 "%.4f,%.4f,%.4f,%u,%u,"
+
                 "%.4f,%.4f,%.4f,%u,%u",
+
+
+                // -----------------------------------------
+                // Time
+                // -----------------------------------------
 
                 static_cast<unsigned long>(
                     nowUs
                 ),
+
+
+                // -----------------------------------------
+                // Load cells
+                // -----------------------------------------
 
                 static_cast<double>(
                     forces[0]
@@ -776,13 +807,36 @@ public:
                     forces[3]
                 ),
 
-                static_cast<unsigned int>(
+
+                // -----------------------------------------
+                // Encoders
+                // -----------------------------------------
+
+                static_cast<double>(
                     encoders.left
                 ),
 
-                static_cast<unsigned int>(
+                static_cast<double>(
                     encoders.right
                 ),
+
+
+                // -----------------------------------------
+                // Commanded motor torques
+                // -----------------------------------------
+
+                static_cast<double>(
+                    leftCommand.torque
+                ),
+
+                static_cast<double>(
+                    rightCommand.torque
+                ),
+
+
+                // -----------------------------------------
+                // Left motor feedback
+                // -----------------------------------------
 
                 static_cast<double>(
                     leftMotor.position
@@ -803,6 +857,11 @@ public:
                 static_cast<unsigned int>(
                     leftMotor.error
                 ),
+
+
+                // -----------------------------------------
+                // Right motor feedback
+                // -----------------------------------------
 
                 static_cast<double>(
                     rightMotor.position
@@ -874,15 +933,18 @@ private:
                     "SD logging started"
                 );
 
-                /*
-                 * Force the current state to be
-                 * written at the beginning of a
-                 * new recording session.
-                 */
+
+                // Force a fresh row when a
+                // new recording starts.
+
                 m_lastLoadCellSequence = 0;
                 m_lastEncoderSequence = 0;
+
                 m_lastLeftMotorSequence = 0;
                 m_lastRightMotorSequence = 0;
+
+                m_lastLeftCommandSequence = 0;
+                m_lastRightCommandSequence = 0;
 
                 break;
             }
@@ -909,7 +971,9 @@ private:
             100'000;
 
 
-    SDCardDriver& m_sdCard;
+    SDCardDriver&
+        m_sdCard;
+
 
     Topic<LoadCellForces>&
         m_loadCells;
@@ -917,11 +981,20 @@ private:
     Topic<EncoderPositions>&
         m_encoders;
 
+
     Topic<MotorReply>&
         m_leftMotor;
 
     Topic<MotorReply>&
         m_rightMotor;
+
+
+    Topic<MotorCmd>&
+        m_leftMotorCommand;
+
+    Topic<MotorCmd>&
+        m_rightMotorCommand;
+
 
     Topic<LoggingState>&
         m_loggingState;
@@ -938,6 +1011,13 @@ private:
 
     uint32_t
         m_lastRightMotorSequence{0};
+
+    uint32_t
+        m_lastLeftCommandSequence{0};
+
+    uint32_t
+        m_lastRightCommandSequence{0};
+
 
     uint32_t
         m_lastFlushUs{0};

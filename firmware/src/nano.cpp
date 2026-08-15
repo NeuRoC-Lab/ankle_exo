@@ -24,6 +24,7 @@ Topic<LoadCellForces> loadCellTopic;
 // make a virtual copy / "mirror" of the topics that are on the teensy to forward the communications to/from the BLE
 Topic<EncoderPositions> encoderTopic;
 Topic<MotorReply> leftMotorTopic;
+Topic<MotorReply> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
 Topic<LoggingState> loggingStateTopic;
 
@@ -46,6 +47,7 @@ BLEBridge bleBridge(
     encoderTopic,
     loadCellTopic,
     leftMotorTopic,
+    rightMotorTopic,
     ina232Topic
 );
 
@@ -70,6 +72,7 @@ void setup()
     messageBus.addTopic<EndpointId::EncoderSnapshot>(encoderTopic);
     messageBus.addTopic<EndpointId::LoadCellSnapshot>(loadCellTopic);
     messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
+    messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.begin();

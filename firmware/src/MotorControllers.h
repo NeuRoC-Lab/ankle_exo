@@ -4,6 +4,9 @@
 #include "MessageBus.h"
 #include "Board.h"
 
+#include <cmath>
+#include <cstdint>
+
 #if defined(PLATFORM_TEENSY)
 
 class MotorCommandTask : public ITask
@@ -23,7 +26,7 @@ public:
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t PERIOD_US = 10'000;
+        static constexpr uint32_t PERIOD_US = 1'000; // 1kHz
 
         if (nowUs - m_previousUs < PERIOD_US)
             return;
@@ -43,7 +46,7 @@ public:
 
         const auto& cmd =
             m_command.latest();
-
+		/*
         Serial.print("SEND p=");
         Serial.print(cmd.position);
 
@@ -58,7 +61,7 @@ public:
 
         Serial.print(" tau=");
         Serial.println(cmd.torque);
-
+		*/
         m_motor.apply(cmd);
     }
 
@@ -506,8 +509,6 @@ private:
         m_limitTriggered{false};
 };
 
-#include <cmath>
-#include <cstdint>
 
 
 
@@ -883,5 +884,510 @@ private:
     bool m_initialized{false};
 };
 
+// NEW FOR NOW : TORQUE BANDWIDTH CONTROLLER FOR BANDWIDTH EVALUATION
+
+template<ExoSide Side>
+class TorqueBandwidthController final :
+    public ITask
+{
+public:
+
+    explicit TorqueBandwidthController(
+        Topic<MotorCmd>& motorCmd,
+		Topic<LoggingState>& loggingState
+		)
+        :
+        m_motorCmd(motorCmd),
+		m_loggingState(loggingState)
+    {}
+
+
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
+
+    void setAmplitude(
+        float amplitudeNm)
+    {
+        m_amplitudeNm =
+            constrain(
+                amplitudeNm,
+                0.0f,
+                MAX_AMPLITUDE_NM
+            );
+    }
+
+
+    float amplitude() const
+    {
+        return m_amplitudeNm;
+    }
+
+
+    float frequency() const
+    {
+        return FREQUENCIES_HZ[
+            m_frequencyIndex
+        ];
+    }
+
+
+    size_t frequencyIndex() const
+    {
+        return m_frequencyIndex;
+    }
+
+
+    // =====================================================
+    // START SWEEP
+    // =====================================================
+
+    void start(uint32_t nowUs)
+	{
+    m_frequencyIndex = 0;
+
+    m_frequencyStartUs =
+        nowUs;
+
+    m_previousUpdateUs =
+        nowUs;
+
+    m_running =
+        true;
+
+    // Start SD logging automatically.
+    m_loggingState.publish(
+        LoggingState::Recording
+    );
+
+    Serial.println(
+        "Bandwidth sweep started"
+    );
+
+    printCurrentFrequency();
+}
+
+
+    // =====================================================
+    // STOP SWEEP
+    // =====================================================
+
+    void stop()
+	{
+    if (!m_running)
+    {
+        return;
+    }
+
+    m_running =
+        false;
+
+    publishZeroTorque();
+
+    // Stop and flush SD logging.
+    m_loggingState.publish(
+        LoggingState::Stopped
+    );
+
+    Serial.println(
+        "Bandwidth sweep stopped"
+    );
+	}
+
+
+    bool running() const
+    {
+        return m_running;
+    }
+
+
+    // =====================================================
+    // TASK
+    // =====================================================
+
+    void update(
+        uint32_t nowUs) override
+    {
+        if (!m_running)
+        {
+            return;
+        }
+
+
+        if (
+            nowUs - m_previousUpdateUs <
+            PERIOD_US
+        )
+        {
+            return;
+        }
+
+
+        m_previousUpdateUs +=
+            PERIOD_US;
+
+
+        const float frequencyHz =
+            FREQUENCIES_HZ[
+                m_frequencyIndex
+            ];
+
+
+        const float elapsedSeconds =
+            static_cast<float>(
+                nowUs -
+                m_frequencyStartUs
+            )
+            *
+            1e-6f;
+
+
+        // =================================================
+        // CHECK IF CURRENT FREQUENCY IS COMPLETE
+        // =================================================
+
+        const float requiredTime =
+            dwellTimeForFrequency(
+                frequencyHz
+            );
+
+
+        if (
+            elapsedSeconds >=
+            requiredTime
+        )
+        {
+            advanceFrequency(
+                nowUs
+            );
+
+            return;
+        }
+
+
+        // =================================================
+        // SINUSOIDAL TORQUE COMMAND
+        // =================================================
+
+        const float phase =
+            TWO_PI
+            *
+            frequencyHz
+            *
+            elapsedSeconds;
+
+
+        const float torque =
+            torqueSign()
+            *
+            m_amplitudeNm
+            *
+            sinf(
+                phase
+            );
+
+
+        MotorCmd command{};
+
+        command.position =
+            0.0f;
+
+        command.velocity =
+            0.0f;
+
+        command.kp =
+            0.0f;
+
+        command.kd =
+            0.0f;
+
+        command.torque =
+            torque;
+
+
+        m_motorCmd.publish(
+            command
+        );
+    }
+
+
+private:
+
+    // =====================================================
+    // ADVANCE TO NEXT FREQUENCY
+    // =====================================================
+
+    void advanceFrequency(
+        uint32_t nowUs)
+    {
+        // Zero command at transition.
+
+        publishZeroTorque();
+
+
+        ++m_frequencyIndex;
+
+
+        if (
+    m_frequencyIndex >=
+    FREQUENCY_COUNT
+)
+{
+    Serial.println(
+        "Bandwidth sweep complete"
+    );
+
+    stop();
+
+    return;
+}
+
+
+        // Reset time / phase for the next
+        // frequency. Since sin(0) = 0,
+        // frequency changes begin at zero torque.
+
+        m_frequencyStartUs =
+            nowUs;
+
+
+        printCurrentFrequency();
+    }
+
+
+    // =====================================================
+    // DWELL TIME
+    // =====================================================
+
+    static float dwellTimeForFrequency(
+        float frequencyHz)
+    {
+        // Enough time for MIN_CYCLES at
+        // every frequency.
+
+        const float cycleTime =
+            static_cast<float>(
+                MIN_CYCLES
+            )
+            /
+            frequencyHz;
+
+
+        // But never use less than
+        // MIN_DWELL_TIME_S.
+
+        if (
+            cycleTime >
+            MIN_DWELL_TIME_S
+        )
+        {
+            return cycleTime;
+        }
+
+
+        return MIN_DWELL_TIME_S;
+    }
+
+
+    // =====================================================
+    // ZERO TORQUE
+    // =====================================================
+
+    void publishZeroTorque()
+    {
+        MotorCmd command{};
+
+        command.position =
+            0.0f;
+
+        command.velocity =
+            0.0f;
+
+        command.kp =
+            0.0f;
+
+        command.kd =
+            0.0f;
+
+        command.torque =
+            0.0f;
+
+
+        m_motorCmd.publish(
+            command
+        );
+    }
+
+
+    // =====================================================
+    // SIDE
+    // =====================================================
+
+    static constexpr float
+    torqueSign()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return LEFT_TORQUE_SIGN;
+        }
+        else
+        {
+            return RIGHT_TORQUE_SIGN;
+        }
+    }
+
+
+    static constexpr const char*
+    sideName()
+    {
+        if constexpr (
+            Side == ExoSide::Left
+        )
+        {
+            return "LEFT";
+        }
+        else
+        {
+            return "RIGHT";
+        }
+    }
+
+
+    void printCurrentFrequency() const
+    {
+        Serial.print(
+            sideName()
+        );
+
+        Serial.print(
+            " bandwidth test: "
+        );
+
+        Serial.print(
+            FREQUENCIES_HZ[
+                m_frequencyIndex
+            ],
+            2
+        );
+
+        Serial.println(
+            " Hz"
+        );
+    }
+
+
+private:
+
+    // =====================================================
+    // TASK FREQUENCY
+    // =====================================================
+
+    static constexpr uint32_t
+        PERIOD_US =
+            1'000;       // 1 kHz
+
+
+    // =====================================================
+    // TEST PARAMETERS
+    // =====================================================
+
+    static constexpr float
+        MAX_AMPLITUDE_NM =
+            1.0f;
+
+
+    // Minimum number of complete sinusoidal cycles
+    // recorded at each frequency.
+
+    static constexpr uint32_t
+        MIN_CYCLES =
+            10;
+
+
+    // At higher frequencies, 10 cycles would
+    // otherwise be extremely short.
+    //
+    // Example:
+    //
+    // 50 Hz -> 10 cycles = only 0.2 s.
+    //
+    // So keep recording each high-frequency
+    // point for at least 3 seconds.
+
+    static constexpr float
+        MIN_DWELL_TIME_S =
+            3.0f;
+
+
+    // =====================================================
+    // FREQUENCY SWEEP
+    // =====================================================
+
+    inline static constexpr float
+        FREQUENCIES_HZ[] =
+        {
+            0.5f,
+            1.0f,
+            2.0f,
+            3.0f,
+            5.0f,
+            7.0f,
+            10.0f,
+            15.0f,
+            20.0f,
+            30.0f,
+            40.0f,
+            50.0f
+        };
+
+
+    inline static constexpr size_t
+        FREQUENCY_COUNT =
+            sizeof(FREQUENCIES_HZ)
+            /
+            sizeof(FREQUENCIES_HZ[0]);
+
+
+    // =====================================================
+    // SIGNS
+    // =====================================================
+
+    static constexpr float
+        LEFT_TORQUE_SIGN =
+            1.0f;
+
+    static constexpr float
+        RIGHT_TORQUE_SIGN =
+            -1.0f;
+
+
+    // =====================================================
+    // STATE
+    // =====================================================
+
+    Topic<MotorCmd>&
+        m_motorCmd;
+
+
+    float
+        m_amplitudeNm{0.2f};
+
+
+    size_t
+        m_frequencyIndex{0};
+
+
+    uint32_t
+        m_frequencyStartUs{0};
+
+    uint32_t
+        m_previousUpdateUs{0};
+
+
+    bool m_running{false};
+	Topic<LoggingState>& m_loggingState;
+};
 #else
 #endif

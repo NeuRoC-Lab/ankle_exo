@@ -67,7 +67,7 @@ PollingPublisher<
 //SD CARD Driver initialization
 
 SDCardDriver sdCard(
-    "loadcell.csv"
+    "sweep.csv"
 );
 
 
@@ -77,6 +77,8 @@ SDLogger sdLogger(
     encoderTopic,
     leftMotorTopic,
     rightMotorTopic,
+    leftMotorCommandTopic,
+    rightMotorCommandTopic,
     loggingStateTopic
 );
 
@@ -136,7 +138,6 @@ MotorMetaCommandTask
 );
 
 /* DEBUG : prints sensor and motor data to Serial continuously
-*/
 DummyController dummyController(
     encoderTopic,
     loadCellTopic,
@@ -144,8 +145,10 @@ DummyController dummyController(
     rightMotorTopic,
     ina232Topic
 );
+*/
 
-
+//TODO PUT BACK
+/*
 JointLimitController<
     ExoSide::Left
 > leftJointLimitController(
@@ -160,6 +163,7 @@ JointLimitController<
     encoderTopic,
     rightMotorMetaCommandTopic
 );
+
 
 TransparentModeController<
     ExoSide::Left
@@ -178,9 +182,32 @@ TransparentModeController<
     rightMotorTopic,
     rightMotorCommandTopic
 );
+*/
+
+
+TorqueBandwidthController<
+    ExoSide::Left
+> leftBandwidthController(
+    leftMotorCommandTopic,
+    loggingStateTopic
+);
+//TODO TEMPORARY FOR DEBUG
+
+volatile bool restartRequested = false; // New  : for reset functionality on "STOP"
+
+void resetButtonISR() {
+  restartRequested = true;
+}
 
 void setup()
 {
+	pinMode(board::teensy41::pins.stopPin, INPUT_PULLUP);
+	attachInterrupt(
+    digitalPinToInterrupt(board::teensy41::pins.stopPin),
+    resetButtonISR,
+    FALLING
+  );
+
     Serial.begin(230400);
     unsigned long startTime = millis();
     while (!Serial && (millis() - startTime < 3000)) {
@@ -213,6 +240,7 @@ void setup()
     );
     while (true) {}
 	}
+
     if (!ina232Driver.begin())
     {
     Serial.println("INA232 initialization failed");
@@ -242,11 +270,14 @@ void setup()
     scheduler.add(messageBus);
     scheduler.add(encoderPublisher);
     scheduler.add(ina232Publisher);
-	scheduler.add(dummyController); //TODO debug only
-   	scheduler.add(leftTransparentModeController);
-	scheduler.add(rightTransparentModeController);
-   	scheduler.add(leftJointLimitController);
-	scheduler.add(rightJointLimitController);
+
+	scheduler.add(leftBandwidthController);
+
+	//scheduler.add(dummyController); //TODO debug only
+   	//scheduler.add(leftTransparentModeController);
+	//scheduler.add(rightTransparentModeController);
+   	//scheduler.add(leftJointLimitController);
+	//scheduler.add(rightJointLimitController);
 
     scheduler.add(motorReceiver);
     scheduler.add(leftMotorCommandTask);
@@ -254,12 +285,34 @@ void setup()
     scheduler.add(rightMotorCommandTask);
     scheduler.add(rightMotorMetaCommandTask);
 
+	rightMotor.exitMotorMode();
+	rightMotorCommandTask.setEnabled(false);
+	//TODO TEMPORARILY TURN OFF THE RIGHT MOTOR
+
 	scheduler.add(sdLogger);
     Serial.println("Teensy: ready");
+
+	Serial.println("Bandwidth sweep starts in 5 seconds");
+
+	delay(5000);
+
+	leftBandwidthController.setAmplitude(
+    0.5f
+	);
+
+	leftBandwidthController.start(
+    micros()
+	);
+	Serial.println("Sweeping controller : started");
 }
 
 void loop()
 {
     scheduler.run(micros());
+	if (restartRequested) {
+	Serial.println("STOP button has been pressed, restarting the Teensy");
+	delay(20);
+	SCB_AIRCR = 0x05FA0004;
+	}
 }
 

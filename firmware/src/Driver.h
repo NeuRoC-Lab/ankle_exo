@@ -390,8 +390,15 @@ public:
          * We can improve that later.
          */
         m_file.println(
-            "time_us,left_1,left_2,right_1,right_2"
-        );
+    "time_us,"
+    "left_1,left_2,right_1,right_2,"
+    "encoder_left,encoder_right,"
+    "left_command_torque,right_command_torque,"
+    "left_motor_position,left_motor_velocity,left_motor_torque,"
+    "left_motor_temperature,left_motor_error,"
+    "right_motor_position,right_motor_velocity,right_motor_torque,"
+    "right_motor_temperature,right_motor_error"
+);
 
         m_file.flush();
 

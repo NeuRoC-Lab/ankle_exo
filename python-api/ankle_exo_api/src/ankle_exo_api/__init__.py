@@ -1,3 +1,7 @@
-from .single_exo_api import SingleExoskeleton
+from .ankle_exo_api import Exoskeleton
+from .bluetooth import Side
 
-__all__ = ["SingleExoskeleton"] # expose the single exo class
+__all__ = [
+    "Exoskeleton",
+    "Side",
+]
