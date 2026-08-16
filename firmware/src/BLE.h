@@ -81,8 +81,8 @@ public:
         MessageBus& bus,
         Topic<EncoderPositions>& encoder,
         Topic<LoadCellForces>& loadCells,
-        Topic<MotorReply>& leftMotor,
-        Topic<MotorReply>& rightMotor,
+        Topic<MotorFeedback>& leftMotor,
+        Topic<MotorFeedback>& rightMotor,
         Topic<PowerReadings>& power)
         :
         m_bus(bus),
@@ -128,19 +128,19 @@ public:
         m_leftMotorReplyCharacteristic(
             leftMotorFeedbackCharacteristicUUID,
             BLERead | BLENotify,
-            sizeof(MotorReply)
+            sizeof(MotorFeedback)
         ),
 
         m_leftMotorCommandCharacteristic(
             leftMotorCommandCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
-            sizeof(MotorCmd)
+            sizeof(float)
         ),
 
         m_leftMotorControlCharacteristic(
             leftMotorControlCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
-            sizeof(MotorMetaCommand)
+            sizeof(bool)
         ),
 
         // -------------------------------------------------
@@ -150,19 +150,19 @@ public:
         m_rightMotorReplyCharacteristic(
             rightMotorFeedbackCharacteristicUUID,
             BLERead | BLENotify,
-            sizeof(MotorReply)
+            sizeof(MotorFeedback)
         ),
 
         m_rightMotorCommandCharacteristic(
             rightMotorCommandCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
-            sizeof(MotorCmd)
+            sizeof(float)
         ),
 
         m_rightMotorControlCharacteristic(
             rightMotorControlCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
-            sizeof(MotorMetaCommand)
+            sizeof(bool)
         ),
 
         // -------------------------------------------------
@@ -415,7 +415,7 @@ private:
     void handleMotorCommand(
         BLECharacteristic& characteristic)
     {
-        MotorCmd command{};
+        float command{};
 
         const int bytesRead =
             characteristic.readValue(
@@ -433,7 +433,7 @@ private:
         )
         {
             Serial.print(
-                "Wrong MotorCmd size: "
+                "Wrong float size: "
             );
 
             Serial.println(
@@ -504,62 +504,38 @@ private:
     // =====================================================
 
     template<EndpointId Id>
-    void handleMotorControl(
-        BLECharacteristic& characteristic)
-    {
-        uint8_t rawCommand{};
+	void handleMotorControl(
+    BLECharacteristic& characteristic)
+{
+    uint8_t rawEnabled{};
 
-        const int bytesRead =
-            characteristic.readValue(
-                &rawCommand,
-                sizeof(rawCommand)
-            );
-
-        if (bytesRead != 1)
-        {
-            Serial.print(
-                "Wrong MotorMetaCommand size: "
-            );
-
-            Serial.println(
-                bytesRead
-            );
-
-            return;
-        }
-
-
-        if (
-            rawCommand >
-            static_cast<uint8_t>(
-                MotorMetaCommand::SetZero
-            )
-        )
-        {
-            Serial.print(
-                "Invalid MotorMetaCommand: "
-            );
-
-            Serial.println(
-                rawCommand
-            );
-
-            return;
-        }
-
-
-        const auto command =
-            static_cast<
-                MotorMetaCommand
-            >(
-                rawCommand
-            );
-
-
-        m_bus.publish<Id>(
-            command
+    const int bytesRead =
+        characteristic.readValue(
+            &rawEnabled,
+            sizeof(rawEnabled)
         );
+
+    if (bytesRead != 1)
+    {
+        Serial.print("Wrong bool size: ");
+        Serial.println(bytesRead);
+        return;
     }
+
+    if (rawEnabled > 1)
+    {
+        Serial.print("Invalid motor enabled value: ");
+        Serial.println(rawEnabled);
+        return;
+    }
+
+    const bool enabled =
+        rawEnabled != 0;
+
+    m_bus.publish<Id>(
+        enabled
+    );
+}
 
 
     // =====================================================
@@ -580,7 +556,7 @@ private:
         s_instance
             ->handleMotorControl<
                 EndpointId::
-                    LeftMotorMetaCommand
+                    LeftMotorEnabled
             >(
                 characteristic
             );
@@ -605,7 +581,7 @@ private:
         s_instance
             ->handleMotorControl<
                 EndpointId::
-                    RightMotorMetaCommand
+                    RightMotorEnabled
             >(
                 characteristic
             );
@@ -730,10 +706,10 @@ private:
     Topic<LoadCellForces>&
         m_loadCells;
 
-    Topic<MotorReply>&
+    Topic<MotorFeedback>&
         m_leftMotor;
 
-    Topic<MotorReply>&
+    Topic<MotorFeedback>&
         m_rightMotor;
 
     Topic<PowerReadings>&

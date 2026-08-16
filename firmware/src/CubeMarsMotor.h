@@ -43,6 +43,7 @@ struct CanFrame
 {
     uint32_t id{0};
     uint8_t length{0};
+    bool extended{false};
     std::array<uint8_t, 8> data{};
 };
 
@@ -101,31 +102,61 @@ inline uint16_t float_to_uint(
 class CanBus
 {
 public:
+
     bool begin()
     {
         if (isReady()) {
-            return true; // prevents the CAN controller from being initialized more than once
+            return true;
         }
 
         m_can.begin();
-        m_can.setBaudRate(board::teensy41::motorCanBaud);
+
+        m_can.setBaudRate(
+            board::teensy41::motorCanBaud
+        );
+
         m_can.setMaxMB(16);
+
         m_can.enableFIFO();
+
+        // Enable interrupt-driven FIFO reception.
+        m_can.enableFIFOInterrupt();
+
+        // FlexCAN_T4 callback.
+        s_instance = this;
+
+        m_can.onReceive(
+            FIFO,
+            onReceiveStatic
+        );
 
         m_isInitialized = true;
 
         return true;
     }
 
-    bool send(const CanFrame& frame)
+
+    bool send(
+        const CanFrame& frame)
     {
-        if (!m_isInitialized || frame.length > 8) {
+        if (
+            !m_isInitialized ||
+            frame.length > 8
+        )
+        {
             return false;
         }
 
         CAN_message_t msg{};
-        msg.id = frame.id;
-        msg.len = frame.length;
+
+        msg.id =
+            frame.id;
+
+        msg.len =
+            frame.length;
+
+        // Servo mode uses extended 29-bit IDs.
+        msg.flags.extended = 1;
 
         std::memcpy(
             msg.buf,
@@ -133,42 +164,166 @@ public:
             frame.length
         );
 
-        return m_can.write(msg) > 0;
+        return
+            m_can.write(msg) > 0;
     }
 
-    bool read(CanFrame& frame)
+
+    // =====================================================
+    // Scheduler-side access
+    // =====================================================
+    //
+    // This DOES NOT touch the CAN hardware.
+    // It only removes a frame already copied into RAM.
+    // =====================================================
+
+    bool read(
+        CanFrame& frame)
     {
-        CAN_message_t rxMsg{};
+        noInterrupts();
 
-        while (m_can.read(rxMsg))
+        if (m_tail == m_head)
         {
-            if (rxMsg.len != 8) {
-                continue;
-            }
-
-            frame.id = rxMsg.id;
-            frame.length = rxMsg.len;
-
-            std::memcpy(
-                frame.data.data(),
-                rxMsg.buf,
-                rxMsg.len
-            );
-
-            return true;
+            interrupts();
+            return false;
         }
 
-        return false;
+        frame =
+            m_rxBuffer[m_tail];
+
+        m_tail =
+            nextIndex(m_tail);
+
+        interrupts();
+
+        return true;
     }
+
 
     bool isReady() const
     {
         return m_isInitialized;
     }
 
+
+    uint32_t droppedFrames() const
+    {
+        return m_droppedFrames;
+    }
+
+
 private:
-    FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> m_can;
-    bool m_isInitialized{false};
+
+    // =====================================================
+    // FlexCAN callback
+    // =====================================================
+
+    static void onReceiveStatic(
+        const CAN_message_t& msg)
+    {
+        if (s_instance != nullptr)
+        {
+            s_instance->onReceive(
+                msg
+            );
+        }
+    }
+
+
+    void onReceive(
+        const CAN_message_t& msg)
+    {
+        // Keep callback extremely short.
+
+        if (msg.len != 8) {
+            return;
+        }
+
+        const size_t next =
+            nextIndex(m_head);
+
+
+        // Buffer full:
+        // drop newest frame rather than blocking.
+        if (next == m_tail)
+        {
+            ++m_droppedFrames;
+            return;
+        }
+
+
+        CanFrame& frame =
+            m_rxBuffer[m_head];
+
+
+        frame.id =
+            msg.id;
+
+        frame.length =
+            msg.len;
+		frame.extended =
+    		msg.flags.extended;
+
+        std::memcpy(
+            frame.data.data(),
+            msg.buf,
+            msg.len
+        );
+
+
+        m_head =
+            next;
+    }
+
+
+    static constexpr size_t
+    nextIndex(size_t index)
+    {
+        return
+            (index + 1) %
+            RX_BUFFER_SIZE;
+    }
+
+
+private:
+
+    static constexpr size_t
+        RX_BUFFER_SIZE = 64;
+
+
+    FlexCAN_T4<
+        CAN1,
+        RX_SIZE_256,
+        TX_SIZE_16
+    >
+        m_can;
+
+
+    std::array<
+        CanFrame,
+        RX_BUFFER_SIZE
+    >
+        m_rxBuffer{};
+
+
+    volatile size_t
+        m_head{0};
+
+
+    volatile size_t
+        m_tail{0};
+
+
+    volatile uint32_t
+        m_droppedFrames{0};
+
+
+    bool
+        m_isInitialized{false};
+
+
+    static CanBus*
+        s_instance;
 };
 
 // Cubemars protocol interface
@@ -209,6 +364,8 @@ public:
     bool begin()
     {
         return true;
+    //TODO IMPORTANT : MAKE A "HEALTH" CHECK TO ENSURE THE MOTORS ARE PROPERLY CONNECTED.
+    // IF THE CAN CABLES ARE MISCONNECTED / DISCONNECTED THE BEGIN WILL STILL WORK WHICH IS A SILENT ERROR. HARD TO TROUBLESHOOT
     }
 
     uint8_t canId() const

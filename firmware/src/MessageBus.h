@@ -12,9 +12,11 @@
 #include "BusTypes.h"
 #include "Encoder.h"
 #include "LoadCell.h"
-#include "CubeMarsMotor.h"
+//#include "CubeMarsMotor.h"
+#include "CubeMarsMotorServo.h"
 #include "UartHandler.h"
 #include "Driver.h"
+
 
 #if defined(PLATFORM_NANO)
 
@@ -60,21 +62,21 @@ template<>
 struct EndpointTraits<
     EndpointId::LeftMotorSnapshot>
 {
-    using Payload = MotorReply;
+    using Payload = MotorFeedback;
 };
 
 template<>
 struct EndpointTraits<
     EndpointId::RightMotorSnapshot>
 {
-    using Payload = MotorReply;
+    using Payload = MotorFeedback;
 };
 
 template<>
 struct EndpointTraits<
     EndpointId::LeftMotorCommand>
 {
-    using Payload = MotorCmd;
+    using Payload = float;
 };
 
 
@@ -87,9 +89,9 @@ struct EndpointTraits<
 
 template<>
 struct EndpointTraits<
-    EndpointId::LeftMotorMetaCommand>
+    EndpointId::LeftMotorEnabled>
 {
-    using Payload = MotorMetaCommand;
+    using Payload = bool;
 };
 template<>
 struct EndpointTraits<
@@ -102,16 +104,29 @@ template<>
 struct EndpointTraits<
     EndpointId::RightMotorCommand>
 {
-    using Payload = MotorCmd;
+    using Payload = float;
 };
 
 template<>
 struct EndpointTraits<
-    EndpointId::RightMotorMetaCommand>
+    EndpointId::RightMotorEnabled>
 {
-    using Payload = MotorMetaCommand;
+    using Payload = bool;
 };
 
+template<>
+struct EndpointTraits<
+    EndpointId::LeftMotorTransparentParams>
+{
+    using Payload = TransparentControllerParameters;
+};
+
+template<>
+struct EndpointTraits<
+    EndpointId::RightMotorTransparentParams>
+{
+    using Payload = TransparentControllerParameters;
+};
 
 
 template<typename T>
@@ -237,7 +252,7 @@ inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
 
 	routes[
     static_cast<size_t>(
-        EndpointId::RightMotorMetaCommand
+        EndpointId::RightMotorEnabled
     )
 	].subscribers =
     platformBit(
@@ -261,7 +276,7 @@ inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
 
     routes[
         static_cast<size_t>(
-            EndpointId::LeftMotorMetaCommand
+            EndpointId::LeftMotorEnabled
         )
     ].subscribers =
         platformBit(PlatformId::Teensy);
@@ -269,6 +284,22 @@ inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
 	routes[
     	static_cast<size_t>(
         	EndpointId::LoggingState
+    	)
+	].subscribers =
+    	platformBit(PlatformId::Teensy) |
+		platformBit(PlatformId::Nano);
+
+	routes[
+    	static_cast<size_t>(
+        	EndpointId::LeftMotorTransparentParams
+    	)
+	].subscribers =
+    	platformBit(PlatformId::Teensy) |
+		platformBit(PlatformId::Nano);
+
+	routes[
+    	static_cast<size_t>(
+        	EndpointId::RightMotorTransparentParams
     	)
 	].subscribers =
     	platformBit(PlatformId::Teensy) |
@@ -578,6 +609,7 @@ private:
     uint32_t m_previousUs{0};
 };
 
+
 #if defined(PLATFORM_TEENSY)
 
 
@@ -590,10 +622,10 @@ public:
         SDCardDriver& sdCard,
         Topic<LoadCellForces>& loadCells,
         Topic<EncoderPositions>& encoders,
-        Topic<MotorReply>& leftMotor,
-        Topic<MotorReply>& rightMotor,
-        Topic<MotorCmd>& leftMotorCommand,
-        Topic<MotorCmd>& rightMotorCommand,
+        Topic<MotorFeedback>& leftMotor,
+        Topic<MotorFeedback>& rightMotor,
+        Topic<float>& leftMotorCommand,
+        Topic<float>& rightMotorCommand,
         Topic<LoggingState>& loggingState)
         :
         m_sdCard(sdCard),
@@ -615,6 +647,7 @@ public:
             return;
         }
 
+
         if (!m_loggingState.valid())
         {
             return;
@@ -625,7 +658,14 @@ public:
             m_loggingState.latest();
 
 
-        if (state != m_previousState)
+        // =================================================
+        // STATE CHANGES
+        // =================================================
+
+        if (
+            state !=
+            m_previousState
+        )
         {
             handleStateChange(
                 state
@@ -646,84 +686,87 @@ public:
 
 
         // =================================================
-        // CURRENT TOPIC SEQUENCES
+        // LOG AT FIXED TARGET RATE
         // =================================================
 
-        const uint32_t loadCellSequence =
-            m_loadCells.sequence();
-
-        const uint32_t encoderSequence =
-            m_encoders.sequence();
-
-        const uint32_t leftMotorSequence =
-            m_leftMotor.sequence();
-
-        const uint32_t rightMotorSequence =
-            m_rightMotor.sequence();
-
-        const uint32_t leftCommandSequence =
-            m_leftMotorCommand.sequence();
-
-        const uint32_t rightCommandSequence =
-            m_rightMotorCommand.sequence();
-
-
-        // =================================================
-        // LOG WHEN ANY RELEVANT TOPIC CHANGES
-        // =================================================
-
-        const bool dataChanged =
-            loadCellSequence !=
-                m_lastLoadCellSequence
-            ||
-            encoderSequence !=
-                m_lastEncoderSequence
-            ||
-            leftMotorSequence !=
-                m_lastLeftMotorSequence
-            ||
-            rightMotorSequence !=
-                m_lastRightMotorSequence
-            ||
-            leftCommandSequence !=
-                m_lastLeftCommandSequence
-            ||
-            rightCommandSequence !=
-                m_lastRightCommandSequence;
-
-
-        if (!dataChanged)
+        if (
+            nowUs -
+            m_lastSampleUs
+            <
+            SAMPLE_PERIOD_US
+        )
         {
             return;
         }
 
 
-        // =================================================
-        // SAVE CURRENT SEQUENCES
-        // =================================================
+        /*
+         * Advance by the desired period instead of:
+         *
+         *     m_lastSampleUs = nowUs;
+         *
+         * This avoids accumulating timing drift.
+         */
 
-        m_lastLoadCellSequence =
-            loadCellSequence;
-
-        m_lastEncoderSequence =
-            encoderSequence;
-
-        m_lastLeftMotorSequence =
-            leftMotorSequence;
-
-        m_lastRightMotorSequence =
-            rightMotorSequence;
-
-        m_lastLeftCommandSequence =
-            leftCommandSequence;
-
-        m_lastRightCommandSequence =
-            rightCommandSequence;
+        m_lastSampleUs +=
+            SAMPLE_PERIOD_US;
 
 
         // =================================================
-        // LATEST VALUES
+        // REQUIRE VALID DATA
         // =================================================
+		/*
+        if (
+            !m_loadCells.valid() ||
+            !m_encoders.valid() ||
+            !m_leftMotor.valid() ||
+            !m_rightMotor.valid() ||
+            !m_leftMotorCommand.valid() ||
+            !m_rightMotorCommand.valid()
+        )
+        {
+            return;
+        }
+		*/
+
+
+        // =================================================
+        // BUILD BINARY RECORD
+        // =================================================
+
+        BinaryLogRecord record{};
+
+
+        record.timeUs =
+            nowUs;
+
+
+        // -------------------------------------------------
+        // Sequences
+        // -------------------------------------------------
+
+        record.loadCellSequence =
+            m_loadCells.sequence();
+
+        record.encoderSequence =
+            m_encoders.sequence();
+
+        record.leftMotorSequence =
+            m_leftMotor.sequence();
+
+        record.rightMotorSequence =
+            m_rightMotor.sequence();
+
+        record.leftCommandSequence =
+            m_leftMotorCommand.sequence();
+
+        record.rightCommandSequence =
+            m_rightMotorCommand.sequence();
+
+
+        // -------------------------------------------------
+        // Latest values
+        // -------------------------------------------------
 
         const auto& forces =
             m_loadCells.latest();
@@ -744,183 +787,139 @@ public:
             m_rightMotorCommand.latest();
 
 
+        // -------------------------------------------------
+        // Load cells
+        // -------------------------------------------------
+
+        record.loadCells[0] =
+            forces[0];
+
+        record.loadCells[1] =
+            forces[1];
+
+        record.loadCells[2] =
+            forces[2];
+
+        record.loadCells[3] =
+            forces[3];
+
+
+        // -------------------------------------------------
+        // Encoders
+        // -------------------------------------------------
+
+        record.encoderLeft =
+            encoders.left;
+
+        record.encoderRight =
+            encoders.right;
+
+
+        // -------------------------------------------------
+        // Commands
+        // -------------------------------------------------
+
+        record.leftCommandTorque = leftCommand;
+
+        record.rightCommandTorque = rightCommand;
+
+
+        // -------------------------------------------------
+        // Motor feedback
+        // -------------------------------------------------
+
+        record.leftMotorTorque =
+            leftMotor.torque;
+
+        record.rightMotorTorque =
+            rightMotor.torque;
+
+
+        record.leftMotorTemperature =
+            leftMotor.temperature;
+
+        record.leftMotorError =
+            leftMotor.error;
+
+
+        record.rightMotorTemperature =
+            rightMotor.temperature;
+
+        record.rightMotorError =
+            rightMotor.error;
+
+
         // =================================================
-        // CSV
-        //
-        // time_us,
-        //
-        // load cells,
-        // encoders,
-        //
-        // commanded torque,
-        //
-        // motor feedback
+        // COPY INTO RAM BUFFER
         // =================================================
 
-        char line[320];
+        m_buffer[
+            m_bufferCount
+        ] = record;
 
 
-        const int length =
-            snprintf(
-                line,
-                sizeof(line),
-
-                "%lu,"
-
-                "%.4f,%.4f,%.4f,%.4f,"
-
-                "%.4f,%.4f,"
-
-                "%.4f,%.4f,"
-
-                "%.4f,%.4f,%.4f,%u,%u,"
-
-                "%.4f,%.4f,%.4f,%u,%u",
+        ++m_bufferCount;
 
 
-                // -----------------------------------------
-                // Time
-                // -----------------------------------------
-
-                static_cast<unsigned long>(
-                    nowUs
-                ),
-
-
-                // -----------------------------------------
-                // Load cells
-                // -----------------------------------------
-
-                static_cast<double>(
-                    forces[0]
-                ),
-
-                static_cast<double>(
-                    forces[1]
-                ),
-
-                static_cast<double>(
-                    forces[2]
-                ),
-
-                static_cast<double>(
-                    forces[3]
-                ),
-
-
-                // -----------------------------------------
-                // Encoders
-                // -----------------------------------------
-
-                static_cast<double>(
-                    encoders.left
-                ),
-
-                static_cast<double>(
-                    encoders.right
-                ),
-
-
-                // -----------------------------------------
-                // Commanded motor torques
-                // -----------------------------------------
-
-                static_cast<double>(
-                    leftCommand.torque
-                ),
-
-                static_cast<double>(
-                    rightCommand.torque
-                ),
-
-
-                // -----------------------------------------
-                // Left motor feedback
-                // -----------------------------------------
-
-                static_cast<double>(
-                    leftMotor.position
-                ),
-
-                static_cast<double>(
-                    leftMotor.velocity
-                ),
-
-                static_cast<double>(
-                    leftMotor.torque
-                ),
-
-                static_cast<unsigned int>(
-                    leftMotor.temperature
-                ),
-
-                static_cast<unsigned int>(
-                    leftMotor.error
-                ),
-
-
-                // -----------------------------------------
-                // Right motor feedback
-                // -----------------------------------------
-
-                static_cast<double>(
-                    rightMotor.position
-                ),
-
-                static_cast<double>(
-                    rightMotor.velocity
-                ),
-
-                static_cast<double>(
-                    rightMotor.torque
-                ),
-
-                static_cast<unsigned int>(
-                    rightMotor.temperature
-                ),
-
-                static_cast<unsigned int>(
-                    rightMotor.error
-                )
-            );
-
+        // =================================================
+        // WRITE ONLY WHEN BUFFER IS FULL
+        // =================================================
 
         if (
-            length <= 0 ||
-            static_cast<size_t>(length)
-                >= sizeof(line)
+            m_bufferCount >=
+            BUFFER_RECORD_COUNT
         )
         {
-            Serial.println(
-                "SD log line too long"
-            );
-
-            return;
-        }
-
-
-        if (!m_sdCard.appendLine(line))
-        {
-            Serial.println(
-                "SD logging failed"
-            );
-        }
-
-
-        if (
-            nowUs - m_lastFlushUs
-            >= FLUSH_PERIOD_US
-        )
-        {
-            m_sdCard.flush();
-
-            m_lastFlushUs =
-                nowUs;
+            writeBuffer();
         }
     }
 
 
 private:
+
+    void writeBuffer()
+    {
+        if (
+            m_bufferCount == 0
+        )
+        {
+            return;
+        }
+
+
+        const size_t bytes =
+            m_bufferCount *
+            sizeof(BinaryLogRecord);
+
+
+        if (
+            !m_sdCard.append(
+                m_buffer.data(),
+                bytes
+            )
+        )
+        {
+            ++m_writeErrors;
+
+            Serial.println(
+                "SD binary write failed"
+            );
+
+            /*
+             * Don't retry forever here.
+             *
+             * A retry inside the realtime scheduler
+             * could make timing even worse.
+             */
+        }
+
+
+        m_bufferCount = 0;
+
+
+        ++m_blockWriteCount;
+    }
+
 
     void handleStateChange(
         LoggingState newState)
@@ -930,21 +929,14 @@ private:
             case LoggingState::Recording:
             {
                 Serial.println(
-                    "SD logging started"
+                    "SD binary logging started"
                 );
 
 
-                // Force a fresh row when a
-                // new recording starts.
+                m_bufferCount = 0;
 
-                m_lastLoadCellSequence = 0;
-                m_lastEncoderSequence = 0;
-
-                m_lastLeftMotorSequence = 0;
-                m_lastRightMotorSequence = 0;
-
-                m_lastLeftCommandSequence = 0;
-                m_lastRightCommandSequence = 0;
+                m_lastSampleUs =
+                    micros();
 
                 break;
             }
@@ -953,8 +945,24 @@ private:
             case LoggingState::Stopped:
             {
                 Serial.println(
-                    "SD logging stopped"
+                    "SD binary logging stopped"
                 );
+
+
+                /*
+                 * Write remaining records that did not
+                 * fill the complete buffer.
+                 */
+
+                writeBuffer();
+
+
+                /*
+                 * Flush only when stopping.
+                 *
+                 * Avoid frequent flush() calls during
+                 * realtime operation.
+                 */
 
                 m_sdCard.flush();
 
@@ -966,66 +974,73 @@ private:
 
 private:
 
+    // =====================================================
+    // LOGGING RATE
+    // =====================================================
+
     static constexpr uint32_t
-        FLUSH_PERIOD_US =
-            100'000;
+        SAMPLE_PERIOD_US =
+            1'000;        // 1 kHz
 
 
-    SDCardDriver&
-        m_sdCard;
+    // =====================================================
+    // BUFFER
+    // =====================================================
+
+    static constexpr size_t
+        BUFFER_RECORD_COUNT =
+            128;
 
 
-    Topic<LoadCellForces>&
-        m_loadCells;
-
-    Topic<EncoderPositions>&
-        m_encoders;
-
-
-    Topic<MotorReply>&
-        m_leftMotor;
-
-    Topic<MotorReply>&
-        m_rightMotor;
+    std::array<
+        BinaryLogRecord,
+        BUFFER_RECORD_COUNT
+    >
+        m_buffer{};
 
 
-    Topic<MotorCmd>&
-        m_leftMotorCommand;
-
-    Topic<MotorCmd>&
-        m_rightMotorCommand;
+    size_t
+        m_bufferCount{0};
 
 
-    Topic<LoggingState>&
-        m_loggingState;
+    // =====================================================
+    // REFERENCES
+    // =====================================================
+
+    SDCardDriver& m_sdCard;
+    Topic<LoadCellForces>& m_loadCells;
+    Topic<EncoderPositions>& m_encoders;
+    Topic<MotorFeedback>& m_leftMotor;
+	Topic<MotorFeedback>& m_rightMotor;
+    Topic<float>& m_leftMotorCommand;
+    Topic<float>& m_rightMotorCommand;
+    Topic<LoggingState>& m_loggingState;
+
+
+    // =====================================================
+    // STATE
+    // =====================================================
+
+    uint32_t
+        m_lastSampleUs{0};
+
+
+    LoggingState
+        m_previousState{
+            LoggingState::Stopped
+        };
+
+
+    // =====================================================
+    // DEBUG COUNTERS
+    // =====================================================
+
+    uint32_t
+        m_blockWriteCount{0};
 
 
     uint32_t
-        m_lastLoadCellSequence{0};
-
-    uint32_t
-        m_lastEncoderSequence{0};
-
-    uint32_t
-        m_lastLeftMotorSequence{0};
-
-    uint32_t
-        m_lastRightMotorSequence{0};
-
-    uint32_t
-        m_lastLeftCommandSequence{0};
-
-    uint32_t
-        m_lastRightCommandSequence{0};
-
-
-    uint32_t
-        m_lastFlushUs{0};
-
-
-    LoggingState m_previousState{
-        LoggingState::Stopped
-    };
+        m_writeErrors{0};
 };
 
 #endif

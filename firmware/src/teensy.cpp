@@ -12,7 +12,7 @@
 #include "MotorControllers.h"
 #include "Scheduler.h"
 
-Scheduler<12> scheduler;
+Scheduler<13> scheduler;
 
 // UART bridge to Arduino Nano
 UARTHandler uart(
@@ -28,14 +28,17 @@ MessageBus messageBus(uart);
 
 Topic<EncoderPositions> encoderTopic;
 Topic<LoadCellForces> loadCellTopic;
-Topic<MotorReply> leftMotorTopic;
-Topic<MotorReply> rightMotorTopic;
+Topic<MotorFeedback> leftMotorTopic;
+Topic<MotorFeedback> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
-Topic<MotorCmd> leftMotorCommandTopic;
-Topic<MotorCmd> rightMotorCommandTopic;
-Topic<MotorMetaCommand> leftMotorMetaCommandTopic;
-Topic<MotorMetaCommand> rightMotorMetaCommandTopic;
+Topic<float> leftMotorCommandTopic;
+Topic<float> rightMotorCommandTopic;
+Topic<bool> leftMotorEnabled;
+Topic<bool> rightMotorEnabled;
 Topic<LoggingState> loggingStateTopic;
+Topic<TransparentControllerParameters> leftMotorControllerParams;
+Topic<TransparentControllerParameters> rightMotorControllerParams;
+
 
 //*** ENCODER INITIALISATION **//
 
@@ -44,7 +47,7 @@ EncoderDriver encoderDriver;
 PollingPublisher<
     EncoderDriver,
     EndpointId::EncoderSnapshot,
-    1'000
+    1'000 // 1,000 µs, which corresponds to 1 kHz
 > encoderPublisher(
     encoderDriver,
     messageBus
@@ -58,7 +61,7 @@ INA232Driver ina232Driver;
 PollingPublisher<
     INA232Driver,
     EndpointId::Ina232Snapshot,
-    1'000
+    10'000 // 100,000 µs, which corresponds to 100 Hz. We don't need a fast sampling rate and we use I2C which might fail at higher frequencies
 > ina232Publisher(
     ina232Driver,
     messageBus
@@ -67,7 +70,7 @@ PollingPublisher<
 //SD CARD Driver initialization
 
 SDCardDriver sdCard(
-    "sweep.csv"
+    "NO_TRANSPARENT.bin"
 );
 
 
@@ -108,36 +111,25 @@ MotorDriver rightMotor(
 
 MotorCommandTask leftMotorCommandTask(
     leftMotor,
-    leftMotorCommandTopic
+    leftMotorCommandTopic,
+	leftMotorEnabled
 );
 
 MotorCommandTask rightMotorCommandTask(
     rightMotor,
-    rightMotorCommandTopic
+    rightMotorCommandTopic,
+	rightMotorEnabled
 );
 
-MotorCanReceiver motorReceiver(
+MotorCanReceiver motorCanReceiver(
     canBus,
     leftMotor,
     rightMotor,
-    messageBus
+    leftMotorTopic,
+    rightMotorTopic
 );
 
-MotorMetaCommandTask
-    leftMotorMetaCommandTask(
-        leftMotor,
-        leftMotorMetaCommandTopic,
-        leftMotorCommandTask
-);
 
-MotorMetaCommandTask
-    rightMotorMetaCommandTask(
-        rightMotor,
-        rightMotorMetaCommandTopic,
-        rightMotorCommandTask
-);
-
-/* DEBUG : prints sensor and motor data to Serial continuously
 DummyController dummyController(
     encoderTopic,
     loadCellTopic,
@@ -145,9 +137,8 @@ DummyController dummyController(
     rightMotorTopic,
     ina232Topic
 );
-*/
 
-//TODO PUT BACK
+
 /*
 JointLimitController<
     ExoSide::Left
@@ -156,13 +147,13 @@ JointLimitController<
     leftMotorMetaCommandTopic
 );
 
-
 JointLimitController<
     ExoSide::Right
 > rightJointLimitController(
     encoderTopic,
     rightMotorMetaCommandTopic
 );
+*/
 
 
 TransparentModeController<
@@ -171,8 +162,10 @@ TransparentModeController<
     encoderTopic,
     loadCellTopic,
     leftMotorTopic,
-    leftMotorCommandTopic
+    leftMotorCommandTopic,
+	leftMotorControllerParams
 );
+
 
 TransparentModeController<
     ExoSide::Right
@@ -180,17 +173,20 @@ TransparentModeController<
     encoderTopic,
     loadCellTopic,
     rightMotorTopic,
-    rightMotorCommandTopic
+    rightMotorCommandTopic,
+	rightMotorControllerParams
 );
-*/
 
 
+
+/*
 TorqueBandwidthController<
     ExoSide::Left
 > leftBandwidthController(
     leftMotorCommandTopic,
     loggingStateTopic
 );
+*/
 //TODO TEMPORARY FOR DEBUG
 
 volatile bool restartRequested = false; // New  : for reset functionality on "STOP"
@@ -219,40 +215,56 @@ void setup()
 
     if (!encoderDriver.begin())
     {
-    Serial.println("Encoder initialization failed");
+    Serial.println("[ERROR] Encoders initialization failed");
         while (true) {}
     }
+	else {
+	Serial.println("[STARTUP] Encoders initialization succeeded");
+	}
+
 
     if (!canBus.begin())
     {
-    Serial.println("CAN initialization failed");
+    Serial.println("[ERROR] CAN initialization failed");
     while(true){}
     }
+	else {
+	Serial.println("[STARTUP] CAN initialization succeeded");
+	}
     if (!leftMotor.begin())
     {
-    Serial.println("Left motor initialization failed");
+    Serial.println("[ERROR] Left motor initialization failed");
     while (true) {}
     }
+	else {
+	Serial.println("[STARTUP] Left motor initialization succeeded");
+	}
+
 	if (!rightMotor.begin())
 	{
-    Serial.println(
-        "Right motor initialization failed"
-    );
+    Serial.println("[ERROR] Right motor initialization failed");
     while (true) {}
+	}
+	else {
+	Serial.println("[STARTUP] Right motor initialization succeeded");
 	}
 
     if (!ina232Driver.begin())
     {
-    Serial.println("INA232 initialization failed");
+    Serial.println("[ERROR] INA232 initialization failed");
     while (true) {}
     }
+	else {
+	Serial.println("[STARTUP] INA232 initialization succeeded");
+	}
 	if (!sdCard.begin())
 	{
-    Serial.println("SD card initialization failed");
+    Serial.println("[ERROR] SD card initialization failed");
 	}
 	else{
-	Serial.println("SD card initialization successful");
+	Serial.println("[STARTUP] SD card initialization successful");
 	}
+    delay(1000);
     //TODO initialise right motor later
 
     messageBus.addTopic<EndpointId::EncoderSnapshot>(encoderTopic);
@@ -261,9 +273,9 @@ void setup()
     messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
     messageBus.addTopic<EndpointId::LeftMotorCommand>(leftMotorCommandTopic);
-    messageBus.addTopic<EndpointId::LeftMotorMetaCommand>(leftMotorMetaCommandTopic);
+    messageBus.addTopic<EndpointId::LeftMotorEnabled>(leftMotorEnabled);
     messageBus.addTopic<EndpointId::RightMotorCommand>(rightMotorCommandTopic);
-    messageBus.addTopic<EndpointId::RightMotorMetaCommand>(rightMotorMetaCommandTopic);
+    messageBus.addTopic<EndpointId::RightMotorEnabled>(rightMotorEnabled);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.begin();
 
@@ -271,48 +283,70 @@ void setup()
     scheduler.add(encoderPublisher);
     scheduler.add(ina232Publisher);
 
-	scheduler.add(leftBandwidthController);
+	//scheduler.add(leftBandwidthController);
 
-	//scheduler.add(dummyController); //TODO debug only
-   	//scheduler.add(leftTransparentModeController);
-	//scheduler.add(rightTransparentModeController);
-   	//scheduler.add(leftJointLimitController);
+	scheduler.add(dummyController); //TODO debug only
+   	scheduler.add(leftTransparentModeController);
+   scheduler.add(rightTransparentModeController);
+   //scheduler.add(leftJointLimitController);
 	//scheduler.add(rightJointLimitController);
 
-    scheduler.add(motorReceiver);
+    scheduler.add(motorCanReceiver);
     scheduler.add(leftMotorCommandTask);
-    scheduler.add(leftMotorMetaCommandTask);
     scheduler.add(rightMotorCommandTask);
-    scheduler.add(rightMotorMetaCommandTask);
 
-	rightMotor.exitMotorMode();
-	rightMotorCommandTask.setEnabled(false);
+
+	//rightMotor.exitMotorMode();
+	//rightMotorCommandTask.setEnabled(false);
 	//TODO TEMPORARILY TURN OFF THE RIGHT MOTOR
 
 	scheduler.add(sdLogger);
     Serial.println("Teensy: ready");
 
-	Serial.println("Bandwidth sweep starts in 5 seconds");
+// load default (safe) values for the transparent mode controllers
+leftMotorControllerParams.publish(
+    DEFAULT_TRANSPARENT_CONTROLLER_PARAMETERS
+);
 
+rightMotorControllerParams.publish(
+    DEFAULT_TRANSPARENT_CONTROLLER_PARAMETERS
+);
+    /*
+	Serial.println("Bandwidth sweep starts in 5 seconds");
 	delay(5000);
 
-	leftBandwidthController.setAmplitude(
-    0.5f
-	);
-
-	leftBandwidthController.start(
-    micros()
-	);
+	leftBandwidthController.setAmplitude(0.5f);
+	leftBandwidthController.start(micros());
 	Serial.println("Sweeping controller : started");
+    */
+
 }
 
 void loop()
 {
-    scheduler.run(micros());
 	if (restartRequested) {
 	Serial.println("STOP button has been pressed, restarting the Teensy");
 	delay(20);
 	SCB_AIRCR = 0x05FA0004;
 	}
+    /*
+    static uint32_t count = 0;
+    static uint32_t previousUs = micros();
+
+    ++count;
+    */
+    scheduler.run(micros());
+    /*
+    const uint32_t nowUs = micros();
+
+    if (nowUs - previousUs >= 1'000'000)
+    {
+        Serial.print("Scheduler loops/s: ");
+        Serial.println(count);
+
+        count = 0;
+        previousUs = nowUs;
+    }
+*/
 }
 

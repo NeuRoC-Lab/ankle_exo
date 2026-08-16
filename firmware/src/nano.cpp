@@ -23,8 +23,8 @@ Topic<LoadCellForces> loadCellTopic;
 
 // make a virtual copy / "mirror" of the topics that are on the teensy to forward the communications to/from the BLE
 Topic<EncoderPositions> encoderTopic;
-Topic<MotorReply> leftMotorTopic;
-Topic<MotorReply> rightMotorTopic;
+Topic<MotorFeedback> leftMotorTopic;
+Topic<MotorFeedback> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
 Topic<LoggingState> loggingStateTopic;
 
@@ -33,14 +33,11 @@ LoadCellDriver loadCellDriver;
 PollingPublisher<
     LoadCellDriver,
     EndpointId::LoadCellSnapshot,
-    1'000
+    500 //TODO this is experimental, try a more conservative value like 1,000 (1kHz) if load cell values drop
 > loadCellPublisher(
     loadCellDriver,
     messageBus
 );
-
-
-
 
 BLEBridge bleBridge(
     messageBus,

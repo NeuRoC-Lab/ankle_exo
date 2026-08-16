@@ -7,7 +7,8 @@
 #include "board.h"
 #include "Encoder.h"
 #include "LoadCell.h"
-#include "CubeMarsMotor.h"
+//#include "CubeMarsMotor.h"
+#include "CubeMarsMotorServo.h"
 
 template<typename T>
 class Driver
@@ -272,8 +273,8 @@ private:
 class MotorDriver
 {
 public:
-    using CommandType = MotorCmd;
-    using FeedbackType = MotorReply;
+    using CommandType = float;
+    using FeedbackType = MotorFeedback;
 
     MotorDriver(
         uint8_t canId,
@@ -285,23 +286,32 @@ public:
 
     bool enterMotorMode()
     {
+        /*
         return m_canBus.send(
             m_motor.enterMotorMode()
         );
+    */
+    return true;
     }
 
     bool exitMotorMode()
     {
+    /*
         return m_canBus.send(
             m_motor.exitMotorMode()
         );
+    */
+    return true;
     }
 
     bool zeroMotor()
     {
+        /*
         return m_canBus.send(
             m_motor.setZeroPosition()
         );
+    */
+    return true;
     }
     bool begin()
     {
@@ -331,21 +341,51 @@ public:
         return true;
     }
 
-    bool apply(const MotorCmd& cmd)
+    bool apply(const auto& cmd)
     {
+	//note : packCommand is overloaded, and this method accepts both MotorCmd (for compatibility with MIT mode) and raw float torque. The "auto" resolves the adequate type
         return m_canBus.send(
             m_motor.packCommand(cmd)
         );
     }
 
+
+    // servo implementation
+bool accepts(const CanFrame& frame) const
+{
+
+    // Bits 0..7 = motor ID
+    const uint8_t motorId =
+        static_cast<uint8_t>(
+            frame.id & 0xFFu
+        );
+
+    // Bits 8..28 = servo function ID
+    const uint32_t functionId =
+        (frame.id >> 8) & 0x1FFFFFu;
+
+    return
+        motorId == m_motor.canId() &&
+        functionId == SERVO_REALTIME_FEEDBACK;
+}
+    /* // MIT IMPLEMENTATION
     bool accepts(const CanFrame& frame) const
     {
         return frame.id == m_motor.canId();
     }
+    */
 
-    MotorReply decode(const CanFrame& frame) const
+    MotorFeedback decode(const CanFrame& frame) const
     {
-        return m_motor.unpackReply(frame);
+        MotorReply reply = m_motor.unpackReply(frame);
+
+        MotorFeedback feedback = {
+        .torque = reply.torque,
+        .temperature = reply.temperature,
+        .error = reply.error,
+        };
+
+        return feedback;
     }
 
 private:
@@ -355,13 +395,102 @@ private:
 
 #include <SD.h>
 
+struct BinaryLogRecord
+{
+    // -----------------------------------------------------
+    // Timestamp
+    // -----------------------------------------------------
+
+    uint32_t timeUs;
+
+
+    // -----------------------------------------------------
+    // Topic sequence numbers
+    // -----------------------------------------------------
+
+    uint32_t loadCellSequence;
+    uint32_t encoderSequence;
+
+    uint32_t leftMotorSequence;
+    uint32_t rightMotorSequence;
+
+    uint32_t leftCommandSequence;
+    uint32_t rightCommandSequence;
+
+
+    // -----------------------------------------------------
+    // Load cells
+    // -----------------------------------------------------
+
+    float loadCells[4];
+
+
+    // -----------------------------------------------------
+    // Encoders
+    // -----------------------------------------------------
+
+    float encoderLeft;
+    float encoderRight;
+
+
+    // -----------------------------------------------------
+    // Commands
+    // -----------------------------------------------------
+
+    float leftCommandTorque;
+    float rightCommandTorque;
+
+
+    // -----------------------------------------------------
+    // Motor feedback
+    // -----------------------------------------------------
+
+    float leftMotorTorque;
+    float rightMotorTorque;
+
+
+    // -----------------------------------------------------
+    // Motor status
+    // -----------------------------------------------------
+
+    uint8_t leftMotorTemperature;
+    uint8_t leftMotorError;
+
+    uint8_t rightMotorTemperature;
+    uint8_t rightMotorError;
+};
+
+
+static_assert(
+    sizeof(BinaryLogRecord) == 72,
+    "Unexpected BinaryLogRecord layout"
+);
+
+struct BinaryLogHeader
+{
+    char magic[8];
+
+    uint16_t version;
+    uint16_t recordSize;
+
+    uint32_t reserved;
+};
+
+
+static_assert(
+    sizeof(BinaryLogHeader) == 16,
+    "Unexpected BinaryLogHeader layout"
+);
+
 //driver class for the SD card. note to distinguish that driver from other sensor drivers that support bidirectional flow we are not subclassing the Driver abstract class
 class SDCardDriver
 {
 public:
+
     explicit SDCardDriver(
-        const char* filename = "recording.csv")
-        : m_filename(filename)
+        const char* filename = "sweep.bin")
+        :
+        m_filename(filename)
     {}
 
 
@@ -372,33 +501,69 @@ public:
             return false;
         }
 
-        m_file = SD.open(
-            m_filename,
-            FILE_WRITE
-        );
+
+        // ---------------------------------------------
+        // Start with a fresh recording file.
+        // ---------------------------------------------
+
+        if (SD.exists(m_filename))
+        {
+            SD.remove(m_filename);
+        }
+
+
+        m_file =
+            SD.open(
+                m_filename,
+                FILE_WRITE
+            );
+
 
         if (!m_file)
         {
             return false;
         }
 
-        /*
-         * Optional CSV header.
-         *
-         * For now this will be added every time
-         * the system boots and opens the file.
-         * We can improve that later.
-         */
-        m_file.println(
-    "time_us,"
-    "left_1,left_2,right_1,right_2,"
-    "encoder_left,encoder_right,"
-    "left_command_torque,right_command_torque,"
-    "left_motor_position,left_motor_velocity,left_motor_torque,"
-    "left_motor_temperature,left_motor_error,"
-    "right_motor_position,right_motor_velocity,right_motor_torque,"
-    "right_motor_temperature,right_motor_error"
-);
+
+        // ---------------------------------------------
+        // Binary file header
+        // ---------------------------------------------
+
+        BinaryLogHeader header{};
+
+        header.magic[0] = 'A';
+        header.magic[1] = 'N';
+        header.magic[2] = 'K';
+        header.magic[3] = 'L';
+        header.magic[4] = 'O';
+        header.magic[5] = 'G';
+        header.magic[6] = '0';
+        header.magic[7] = '1';
+
+        header.version = 1;
+
+        header.recordSize =
+            sizeof(BinaryLogRecord);
+
+        header.reserved = 0;
+
+
+        const size_t written =
+            m_file.write(
+                reinterpret_cast<
+                    const uint8_t*
+                >(&header),
+                sizeof(header)
+            );
+
+
+        if (written != sizeof(header))
+        {
+            m_file.close();
+
+            return false;
+        }
+
 
         m_file.flush();
 
@@ -409,7 +574,7 @@ public:
 
 
     bool append(
-        const uint8_t* data,
+        const void* data,
         size_t size)
     {
         if (!m_ready || !m_file)
@@ -417,33 +582,26 @@ public:
             return false;
         }
 
+
         const size_t written =
             m_file.write(
-                data,
+                reinterpret_cast<
+                    const uint8_t*
+                >(data),
                 size
             );
+
 
         return written == size;
     }
 
 
-    bool appendLine(
-        const char* line)
-    {
-        if (!m_ready || !m_file)
-        {
-            return false;
-        }
-
-        m_file.println(line);
-
-        return true;
-    }
-
-
     void flush()
     {
-        if (m_ready && m_file)
+        if (
+            m_ready &&
+            m_file
+        )
         {
             m_file.flush();
         }
@@ -457,11 +615,17 @@ public:
 
 
 private:
-    const char* m_filename;
 
-    File m_file;
+    const char*
+        m_filename;
 
-    bool m_ready{false};
+
+    File
+        m_file;
+
+
+    bool
+        m_ready{false};
 };
 
 #endif

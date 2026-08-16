@@ -7,170 +7,186 @@
 #include <cmath>
 #include <cstdint>
 
+
 #if defined(PLATFORM_TEENSY)
 
 class MotorCommandTask : public ITask
+/**
+@brief Standalone task that periodically sends user command to motor
+
+@param motorControl : the topic which holds the state of the motor (on,off)
+@param command : the user commanded torque
+@param motor : the CubeMars motor instance
+**/
 {
 public:
     MotorCommandTask(
         MotorDriver& motor,
-        Topic<MotorCmd>& command)
+        Topic<float>& command,
+        Topic<bool>& motorEnabled)
         : m_motor(motor),
-          m_command(command)
+          m_command(command),
+          m_motorEnabled(motorEnabled)
     {}
-
-    void setEnabled(bool enabled)
-    {
-        m_enabled = enabled;
-    }
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t PERIOD_US = 1'000; // 1kHz
+        static constexpr uint32_t PERIOD_US = 1'000;
+
+        processmotorEnabled();
 
         if (nowUs - m_previousUs < PERIOD_US)
             return;
 
         m_previousUs += PERIOD_US;
 
-        if (!m_enabled) {
-            //Serial.println("MotorCommandTask DISABLED");
-            return;
-            }
-
-        if (!m_command.valid())
+        if (!m_enabled)
         {
-            //Serial.println("MOTOR CMD: no command");
+            m_motor.apply(0.0f);
             return;
         }
 
-        const auto& cmd =
-            m_command.latest();
-		/*
-        Serial.print("SEND p=");
-        Serial.print(cmd.position);
+        if (!m_command.valid())
+            return;
 
-        Serial.print(" v=");
-        Serial.print(cmd.velocity);
-
-        Serial.print(" kp=");
-        Serial.print(cmd.kp);
-
-        Serial.print(" kd=");
-        Serial.print(cmd.kd);
-
-        Serial.print(" tau=");
-        Serial.println(cmd.torque);
-		*/
-        m_motor.apply(cmd);
+        m_motor.apply(m_command.latest());
     }
 
+	void setEnabled(const bool enable){
+		m_enabled = enable;
+		}
+
 private:
+    void processmotorEnabled()
+    {
+        if (!m_motorEnabled.valid())
+            return;
+
+        if (m_motorEnabled.sequence() == m_lastControlSequence)
+            return;
+
+        m_lastControlSequence = m_motorEnabled.sequence();
+
+        setEnabled(m_motorEnabled.latest());
+    }
+
     MotorDriver& m_motor;
-    Topic<MotorCmd>& m_command;
+    Topic<float>& m_command;
+    Topic<bool>& m_motorEnabled;
 
     bool m_enabled{true};
+    bool m_lastControlSequence{0};
     uint32_t m_previousUs{0};
 };
 
-
-class MotorCanReceiver final :
-    public ITask
+template<typename T, size_t Capacity>
+class RingBuffer
 {
 public:
+    bool push(const T& value)
+    {
+        const size_t next =
+            (m_head + 1) % Capacity;
+
+        if (next == m_tail)
+        {
+            // Buffer full
+            ++m_dropped;
+            return false;
+        }
+
+        m_buffer[m_head] = value;
+        m_head = next;
+
+        return true;
+    }
+
+
+    bool pop(T& value)
+    {
+        if (m_tail == m_head)
+        {
+            return false;
+        }
+
+        value = m_buffer[m_tail];
+
+        m_tail =
+            (m_tail + 1) % Capacity;
+
+        return true;
+    }
+
+
+    size_t dropped() const
+    {
+        return m_dropped;
+    }
+
+
+private:
+    std::array<T, Capacity> m_buffer{};
+
+    volatile size_t m_head{0};
+    volatile size_t m_tail{0};
+
+    volatile size_t m_dropped{0};
+};
+
+class MotorCanReceiver final : public ITask
+{
+public:
+
     MotorCanReceiver(
         CanBus& bus,
         MotorDriver& left,
         MotorDriver& right,
-        MessageBus& messageBus)
-        : m_bus(bus),
-          m_left(left),
-          m_right(right),
-          m_messageBus(messageBus)
+        Topic<MotorFeedback>& leftFeedback,
+        Topic<MotorFeedback>& rightFeedback)
+        :
+        m_bus(bus),
+        m_left(left),
+        m_right(right),
+        m_leftFeedback(leftFeedback),
+        m_rightFeedback(rightFeedback)
     {}
 
     void update(uint32_t) override
     {
         CanFrame frame{};
 
-        while (m_bus.read(frame))
+        uint8_t processed = 0;
+
+        while (
+            processed < MAX_FRAMES_PER_UPDATE &&
+            m_bus.read(frame)
+        )
         {
+            ++processed;
+
             if (m_left.accepts(frame))
             {
-                m_messageBus.publish<
-                    EndpointId::LeftMotorSnapshot
-                >(
-                    m_left.decode(frame)
-                );
+                m_leftFeedback.publish(m_left.decode(frame));
             }
-            else if (
-                m_right.accepts(frame))
+            else if (m_right.accepts(frame))
             {
-                m_messageBus.publish<
-                    EndpointId::RightMotorSnapshot
-                >(
-                    m_right.decode(frame)
-                );
+                m_rightFeedback.publish(m_right.decode(frame));
             }
         }
     }
 
 private:
+
+    static constexpr uint8_t
+        MAX_FRAMES_PER_UPDATE = 8; // I would raise this
+
     CanBus& m_bus;
+
     MotorDriver& m_left;
     MotorDriver& m_right;
-    MessageBus& m_messageBus;
-};
 
-class MotorMetaCommandTask : public ITask
-{
-public:
-    MotorMetaCommandTask(
-        MotorDriver& motor,
-        Topic<MotorMetaCommand>& command,
-        MotorCommandTask& motorCommandTask)
-        : m_motor(motor),
-          m_command(command),
-          m_motorCommandTask(motorCommandTask)
-    {}
-
-    void update(uint32_t) override
-    {
-        if (!m_command.valid())
-            return;
-
-        if (m_command.sequence() == m_lastSequence)
-            // to make this task event-driven we only take action on changing data
-            return;
-
-        m_lastSequence = m_command.sequence();
-        switch (m_command.latest())
-        {
-            case MotorMetaCommand::EnterMotorMode:
-                m_motor.enterMotorMode();
-                m_motorCommandTask.setEnabled(true);
-                Serial.println("Entering");
-                break;
-
-            case MotorMetaCommand::ExitMotorMode:
-                // Stop regular MIT frames FIRST
-                Serial.println("Exciting");
-                m_motorCommandTask.setEnabled(false);
-                m_motor.exitMotorMode();
-                break;
-
-            case MotorMetaCommand::SetZero:
-                m_motor.zeroMotor();
-                break;
-        }
-    }
-
-private:
-    MotorDriver& m_motor;
-    Topic<MotorMetaCommand>& m_command;
-    MotorCommandTask& m_motorCommandTask;
-
-    uint32_t m_lastSequence{0};
+    Topic<MotorFeedback>& m_leftFeedback;
+    Topic<MotorFeedback>& m_rightFeedback;
 };
 
 class DummyController final :
@@ -180,8 +196,8 @@ public:
     DummyController(
         Topic<EncoderPositions>& encoders,
         Topic<LoadCellForces>& loadCells,
-        Topic<MotorReply>& leftMotor,
-		Topic<MotorReply>& rightMotor,
+        Topic<MotorFeedback>& leftMotor,
+		Topic<MotorFeedback>& rightMotor,
         Topic<PowerReadings>& power)
         : m_encoders(encoders),
           m_loadCells(loadCells),
@@ -298,7 +314,7 @@ private:
 
     static void printMotor(
         const char* name,
-        const Topic<MotorReply>& topic)
+        const Topic<MotorFeedback>& topic)
     {
         Serial.print(name);
         Serial.print(" motor: ");
@@ -312,11 +328,11 @@ private:
         const auto& value =
             topic.latest();
 
-        Serial.print("pos=");
-        Serial.print(value.position);
+        //Serial.print("pos=");
+        //Serial.print(value.position);
 
-        Serial.print(" vel=");
-        Serial.print(value.velocity);
+        //Serial.print(" vel=");
+        //Serial.print(value.velocity);
 
         Serial.print(" torque=");
         Serial.print(value.torque);
@@ -331,9 +347,9 @@ private:
 private:
     Topic<EncoderPositions>& m_encoders;
     Topic<LoadCellForces>& m_loadCells;
-    Topic<MotorReply>& m_leftMotor;
+    Topic<MotorFeedback>& m_leftMotor;
     Topic<PowerReadings>& m_power;
-    Topic<MotorReply>& m_rightMotor;
+    Topic<MotorFeedback>& m_rightMotor;
 
     uint32_t m_previousPrintUs{0};
 };
@@ -351,7 +367,7 @@ class JointLimitController final :
 public:
     JointLimitController(
         Topic<EncoderPositions>& encoders,
-        Topic<MotorMetaCommand>& motorControl)
+        Topic<bool>& motorControl)
         :
         m_encoders(encoders),
         m_motorControl(motorControl)
@@ -398,10 +414,7 @@ public:
         {
             if (!m_limitTriggered)
             {
-                m_motorControl.publish(
-                    MotorMetaCommand::
-                        ExitMotorMode
-                );
+                m_motorControl.publish(false);
 
                 m_limitTriggered = true;
 
@@ -498,8 +511,7 @@ private:
     Topic<EncoderPositions>&
         m_encoders;
 
-    Topic<MotorMetaCommand>&
-        m_motorControl;
+    Topic<bool>& m_motorControl;
 
 
     uint32_t
@@ -512,6 +524,7 @@ private:
 
 
 
+
 template<ExoSide Side>
 class TransparentModeController final :
     public ITask
@@ -520,14 +533,17 @@ public:
     TransparentModeController(
         Topic<EncoderPositions>& encoders,
         Topic<LoadCellForces>& loadCells,
-        Topic<MotorReply>& motorFeed,
-        Topic<MotorCmd>& motorCmd)
+        Topic<MotorFeedback>& motorFeed,
+        Topic<float>& motorCmd,
+        Topic<TransparentControllerParameters>& params)
         :
         m_encoders(encoders),
         m_loadcells(loadCells),
         m_motorFeed(motorFeed),
-        m_motorCmd(motorCmd)
+        m_motorCmd(motorCmd),
+        m_params(params)
     {}
+
 
     void update(uint32_t nowUs) override
     {
@@ -544,13 +560,26 @@ public:
 
         m_previousUpdateUs = nowUs;
 
-        if (!m_loadcells.valid())
+        if (
+            !m_loadcells.valid() ||
+            !m_params.valid()
+        )
         {
             return;
         }
 
+        /*
+         * Snapshot the parameters once for this control iteration.
+         *
+         * This guarantees that every calculation in this update
+         * uses the same parameter set.
+         */
+        const auto& params =
+            m_params.latest();
+
         const auto& loadcellSnapshot =
             m_loadcells.latest();
+
 
         const float force1 =
             loadcellSnapshot[
@@ -566,6 +595,7 @@ public:
                 )
             ];
 
+
         const float measuredTorque =
             torqueSign()
             *
@@ -573,6 +603,11 @@ public:
             *
             LOAD_CELL_LEVER_ARM;
 
+
+        /*
+         * Initialize filter states with the first valid
+         * torque measurement.
+         */
         if (!m_initialized)
         {
             m_filteredTorque =
@@ -596,44 +631,64 @@ public:
             return;
         }
 
+
         const float dt =
             static_cast<float>(
                 nowUs - m_previousUs
-            ) * 1e-6f;
+            )
+            *
+            1e-6f;
 
         if (dt <= 0.0f)
         {
             return;
         }
 
+
+        /*
+         * Measured torque low-pass filter.
+         */
         m_filteredTorque =
-            TORQUE_FILTER_ALPHA *
-                measuredTorque
-            +
-            (1.0f -
-                TORQUE_FILTER_ALPHA)
-                *
-                m_filteredTorque;
-
-        const float
-            rawTorqueDerivative =
-                (
-                    m_filteredTorque
-                    -
-                    m_previousFilteredTorque
-                ) / dt;
-
-        m_filteredTorqueDerivative =
-            DERIVATIVE_FILTER_ALPHA
-                *
-                rawTorqueDerivative
+            params.a_torque
+            *
+            measuredTorque
             +
             (
                 1.0f -
-                DERIVATIVE_FILTER_ALPHA
+                params.a_torque
             )
-                *
-                m_filteredTorqueDerivative;
+            *
+            m_filteredTorque;
+
+
+        /*
+         * Torque derivative.
+         */
+        const float rawTorqueDerivative =
+            (
+                m_filteredTorque
+                -
+                m_previousFilteredTorque
+            )
+            /
+            dt;
+
+
+        /*
+         * Derivative low-pass filter.
+         */
+        m_filteredTorqueDerivative =
+            params.a_derivative
+            *
+            rawTorqueDerivative
+            +
+            (
+                1.0f -
+                params.a_derivative
+            )
+            *
+            m_filteredTorqueDerivative;
+
 
         const float error =
             -m_filteredTorque;
@@ -641,14 +696,25 @@ public:
         const float errorDerivative =
             -m_filteredTorqueDerivative;
 
+
+        /*
+         * PD transparent-mode feedback.
+         */
         const float feedbackTorque =
-            KP * error
+            params.kp
+            *
+            error
             +
-            KD * errorDerivative;
+            params.kd
+            *
+            errorDerivative;
+
 
         updateFrictionDirection(
-            feedbackTorque
+            feedbackTorque,
+            params
         );
+
 
         float targetFrictionComp =
             0.0f;
@@ -658,60 +724,51 @@ public:
         )
         {
             targetFrictionComp =
-                STATIC_FRICTION_COMP_TORQUE;
+                params.comp_torque;
         }
         else if (
             m_frictionDirection < 0
         )
         {
             targetFrictionComp =
-                -STATIC_FRICTION_COMP_TORQUE;
+                -params.comp_torque;
         }
 
+
+        /*
+         * Smooth friction compensation.
+         */
         m_filteredFrictionComp =
-            FRICTION_FILTER_ALPHA
-                *
-                targetFrictionComp
+            params.a_friction
+            *
+            targetFrictionComp
             +
             (
                 1.0f -
-                FRICTION_FILTER_ALPHA
+                params.a_friction
             )
-                *
-                m_filteredFrictionComp;
+            *
+            m_filteredFrictionComp;
+
 
         float commandedTorque =
             feedbackTorque
             +
             m_filteredFrictionComp;
 
+
         commandedTorque =
             constrain(
                 commandedTorque,
-                -MAX_TRANSPARENT_TORQUE,
-                MAX_TRANSPARENT_TORQUE
+                -params.max_abs_out_trq,
+                params.max_abs_out_trq
             );
 
-        MotorCmd command{};
-
-        command.position =
-            0.0f;
-
-        command.velocity =
-            0.0f;
-
-        command.kp =
-            0.0f;
-
-        command.kd =
-            0.0f;
-
-        command.torque =
-            commandedTorque;
 
         m_motorCmd.publish(
-            command
+            commandedTorque
         );
+
 
         m_previousFilteredTorque =
             m_filteredTorque;
@@ -772,11 +829,12 @@ private:
 
 
     void updateFrictionDirection(
-        float feedbackTorque)
+        float feedbackTorque,
+        const TransparentControllerParameters& params)
     {
         if (
             feedbackTorque >
-            FRICTION_TRIGGER_ON_TORQUE
+            params.trigger_on_trq
         )
         {
             m_frictionDirection = +1;
@@ -785,7 +843,7 @@ private:
 
         if (
             feedbackTorque <
-            -FRICTION_TRIGGER_ON_TORQUE
+            -params.trigger_on_trq
         )
         {
             m_frictionDirection = -1;
@@ -794,7 +852,7 @@ private:
 
         if (
             std::abs(feedbackTorque) <
-            FRICTION_TRIGGER_OFF_TORQUE
+            params.trigger_off_trq
         )
         {
             m_frictionDirection = 0;
@@ -804,16 +862,16 @@ private:
 
 private:
 
-    static constexpr float KP =
-        0.5f;
-
-    static constexpr float KD =
-        0.01f;
-
     static constexpr float
         LOAD_CELL_LEVER_ARM =
             0.055f;
 
+
+    /*
+     * TODO:
+     * Remove torque signs and encode the correct
+     * load-cell order in Board.h instead.
+     */
     static constexpr float
         LEFT_TORQUE_SIGN =
             1.0f;
@@ -822,34 +880,6 @@ private:
         RIGHT_TORQUE_SIGN =
             -1.0f;
 
-    static constexpr float
-        STATIC_FRICTION_COMP_TORQUE =
-            0.08f;
-
-    static constexpr float
-        FRICTION_TRIGGER_ON_TORQUE =
-            0.025f;
-
-    static constexpr float
-        FRICTION_TRIGGER_OFF_TORQUE =
-            0.010f;
-
-    static constexpr float
-        FRICTION_FILTER_ALPHA =
-            0.10f;
-
-    static constexpr float
-        MAX_TRANSPARENT_TORQUE =
-            0.4f;
-
-    static constexpr float
-        TORQUE_FILTER_ALPHA =
-            0.15f;
-
-    static constexpr float
-        DERIVATIVE_FILTER_ALPHA =
-            0.05f;
-
 
     Topic<EncoderPositions>&
         m_encoders;
@@ -857,14 +887,18 @@ private:
     Topic<LoadCellForces>&
         m_loadcells;
 
-    Topic<MotorReply>&
+    Topic<MotorFeedback>&
         m_motorFeed;
 
-    Topic<MotorCmd>&
+    Topic<float>&
         m_motorCmd;
 
+    Topic<TransparentControllerParameters>&
+        m_params;
 
-    float m_filteredTorque{0.0f};
+
+    float
+        m_filteredTorque{0.0f};
 
     float
         m_previousFilteredTorque{0.0f};
@@ -875,13 +909,17 @@ private:
     float
         m_filteredFrictionComp{0.0f};
 
-    int m_frictionDirection{0};
+    int
+        m_frictionDirection{0};
 
-    uint32_t m_previousUs{0};
+    uint32_t
+        m_previousUs{0};
 
-    uint32_t m_previousUpdateUs{0};
+    uint32_t
+        m_previousUpdateUs{0};
 
-    bool m_initialized{false};
+    bool
+        m_initialized{false};
 };
 
 // NEW FOR NOW : TORQUE BANDWIDTH CONTROLLER FOR BANDWIDTH EVALUATION
@@ -893,7 +931,7 @@ class TorqueBandwidthController final :
 public:
 
     explicit TorqueBandwidthController(
-        Topic<MotorCmd>& motorCmd,
+        Topic<float>& motorCmd,
 		Topic<LoggingState>& loggingState
 		)
         :
@@ -1087,22 +1125,9 @@ public:
             );
 
 
-        MotorCmd command{};
+        float command{};
 
-        command.position =
-            0.0f;
-
-        command.velocity =
-            0.0f;
-
-        command.kp =
-            0.0f;
-
-        command.kd =
-            0.0f;
-
-        command.torque =
-            torque;
+        command = torque;
 
 
         m_motorCmd.publish(
@@ -1195,27 +1220,8 @@ private:
 
     void publishZeroTorque()
     {
-        MotorCmd command{};
 
-        command.position =
-            0.0f;
-
-        command.velocity =
-            0.0f;
-
-        command.kp =
-            0.0f;
-
-        command.kd =
-            0.0f;
-
-        command.torque =
-            0.0f;
-
-
-        m_motorCmd.publish(
-            command
-        );
+        m_motorCmd.publish(0.0f);
     }
 
 
@@ -1367,7 +1373,7 @@ private:
     // STATE
     // =====================================================
 
-    Topic<MotorCmd>&
+    Topic<float>&
         m_motorCmd;
 
 

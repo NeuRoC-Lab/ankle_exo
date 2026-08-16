@@ -3,10 +3,13 @@ import time
 
 
 with Exoskeleton() as exo:
+    time.sleep(4)
     exo.start_recording()
-    i = input("Enter to stop")
+    time.sleep(15)
     exo.stop_recording()
-    exo.stop_motor(Side.LEFT)
-    exo.stop_motor(Side.RIGHT)
+    print("Stopped recording")
+    time.sleep(4)
+
+
 
 

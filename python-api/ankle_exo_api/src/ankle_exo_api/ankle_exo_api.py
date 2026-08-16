@@ -155,7 +155,7 @@ class Exoskeleton:
             deadline = (
                     time.perf_counter()
                     +
-                    2.0
+                    5.0
             )
 
             while (
@@ -274,15 +274,15 @@ class Exoskeleton:
             command,
         )
 
-
+    #DEPRECATED
     def set_command(
             self,
             side: Side,
-            position=None,
-            velocity=None,
+            #position=None,
+            #velocity=None,
             torque=None,
-            kp=None,
-            kd=None,
+            #kp=None,
+            #kd=None,
     ):
         """
         Update one or more components of the desired MIT
@@ -296,7 +296,7 @@ class Exoskeleton:
             side
         ]
 
-
+        """
         if position is not None:
             command.position = float(
                 position
@@ -306,12 +306,12 @@ class Exoskeleton:
             command.velocity = float(
                 velocity
             )
-
+        """
         if torque is not None:
             command.torque = float(
                 torque
             )
-
+        """
         if kp is not None:
             command.kp = float(
                 kp
@@ -321,13 +321,13 @@ class Exoskeleton:
             command.kd = float(
                 kd
             )
-
+        """
 
         self._send_current_command(
             side
         )
 
-
+    """
     def set_position(
             self,
             side: Side,
@@ -348,7 +348,7 @@ class Exoskeleton:
             side,
             velocity=velocity,
         )
-
+    """
 
     def set_torque(
             self,
@@ -360,7 +360,7 @@ class Exoskeleton:
             torque=torque,
         )
 
-
+    """
     def set_kp(
             self,
             side: Side,
@@ -381,7 +381,7 @@ class Exoskeleton:
             side,
             kd=kd,
         )
-
+    """
 
     def reset_command(
             self,
@@ -413,20 +413,20 @@ class Exoskeleton:
         ]
 
         return {
+            """
             "position":
                 command.position,
 
             "velocity":
                 command.velocity,
-
-            "torque":
-                command.torque,
-
             "kp":
                 command.kp,
 
             "kd":
                 command.kd,
+            """
+            "torque":
+                command.torque,
         }
 
 
@@ -445,20 +445,14 @@ class Exoskeleton:
         ]
 
         (
-            position,
-            velocity,
+            #position,
+            #velocity,
             torque,
             temperature,
             error,
         ) = motor.get_values()
 
         return {
-            "position":
-                position,
-
-            "velocity":
-                velocity,
-
             "torque":
                 torque,
 

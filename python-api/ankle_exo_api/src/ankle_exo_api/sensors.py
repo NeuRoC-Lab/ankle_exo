@@ -88,26 +88,26 @@ class LoadCells:
 class Motor:
     def __init__(self):
         self.id  = 0
-        self.position = 0.0
-        self.velocity = 0.0
+        #self.position = 0.0
+        #self.velocity = 0.0
         self.torque = 0.0
         self.temperature = 0
         self.error = 0
         self.lock = threading.Lock()
 
-    def _update(self,id,position,velocity,torque,temperature,error):
+    def _update(self,torque,temperature,error):
         """Meant to be used internally by bluetooth manager to update motor state"""
         with self.lock:
-            self.position = position
-            self.velocity = velocity
+            #self.position = position
+            #self.velocity = velocity
             self.torque = torque
             self.temperature = temperature
             self.error = error
     def get_values(self):
         with self.lock:
             return (
-                self.position,
-                self.velocity,
+                #self.position,
+                #self.velocity,
                 self.torque,
                 self.temperature,
                 self.error,
@@ -141,21 +141,21 @@ class Power:
 
 @dataclass
 class MotorCommand(StructPacket):
-    position: float = 0.0
-    velocity: float = 0.0
+    #position: float = 0.0
+    #velocity: float = 0.0
     torque: float = 0.0
-    kp: float = 0.0
-    kd: float = 0.0
+    #kp: float = 0.0
+   # kd: float = 0.0
 
-    FORMAT = "<5f"
+    FORMAT = "<1f"
 
     def _values(self):
         return (
-            self.position,
-            self.velocity,
+            #self.position,
+            #self.velocity,
             self.torque,
-            self.kp,
-            self.kd,
+            #self.kp,
+            #self.kd,
         )
 
 class MotorControlCmd(ByteCommand):

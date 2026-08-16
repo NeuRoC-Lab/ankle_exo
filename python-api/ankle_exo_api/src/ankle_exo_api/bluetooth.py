@@ -153,24 +153,14 @@ class BluetoothManager:
             or not self.sd_queue.empty()
         )
 
-    def _fetch_motor(self,sender,data,side:Side):
+    def _fetch_motor(self, sender, data, side: Side):
 
-        values = struct.unpack("<B3x3fBB2x",data)
+        values = struct.unpack("<fBBxx", data)
 
-        """
-        if can_id == CanId.LEFT:
-            side = Side.LEFT
-        elif can_id == CanId.RIGHT:
-            side = Side.RIGHT
-        else:
-            print("Invalid CAN ID")
-            return
-        """
-        # determine the side from the CAN ID
         if self.motors[side] is None:
             print("Motor is undefined")
             return
-        #finally update the motor
+
         self.motors[side]._update(*values)
 
     def _fetch_loadcells(self, sender, data):

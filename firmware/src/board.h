@@ -22,10 +22,10 @@ struct SingleEndedLoadCellPins
 // This ensures that we can address the load cells by their location and not by their raw pin
 enum class LoadCellId : std::uint8_t
 {
- Left1, // 0
- Left2, // 1
- Right2, // 2
- Right1 // 3
+ Left2, // 0
+ Left1, // 1
+ Right1, // 2
+ Right2 // 3
 }; //FLIPPED HERE
 
 // these are now FIXED
