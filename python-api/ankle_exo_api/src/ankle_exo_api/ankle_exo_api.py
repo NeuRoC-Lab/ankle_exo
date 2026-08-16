@@ -20,7 +20,7 @@ from .bluetooth import (
     Side,
 )
 
-from .sensors import (
+from .peripherals import (
     Encoders,
     LoadCells,
     Power,
@@ -28,6 +28,7 @@ from .sensors import (
     MotorCommand,
     MotorControlCmd,
     SDLoggerControlCmd,
+    TransparentControlCommand,
 )
 
 
@@ -76,6 +77,11 @@ class Exoskeleton:
         self.commands = {
             Side.LEFT: MotorCommand(),
             Side.RIGHT: MotorCommand(),
+        }
+
+        self.transparent = {
+            Side.LEFT : TransparentControlCommand(),
+            Side.RIGHT : TransparentControlCommand(),
         }
 
 
@@ -190,7 +196,7 @@ class Exoskeleton:
 
 
     # =====================================================
-    # MOTOR META COMMANDS
+    # MOTOR CONTROLS
     # =====================================================
 
     def start_motor(
@@ -217,18 +223,6 @@ class Exoskeleton:
         )
 
 
-    def zero_motor(
-            self,
-            side: Side,
-    ):
-        self._check_connection()
-
-        self.bluetooth.queue_motor_control(
-            side,
-            MotorControlCmd.SET_ZERO,
-        )
-
-
     # =====================================================
     # SD LOGGER
     # =====================================================
@@ -252,7 +246,31 @@ class Exoskeleton:
 
 
     # =====================================================
-    # MOTOR MIT COMMAND
+    # TRANSPARENT MODE CONTROL
+    # =====================================================
+
+    def update_transparent_params(self,side:Side,updates: dict):
+        self._check_connection()
+        update = self.transparent[side]
+        try:
+            update.enabled = updates["enabled"]
+            update.kp = updates["kp"]
+            update.kd = updates["kd"]
+            update.a_derivative = updates["a_derivative"]
+            update.a_friction = updates["a_friction"]
+            update.a_torque = updates["a_torque"]
+            update.comp_torque = updates["comp_torque"]
+            update.trigger_on_trq = updates["trigger_on_trq"]
+            update.trigger_off_trq = updates["trigger_off_trq"]
+            update.max_abs_out_trq = updates["max_abs_out_trq"]
+
+            self.bluetooth.queue_transparent_command(side,update)
+        except KeyError:
+            print("Invalid or missing parameters")
+            return
+
+    # =====================================================
+    # MOTOR MIT COMMAND to fix (OUTDATED)
     # =====================================================
 
     def _send_current_command(
@@ -551,6 +569,8 @@ class Exoskeleton:
         self._check_connection()
 
         return self.power.get_values()
+
+
 
 
     # =====================================================

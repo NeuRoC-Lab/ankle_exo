@@ -43,7 +43,7 @@ constexpr char leftMotorCommandCharacteristicUUID[] =
     "E0D883F6-705C-4A11-B117-E2B0909CC68E";
 
 constexpr char leftMotorControlCharacteristicUUID[] =
-    "99F02A66-065C-41BE-B05E-4BE2B9035A8B";
+    "99F02A66-065C-41BE-B05E-4BE2B9035A8B"; // basically a bool to turn on / off the motor (virtual state)
 
 
 // =========================================================
@@ -67,6 +67,15 @@ constexpr char rightMotorControlCharacteristicUUID[] =
 constexpr char loggingControlCharacteristicUUID[] =
     "A06EE428-0AB6-4CD4-AA8A-91619F1AF577";
 
+// =========================================================
+// Transparent Mode Controller UUIDs
+// =========================================================
+
+constexpr char leftTransparentModeControllerUUID[] =
+    "644CD587-A563-437E-8006-8B7F39559690";
+
+constexpr char rightTransparentModeControllerUUID[] =
+    "A8B58E7F-4B57-4C5F-85E4-55F38A6CE271";
 
 // =========================================================
 // BLE BRIDGE
@@ -173,7 +182,24 @@ public:
             loggingControlCharacteristicUUID,
             BLEWrite | BLEWriteWithoutResponse,
             sizeof(LoggingState)
-        )
+        ),
+
+        // -------------------------------------------------
+        // Transparent Mode controller
+        // -------------------------------------------------
+
+        m_leftTransparentModeControllerCharacteristic(
+    	leftTransparentModeControllerUUID,
+    	BLEWrite | BLEWriteWithoutResponse,
+    	sizeof(TransparentControllerParameters)
+	),
+
+		m_rightTransparentModeControllerCharacteristic(
+    rightTransparentModeControllerUUID,
+    BLEWrite | BLEWriteWithoutResponse,
+    sizeof(TransparentControllerParameters)
+	)
+
     {
         s_instance = this;
     }
@@ -259,6 +285,18 @@ public:
             m_loggingControlCharacteristic
         );
 
+        // -------------------------------------------------
+        // Transparent Mode Controller
+        // -------------------------------------------------
+
+                m_service.addCharacteristic(
+    	m_leftTransparentModeControllerCharacteristic
+		);
+
+		m_service.addCharacteristic(
+    	m_rightTransparentModeControllerCharacteristic
+		);
+
 
         // -------------------------------------------------
         // Left motor callbacks
@@ -303,6 +341,23 @@ public:
                 BLEWritten,
                 loggingControlWrittenCallback
             );
+
+        // -------------------------------------------------
+        // Transparent Mode Controller Callback
+        // -------------------------------------------------
+
+m_leftTransparentModeControllerCharacteristic
+    .setEventHandler(
+        BLEWritten,
+        leftTransparentModeControllerWrittenCallback
+    );
+
+m_rightTransparentModeControllerCharacteristic
+    .setEventHandler(
+        BLEWritten,
+        rightTransparentModeControllerWrittenCallback
+    );
+
 
 
         BLE.addService(
@@ -417,35 +472,16 @@ private:
     {
         float command{};
 
-        const int bytesRead =
-            characteristic.readValue(
-                reinterpret_cast<uint8_t*>(
-                    &command
-                ),
-                sizeof(command)
-            );
+        const int bytesRead = characteristic.readValue(reinterpret_cast<uint8_t*>(&command),sizeof(command));
 
-        if (
-            bytesRead !=
-            static_cast<int>(
-                sizeof(command)
-            )
-        )
+        if (bytesRead != static_cast<int>(sizeof(command)))
         {
-            Serial.print(
-                "Wrong float size: "
-            );
-
-            Serial.println(
-                bytesRead
-            );
-
+            Serial.print("Wrong float size: ");
+            Serial.println(bytesRead);
             return;
         }
 
-        m_bus.publish<Id>(
-            command
-        );
+        m_bus.publish<Id>(command);
     }
 
 
@@ -463,14 +499,7 @@ private:
         {
             return;
         }
-
-        s_instance
-            ->handleMotorCommand<
-                EndpointId::
-                    LeftMotorCommand
-            >(
-                characteristic
-            );
+        s_instance->handleMotorCommand<EndpointId::LeftMotorCommand>(characteristic);
     }
 
 
@@ -489,18 +518,12 @@ private:
             return;
         }
 
-        s_instance
-            ->handleMotorCommand<
-                EndpointId::
-                    RightMotorCommand
-            >(
-                characteristic
-            );
+        s_instance->handleMotorCommand<EndpointId::RightMotorCommand>(characteristic);
     }
 
 
     // =====================================================
-    // GENERIC MOTOR META-CONTROL DECODER
+    // GENERIC MOTOR CONTROL CALLBACK
     // =====================================================
 
     template<EndpointId Id>
@@ -510,10 +533,7 @@ private:
     uint8_t rawEnabled{};
 
     const int bytesRead =
-        characteristic.readValue(
-            &rawEnabled,
-            sizeof(rawEnabled)
-        );
+        characteristic.readValue(&rawEnabled,sizeof(rawEnabled));
 
     if (bytesRead != 1)
     {
@@ -531,7 +551,6 @@ private:
 
     const bool enabled =
         rawEnabled != 0;
-
     m_bus.publish<Id>(
         enabled
     );
@@ -553,13 +572,7 @@ private:
             return;
         }
 
-        s_instance
-            ->handleMotorControl<
-                EndpointId::
-                    LeftMotorEnabled
-            >(
-                characteristic
-            );
+        s_instance->handleMotorControl<EndpointId::LeftMotorEnabled>(characteristic);
     }
 
 
@@ -578,13 +591,7 @@ private:
             return;
         }
 
-        s_instance
-            ->handleMotorControl<
-                EndpointId::
-                    RightMotorEnabled
-            >(
-                characteristic
-            );
+        s_instance->handleMotorControl<EndpointId::RightMotorEnabled>(characteristic);
     }
 
 
@@ -678,6 +685,82 @@ private:
         );
     }
 
+template<EndpointId Id>
+void handleTransparentModeController(
+    BLECharacteristic& characteristic)
+{
+    TransparentControllerParameters params{};
+
+    const int bytesRead =
+        characteristic.readValue(
+            reinterpret_cast<uint8_t*>(
+                &params
+            ),
+            sizeof(params)
+        );
+
+    if (
+        bytesRead !=
+        static_cast<int>(
+            sizeof(params)
+        )
+    )
+    {
+        Serial.print(
+            "Wrong TransparentControllerParameters size: "
+        );
+
+        Serial.println(
+            bytesRead
+        );
+
+        return;
+    }
+
+    m_bus.publish<Id>(
+        params
+    );
+}
+
+static void leftTransparentModeControllerWrittenCallback(
+    BLEDevice central,
+    BLECharacteristic characteristic)
+{
+    (void)central;
+
+    if (s_instance == nullptr)
+    {
+        return;
+    }
+
+    s_instance
+        ->handleTransparentModeController<
+            EndpointId::LeftMotorTransparentParams
+        >(
+            characteristic
+        );
+}
+
+
+static void rightTransparentModeControllerWrittenCallback(
+    BLEDevice central,
+    BLECharacteristic characteristic)
+{
+    (void)central;
+
+    if (s_instance == nullptr)
+    {
+        return;
+    }
+
+    s_instance
+        ->handleTransparentModeController<
+            EndpointId::RightMotorTransparentParams
+        >(
+            characteristic
+        );
+}
+
 
 private:
 
@@ -714,6 +797,8 @@ private:
 
     Topic<PowerReadings>&
         m_power;
+
+
 
 
     // =====================================================
@@ -791,6 +876,16 @@ private:
 
     BLECharacteristic
         m_loggingControlCharacteristic;
+
+    // =====================================================
+    //TRANSPARENT MODE CONTROLLER CHARACTERISTIC
+    // =====================================================
+
+BLECharacteristic
+    m_leftTransparentModeControllerCharacteristic;
+
+BLECharacteristic
+    m_rightTransparentModeControllerCharacteristic;
 };
 
 #endif

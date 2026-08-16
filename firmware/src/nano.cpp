@@ -27,6 +27,8 @@ Topic<MotorFeedback> leftMotorTopic;
 Topic<MotorFeedback> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
 Topic<LoggingState> loggingStateTopic;
+Topic<TransparentControllerParameters> leftMotorControllerParams;
+Topic<TransparentControllerParameters> rightMotorControllerParams;
 
 LoadCellDriver loadCellDriver;
 

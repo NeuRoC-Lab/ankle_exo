@@ -61,6 +61,8 @@ struct BusMessage
 
 struct TransparentControllerParameters
 {
+	bool enabled;			// to enable / disable it
+
     float kp;               // Proportional gain
     float kd;               // Derivative gain
 
@@ -79,6 +81,7 @@ struct TransparentControllerParameters
 constexpr TransparentControllerParameters
     DEFAULT_TRANSPARENT_CONTROLLER_PARAMETERS
 {
+	.enabled 		= false,
     .kp              = 0.5f,
     .kd              = 0.01f,
 

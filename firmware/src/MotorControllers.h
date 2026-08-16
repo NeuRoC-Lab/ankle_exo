@@ -568,6 +568,10 @@ public:
             return;
         }
 
+        if(!m_params.latest().enabled){
+            return;
+        }
+
         /*
          * Snapshot the parameters once for this control iteration.
          *
@@ -813,18 +817,10 @@ private:
 
 
     static constexpr float
+    //TODO completely remove that function
     torqueSign()
     {
-        if constexpr (
-            Side == ExoSide::Left
-        )
-        {
-            return LEFT_TORQUE_SIGN;
-        }
-        else
-        {
-            return RIGHT_TORQUE_SIGN;
-        }
+      return 1.0f;
     }
 
 
@@ -872,13 +868,8 @@ private:
      * Remove torque signs and encode the correct
      * load-cell order in Board.h instead.
      */
-    static constexpr float
-        LEFT_TORQUE_SIGN =
-            1.0f;
 
-    static constexpr float
-        RIGHT_TORQUE_SIGN =
-            -1.0f;
+
 
 
     Topic<EncoderPositions>&
@@ -1228,20 +1219,11 @@ private:
     // =====================================================
     // SIDE
     // =====================================================
-
+    //TODO get completely rid of that function
     static constexpr float
     torqueSign()
     {
-        if constexpr (
-            Side == ExoSide::Left
-        )
-        {
-            return LEFT_TORQUE_SIGN;
-        }
-        else
-        {
-            return RIGHT_TORQUE_SIGN;
-        }
+       return 1.0f;
     }
 
 
@@ -1354,20 +1336,6 @@ private:
             sizeof(FREQUENCIES_HZ)
             /
             sizeof(FREQUENCIES_HZ[0]);
-
-
-    // =====================================================
-    // SIGNS
-    // =====================================================
-
-    static constexpr float
-        LEFT_TORQUE_SIGN =
-            1.0f;
-
-    static constexpr float
-        RIGHT_TORQUE_SIGN =
-            -1.0f;
-
 
     // =====================================================
     // STATE

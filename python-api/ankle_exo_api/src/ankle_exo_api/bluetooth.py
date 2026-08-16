@@ -6,7 +6,7 @@ from enum import  Enum
 
 from bleak import BleakClient, BleakScanner
 
-from .sensors import (
+from .peripherals import (
     Encoders,
     LoadCells,
     Motor,
@@ -14,6 +14,7 @@ from .sensors import (
     MotorControlCmd,
     SDLoggerControlCmd,
     Power,
+    TransparentControlCommand,
 )
 
 class Side(Enum):
@@ -44,6 +45,9 @@ LEFT_MOTOR_CONTROL_UUID = "99F02A66-065C-41BE-B05E-4BE2B9035A8B"
 
 SD_LOGGER_UUID = "A06EE428-0AB6-4CD4-AA8A-91619F1AF577"
 
+LEFT_TRANSPARENT_CONTROLLER_UUID = "644CD587-A563-437E-8006-8B7F39559690"
+RIGHT_TRANSPARENT_CONTROLLER_UUID = "A8B58E7F-4B57-4C5F-85E4-55F38A6CE271"
+
 MOTOR_FEEDBACK_UUIDS = {
     Side.LEFT:
         LEFT_MOTOR_FEEDBACK_UUID,
@@ -68,6 +72,13 @@ MOTOR_CONTROL_UUIDS = {
 
     Side.RIGHT:
         RIGHT_MOTOR_CONTROL_UUID,
+}
+
+TRANSPARENT_CONTROLLER_UUIDS = {
+    Side.LEFT:
+        LEFT_TRANSPARENT_CONTROLLER_UUID,
+    Side.RIGHT:
+        RIGHT_TRANSPARENT_CONTROLLER_UUID,
 }
 
 class BluetoothManager:
@@ -104,6 +115,11 @@ class BluetoothManager:
 
         self.sd_queue = queue.Queue()
 
+        self.transparent_queues = {
+            Side.LEFT : queue.Queue(),
+            Side.RIGHT : queue.Queue(),
+        }
+
         self.data_queue = queue.Queue()
         #TODO determine if that is really necessary
 
@@ -138,12 +154,6 @@ class BluetoothManager:
 
         self.ble_thread = None
 
-    def _queue_motor_command(self,side: Side,command: MotorCommand):
-        self.command_queues[side].put(command)
-    def _queue_motor_control(self,side: Side,command: MotorControlCmd):
-        self.control_queues[side].put(command)
-    def _queue_sd_command(self, command : SDLoggerControlCmd):
-        self.sd_queue.put(command)
     def _has_pending_commands(self):
         return (
             not self.command_queues[Side.LEFT].empty()
@@ -192,24 +202,14 @@ class BluetoothManager:
             command
         )
 
-    def queue_motor_control(
-            self,
-            side: Side,
-            command: MotorControlCmd,
-    ):
-        self.control_queues[
-            side
-        ].put(
-            command
-        )
+    def queue_motor_control(self,side: Side,command: MotorControlCmd):
+        self.control_queues[side].put(command)
 
-    def queue_sd_command(
-            self,
-            command: SDLoggerControlCmd,
-    ):
-        self.sd_queue.put(
-            command
-        )
+    def queue_sd_command(self,command: SDLoggerControlCmd):
+        self.sd_queue.put(command)
+
+    def queue_transparent_command(self,side: Side, command : TransparentControlCommand):
+        self.transparent_queues[side].put(command)
 
     def has_pending_commands(self):
 
@@ -226,6 +226,12 @@ class BluetoothManager:
                     self.control_queues.values()
                 )
                 or
+                any(
+                    not q.empty()
+                    for q in
+                    self.transparent_queues.values()
+                )
+                or
                 not self.sd_queue.empty()
         )
 
@@ -235,6 +241,9 @@ class BluetoothManager:
             self._clear_queue(q)
 
         for q in self.control_queues.values():
+            self._clear_queue(q)
+
+        for q in self.transparent_queues.values():
             self._clear_queue(q)
 
         self._clear_queue(
@@ -414,6 +423,62 @@ class BluetoothManager:
                         exc,
                     )
 
+    async def _send_pending_transparent_commands(
+            self,
+            client: BleakClient,
+            side: Side,
+    ):
+        characteristic = (
+            client.services
+            .get_characteristic(
+                TRANSPARENT_CONTROLLER_UUIDS[
+                    side
+                ]
+            )
+        )
+
+
+        properties = {
+            prop.lower()
+            for prop
+            in characteristic.properties
+        }
+
+        use_response = (
+                "write" in properties
+        )
+
+
+        transparent_queue = (
+            self.transparent_queues[
+                side
+            ]
+        )
+
+        while True:
+            try:
+                command = (transparent_queue.get_nowait())
+            except queue.Empty:
+                break
+            try:
+                packet = (command.to_bytes())
+
+                await client.write_gatt_char(
+                    characteristic,
+                    packet,
+                    response=use_response,
+                )
+
+            except Exception as exc:
+
+                print(
+                    f"Could not send "
+                    f"{side.value} "
+                    f"transparent mode control:",
+                    exc,
+                )
+
+
     async def _bluetooth_connection(self):
             print("Searching for Bluetooth device...")
             device = (
@@ -471,9 +536,13 @@ class BluetoothManager:
                         side,
                         )
 
+                        await  self._send_pending_transparent_commands(
+                            client,
+                            side,
+                        )
+
                     await self._send_pending_sd_commands(
                     client)
-
 
 
                     await asyncio.sleep(0.01)

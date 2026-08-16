@@ -89,8 +89,8 @@ SDLogger sdLogger(
 
 CanBus canBus;
 
-constexpr uint8_t LEFT_MOTOR_CAN_ID = 0x02;
-constexpr uint8_t RIGHT_MOTOR_CAN_ID = 0x03;
+constexpr uint8_t LEFT_MOTOR_CAN_ID = 0x03;
+constexpr uint8_t RIGHT_MOTOR_CAN_ID = 0x02;
 
 AK60Params leftMotorLimits = MotorParams;
 AK60Params rightMotorLimits = MotorParams;
@@ -277,6 +277,8 @@ void setup()
     messageBus.addTopic<EndpointId::RightMotorCommand>(rightMotorCommandTopic);
     messageBus.addTopic<EndpointId::RightMotorEnabled>(rightMotorEnabled);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
+    messageBus.addTopic<EndpointId::LeftMotorTransparentParams>(leftMotorControllerParams);
+    messageBus.addTopic<EndpointId::RightMotorTransparentParams>(rightMotorControllerParams);
     messageBus.begin();
 
     scheduler.add(messageBus);
@@ -285,7 +287,7 @@ void setup()
 
 	//scheduler.add(leftBandwidthController);
 
-	scheduler.add(dummyController); //TODO debug only
+	//scheduler.add(dummyController); //TODO debug only
    	scheduler.add(leftTransparentModeController);
    scheduler.add(rightTransparentModeController);
    //scheduler.add(leftJointLimitController);

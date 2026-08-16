@@ -158,12 +158,42 @@ class MotorCommand(StructPacket):
             #self.kd,
         )
 
+@dataclass
+class TransparentControlCommand(StructPacket):
+    enabled : bool = False
+    kp : float = 0.5
+    kd : float = 0.01
+    a_derivative : float = 0.05
+    a_friction : float = 0.10
+    a_torque : float = 0.15
+    comp_torque : float = 0.08
+    trigger_on_trq : float = 0.025
+    trigger_off_trq : float = 0.010
+    max_abs_out_trq : float = 0.4
+
+    FORMAT = "<b3x9f"
+
+    def _values(self):
+        return (
+            self.enabled,
+            self.kp,
+            self.kd,
+            self.a_derivative,
+            self.a_friction,
+            self.a_torque,
+            self.comp_torque,
+            self.trigger_on_trq,
+            self.trigger_off_trq,
+            self.max_abs_out_trq,
+        )
+
+
 class MotorControlCmd(ByteCommand):
-    ENTER_MOTOR_MODE = 0
-    EXIT_MOTOR_MODE = 1
-    SET_ZERO = 2
+    EXIT_MOTOR_MODE = 0
+    ENTER_MOTOR_MODE = 1
 
 
 class SDLoggerControlCmd(ByteCommand):
     STOP_RECORDING = 0
     START_RECORDING = 1
+
