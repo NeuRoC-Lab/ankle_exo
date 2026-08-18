@@ -269,9 +269,10 @@ class Exoskeleton:
             command.enabled = updates["enabled"]
             command.kp = updates["kp"]
             command.kd = updates["kd"]
-            command.a_derivative = updates["a_derivative"]
-            command.a_friction = updates["a_friction"]
-            command.a_torque = updates["a_torque"]
+            command.input_hp_cutoff_hz = updates["input_hp_cutoff_hz"]
+            command.input_lp_cutoff_hz = updates["input_lp_cutoff_hz"]
+            command.derivative_lp_cutoff_hz = updates["derivative_lp_cutoff_hz"]
+            command.friction_lp_cutoff_hz = updates["friction_lp_cutoff_hz"]
             command.comp_torque = updates["comp_torque"]
             command.trigger_on_trq = updates["trigger_on_trq"]
             command.trigger_off_trq = updates["trigger_off_trq"]
@@ -522,6 +523,18 @@ class Exoskeleton:
 
         return right
 
+
+    def get_controller_output_torque(
+                self,
+                side: Side,
+        ):
+        if side == Side.LEFT:
+                return self.bluetooth.controller_output_torque.left
+
+        if side == Side.RIGHT:
+            return self.bluetooth.controller_output_torque.right
+
+        raise ValueError(f"Invalid side: {side}")
     def get_encoder(
             self,
             side: Side,
@@ -548,28 +561,24 @@ class Exoskeleton:
         self._check_connection()
 
         (
-            left1,
-            left2,
-            right1,
-            right2,
+            leftTorque,
+            rightTorque,
         ) = self.loadcells.get_values()
 
         return {
-            "left1": left1,
-            "left2": left2,
-            "right1": right1,
-            "right2": right2,
+            "left": leftTorque,
+            "right": rightTorque,
         }
 
-
+    """to fix 
     def get_loadcells_for_side(
             self,
             side: Side,
     ):
-        """
+        '''
         Convenience method for retrieving the two load cells
         associated with a single side.
-        """
+        '''
 
         values = (
             self.get_loadcells()
@@ -594,7 +603,7 @@ class Exoskeleton:
                 "right2"
             ],
         }
-
+    """
 
     # =====================================================
     # POWER

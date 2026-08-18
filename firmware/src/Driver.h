@@ -678,18 +678,42 @@ public:
             return {};
         }
 
-        LoadCellTorques torques{};
-
         for (size_t i = 0; i < LoadCellCount; ++i)
         {
             m_loadCells[i].setLatestDiffVoltage(
                 rawToDiffVoltage(m_rawBuffer[i])
             );
-
-            torques[i] =
-                LOAD_CELL_LEVER_ARM * (m_loadCells[i].sampleForce() - m_loadCells[i+1].sampleForce());
-                //TODO determine if the substraction needs to be reversed for the force substraction. Or change the order in board.h
         }
+
+        LoadCellTorques torques{};
+
+        const float right2 =
+            m_loadCells[
+                static_cast<size_t>(LoadCellId::Right2)
+            ].sampleForce();
+
+        const float right1 =
+            m_loadCells[
+                static_cast<size_t>(LoadCellId::Right1)
+            ].sampleForce();
+
+        const float left2 =
+            m_loadCells[
+                static_cast<size_t>(LoadCellId::Left2)
+            ].sampleForce();
+
+        const float left1 =
+            m_loadCells[
+                static_cast<size_t>(LoadCellId::Left1)
+            ].sampleForce();
+
+        torques[0] =
+            LOAD_CELL_LEVER_ARM *
+            (left1 - left2);
+
+        torques[1] =
+            LOAD_CELL_LEVER_ARM *
+            (right1 - right2);
 
         return torques;
     }
@@ -832,25 +856,24 @@ private:
     nrf_saadc_value_t
         m_rawBuffer[NRF_SAADC_CHANNEL_COUNT]{};
 
-    std::array<LoadCell, LoadCellCount>
-        m_loadCells{
-            LoadCell{
-                loadCellParams,
-                LoadCellId::Left1
-            },
-            LoadCell{
-                loadCellParams,
-                LoadCellId::Left2
-            },
-            LoadCell{
-                loadCellParams,
-                LoadCellId::Right1
-            },
-            LoadCell{
-                loadCellParams,
-                LoadCellId::Right2
-            }
-        };
+    std::array<LoadCell, 4> m_loadCells{
+        LoadCell{
+            loadCellParams,
+            LoadCellId::Right2
+        },
+        LoadCell{
+            loadCellParams,
+            LoadCellId::Right1
+        },
+        LoadCell{
+            loadCellParams,
+            LoadCellId::Left2
+        },
+        LoadCell{
+            loadCellParams,
+            LoadCellId::Left1
+        }
+    };
 };
 
 #endif

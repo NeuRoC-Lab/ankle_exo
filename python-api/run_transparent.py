@@ -18,6 +18,7 @@ MAX_SAMPLES = int(WINDOW_SECONDS / PLOT_PERIOD)
 times = deque(maxlen=MAX_SAMPLES)
 left_values = deque(maxlen=MAX_SAMPLES)
 right_values = deque(maxlen=MAX_SAMPLES)
+left_output_values = deque(maxlen=MAX_SAMPLES)
 
 
 # -------------------------------------------------
@@ -31,18 +32,24 @@ fig, ax = plt.subplots()
 left_line, = ax.plot(
     [],
     [],
-    label="Left intermediate torque"
+    label="Left intermediate torque (after HP+LP)"
 )
 
 right_line, = ax.plot(
     [],
     [],
-    label="Right intermediate torque"
+    label="Raw Left load cell torque"
+)
+
+left_output_line, = ax.plot(
+    [],
+    [],
+    label="Left controller output torque"
 )
 
 ax.set_xlabel("Time [s]")
-ax.set_ylabel("HP-filtered interaction torque [Nm]")
-ax.set_title("Intermediate Torque - Live")
+ax.set_ylabel("Torque [Nm]")
+ax.set_title("Left Torque Signals - Live")
 ax.legend()
 ax.grid(True)
 
@@ -51,7 +58,7 @@ ax.grid(True)
 # Exoskeleton
 # -------------------------------------------------
 
-with (Exoskeleton() as exo):
+with Exoskeleton() as exo:
 
     time.sleep(5)
 
@@ -62,8 +69,16 @@ with (Exoskeleton() as exo):
 
     importlib.reload(exo_params)
     params = exo_params.params
-    exo.update_transparent_params(Side.LEFT, params)
-    exo.update_transparent_params(Side.RIGHT, params)
+
+    exo.update_transparent_params(
+        Side.LEFT,
+        params
+    )
+
+    exo.update_transparent_params(
+        Side.RIGHT,
+        params
+    )
 
     print("Voltage of the battery")
     print(exo.get_power()[0])
@@ -72,9 +87,21 @@ with (Exoskeleton() as exo):
 
     start_time = time.perf_counter()
 
+    exo.start_recording()
+
     try:
 
         while True:
+
+            exo.update_transparent_params(
+                Side.LEFT,
+                params
+            )
+
+            exo.update_transparent_params(
+                Side.RIGHT,
+                params
+            )
 
             loop_start = time.perf_counter()
 
@@ -84,24 +111,24 @@ with (Exoskeleton() as exo):
             )
 
             # -----------------------------------------
-            # Read intermediate torque values
+            # Read torque values
             # -----------------------------------------
 
-            #left_torque = exo.get_loadcells()["left1"] #note just for debug here!
             left_torque = (
                 exo.get_intermediate_torque(
                     Side.LEFT
                 )
             )
 
-            #right_torque = exo.get_loadcells()["left2"]  #note just for debug here!
-            right_torque =  (
-             exo.get_intermediate_torque(
-                    Side.RIGHT
-                )
+            raw_left_torque = (
+                exo.get_loadcells()["left"]
             )
 
-
+            left_output_torque = (
+                exo.get_controller_output_torque(
+                    Side.LEFT
+                )
+            )
 
             # -----------------------------------------
             # Store values
@@ -116,9 +143,12 @@ with (Exoskeleton() as exo):
             )
 
             right_values.append(
-                right_torque
+                raw_left_torque
             )
 
+            left_output_values.append(
+                left_output_torque
+            )
 
             # -----------------------------------------
             # Update plot
@@ -134,6 +164,10 @@ with (Exoskeleton() as exo):
                 right_values
             )
 
+            left_output_line.set_data(
+                times,
+                left_output_values
+            )
 
             # -----------------------------------------
             # Moving X axis
@@ -153,7 +187,6 @@ with (Exoskeleton() as exo):
                     WINDOW_SECONDS
                 )
 
-
             # -----------------------------------------
             # Auto-scale Y axis
             # -----------------------------------------
@@ -165,14 +198,12 @@ with (Exoskeleton() as exo):
                 scaley=True
             )
 
-
             # -----------------------------------------
             # Draw
             # -----------------------------------------
 
             fig.canvas.draw_idle()
             fig.canvas.flush_events()
-
 
             # -----------------------------------------
             # Maintain ~50 Hz
@@ -193,15 +224,14 @@ with (Exoskeleton() as exo):
                     sleep_time
                 )
 
-
     except KeyboardInterrupt:
 
         print("Stopping...")
 
-
     finally:
 
-        # Safety
+        exo.stop_recording()
+
         exo.set_torque(
             Side.LEFT,
             0.0

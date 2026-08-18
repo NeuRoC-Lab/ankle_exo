@@ -10,6 +10,7 @@
 #include "Driver.h"
 #include "BLE.h"
 #include "MotorControllers.h"
+#include "TransparentMode.h"
 #include "Scheduler.h"
 
 Scheduler<14> scheduler;
@@ -33,8 +34,8 @@ Topic<MotorFeedback> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
 Topic<float> leftLegIntermediateTorque;
 Topic<float> rightLegIntermediateTorque;
-Topic<float> leftMotorCommandTopic;
-Topic<float> rightMotorCommandTopic;
+Topic<float> leftControllerOutputTorqueTopic;
+Topic<float> rightControllerOutputTorqueTopic;
 Topic<bool> leftMotorEnabled;
 Topic<bool> rightMotorEnabled;
 Topic<LoggingState> loggingStateTopic;
@@ -82,8 +83,8 @@ SDLogger sdLogger(
     encoderTopic,
     leftMotorTopic,
     rightMotorTopic,
-    leftMotorCommandTopic,
-    rightMotorCommandTopic,
+    leftControllerOutputTorqueTopic,
+    rightControllerOutputTorqueTopic,
     loggingStateTopic
 );
 
@@ -113,13 +114,13 @@ MotorDriver rightMotor(
 
 MotorCommandTask leftMotorCommandTask(
     leftMotor,
-    leftMotorCommandTopic,
+    leftControllerOutputTorqueTopic,
 	leftMotorEnabled
 );
 
 MotorCommandTask rightMotorCommandTask(
     rightMotor,
-    rightMotorCommandTopic,
+    rightControllerOutputTorqueTopic,
 	rightMotorEnabled
 );
 
@@ -157,36 +158,61 @@ JointLimitController<
 );
 */
 
-
 TransparentModeController<
     Side::Left
 > leftTransparentModeController(
     loadCellTopic,
     leftMotorTopic,
-    leftMotorCommandTopic,
-	leftMotorControllerParams,
-	leftLegIntermediateTorque
+    leftControllerOutputTorqueTopic,
+    leftMotorControllerParams,
+    leftLegIntermediateTorque
 );
-
-
 
 TransparentModeController<
     Side::Right
 > rightTransparentModeController(
     loadCellTopic,
     rightMotorTopic,
-    rightMotorCommandTopic,
-	rightMotorControllerParams,
-	rightLegIntermediateTorque
+    rightControllerOutputTorqueTopic,
+    rightMotorControllerParams,
+    rightLegIntermediateTorque
 );
 
 
+TopicForwarder<
+    EndpointId::LeftMotorTransparentTorque
+> leftIntermediateTorqueForwarder(
+    leftLegIntermediateTorque,
+    messageBus
+);
+
+TopicForwarder<
+    EndpointId::RightMotorTransparentTorque
+> rightIntermediateTorqueForwarder(
+    rightLegIntermediateTorque,
+    messageBus
+);
+
+// forward the trnapsrent mode's torque output
+TopicForwarder<
+    EndpointId::LeftMotorTransparentCommand
+> leftTransparentCommandForwarder(
+    leftControllerOutputTorqueTopic,
+    messageBus
+);
+
+TopicForwarder<
+    EndpointId::RightMotorTransparentCommand
+> rightTransparentCommandForwarder(
+    rightControllerOutputTorqueTopic,
+    messageBus
+);
 
 /*
 TorqueBandwidthController<
     Side::Left
 > leftBandwidthController(
-    leftMotorCommandTopic,
+    leftControllerOutputTorqueTopic,
     loggingStateTopic
 );
 */
@@ -275,26 +301,33 @@ void setup()
     messageBus.addTopic<EndpointId::LeftMotorSnapshot>(leftMotorTopic);
     messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
-    messageBus.addTopic<EndpointId::LeftMotorCommand>(leftMotorCommandTopic);
+    messageBus.addTopic<EndpointId::LeftMotorCommand>(leftControllerOutputTorqueTopic);
     messageBus.addTopic<EndpointId::LeftMotorEnabled>(leftMotorEnabled);
-    messageBus.addTopic<EndpointId::RightMotorCommand>(rightMotorCommandTopic);
+    messageBus.addTopic<EndpointId::RightMotorCommand>(rightControllerOutputTorqueTopic);
     messageBus.addTopic<EndpointId::RightMotorEnabled>(rightMotorEnabled);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.addTopic<EndpointId::LeftMotorTransparentParams>(leftMotorControllerParams);
     messageBus.addTopic<EndpointId::RightMotorTransparentParams>(rightMotorControllerParams);
-    messageBus.addTopic<EndpointId::LeftMotorTransparentTorque>(leftLegIntermediateTorque);
-    messageBus.addTopic<EndpointId::RightMotorTransparentTorque>(rightLegIntermediateTorque);
     messageBus.begin();
 
     scheduler.add(messageBus);
     scheduler.add(encoderPublisher);
     scheduler.add(ina232Publisher);
 
+    scheduler.add(leftTransparentModeController);
+    scheduler.add(rightTransparentModeController);
+
+    scheduler.add(leftIntermediateTorqueForwarder);
+    scheduler.add(rightIntermediateTorqueForwarder);
+
+
+    scheduler.add(leftTransparentCommandForwarder);
+
+    //scheduler.add(rightTransparentCommandForwarder);
+
 	//scheduler.add(leftBandwidthController);
 
 	//scheduler.add(dummyController); //TODO debug only
-   	scheduler.add(leftTransparentModeController);
-   scheduler.add(rightTransparentModeController);
    //scheduler.add(leftJointLimitController);
 	//scheduler.add(rightJointLimitController);
 

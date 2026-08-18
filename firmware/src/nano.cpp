@@ -11,7 +11,7 @@
 #include "MotorControllers.h"
 #include "Scheduler.h"
 
-Scheduler<12> scheduler;
+Scheduler<14> scheduler;
 
 UARTHandler uart(
     board::nano::teensyUart
@@ -31,6 +31,8 @@ Topic<TransparentControllerParameters> leftMotorControllerParams;
 Topic<TransparentControllerParameters> rightMotorControllerParams;
 Topic<float> leftLegIntermediateTorque;
 Topic<float> rightLegIntermediateTorque;
+Topic<float> leftMotorCommandTopic;
+Topic<float> rightMotorCommandTopic;
 
 LoadCellDriver loadCellDriver;
 
@@ -50,8 +52,10 @@ BLEBridge bleBridge(
     leftMotorTopic,
     rightMotorTopic,
     ina232Topic,
-	leftLegIntermediateTorque,
-	rightLegIntermediateTorque
+    leftLegIntermediateTorque,
+    rightLegIntermediateTorque,
+    leftMotorCommandTopic,
+    rightMotorCommandTopic
 );
 
 void setup()
@@ -78,17 +82,10 @@ void setup()
     messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
-messageBus.addTopic<
-    EndpointId::LeftMotorTransparentTorque
->(
-    leftLegIntermediateTorque
-);
-
-messageBus.addTopic<
-    EndpointId::RightMotorTransparentTorque
->(
-    rightLegIntermediateTorque
-);
+    messageBus.addTopic<EndpointId::LeftMotorTransparentTorque>(leftLegIntermediateTorque);
+    messageBus.addTopic<EndpointId::RightMotorTransparentTorque>(rightLegIntermediateTorque);
+    messageBus.addTopic<EndpointId::LeftMotorTransparentCommand>(leftMotorCommandTopic);
+    messageBus.addTopic<EndpointId::RightMotorTransparentCommand>(rightMotorCommandTopic);
     messageBus.begin();
 
     if (!bleBridge.begin())

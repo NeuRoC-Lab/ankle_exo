@@ -155,27 +155,34 @@ class MotorCommand(StructPacket):
 
 @dataclass
 class TransparentControlCommand(StructPacket):
-    enabled : bool = False
-    kp : float = 0.5
-    kd : float = 0.01
-    a_derivative : float = 0.05
-    a_friction : float = 0.10
-    a_torque : float = 0.15
-    comp_torque : float = 0.08
-    trigger_on_trq : float = 0.025
-    trigger_off_trq : float = 0.010
-    max_abs_out_trq : float = 0.4
+    enabled: bool = False
 
-    FORMAT = "<b3x9f"
+    input_hp_cutoff_hz: float = 0.1
+    input_lp_cutoff_hz: float = 5.0
+    derivative_lp_cutoff_hz: float = 3.7
+    friction_lp_cutoff_hz: float = 5.0
+
+    kp: float = 0.5
+    kd: float = 0.01
+
+    comp_torque: float = 0.08
+
+    trigger_on_trq: float = 0.025
+    trigger_off_trq: float = 0.010
+
+    max_abs_out_trq: float = 0.4
+
+    FORMAT = "<?3x10f"
 
     def _values(self):
         return (
             self.enabled,
+            self.input_hp_cutoff_hz,
+            self.input_lp_cutoff_hz,
+            self.derivative_lp_cutoff_hz,
+            self.friction_lp_cutoff_hz,
             self.kp,
             self.kd,
-            self.a_derivative,
-            self.a_friction,
-            self.a_torque,
             self.comp_torque,
             self.trigger_on_trq,
             self.trigger_off_trq,

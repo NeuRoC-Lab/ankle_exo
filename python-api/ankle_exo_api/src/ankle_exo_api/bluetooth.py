@@ -90,6 +90,14 @@ RIGHT_INTERMEDIATE_TORQUE_UUID = (
     "B50F6E44-AB02-4C7A-A801-74A85815B002"
 )
 
+LEFT_CONTROLLER_OUTPUT_TORQUE_UUID = (
+    "B50F6E44-AB02-4C7A-A801-74A85815B003"
+)
+
+RIGHT_CONTROLLER_OUTPUT_TORQUE_UUID = (
+    "B50F6E44-AB02-4C7A-A801-74A85815B004"
+)
+
 
 class BluetoothManager:
     """Owns the BLE connection with the Arduino Nano"""
@@ -138,6 +146,8 @@ class BluetoothManager:
         self.ble_thread = None
 
         self.intermediate_torque = intermediate_torque
+        self.controller_output_torque = IntermediateTorque()
+
 
 
     def connect(self):
@@ -217,6 +227,29 @@ class BluetoothManager:
         )
 
         self.intermediate_torque._update_right(
+            value
+        )
+
+    def _fetch_left_controller_output_torque(
+            self,
+            sender,
+            data,
+        ):
+            value, = struct.unpack("<f", data)
+
+            self.controller_output_torque._update_left(
+            value
+        )
+
+
+    def _fetch_right_controller_output_torque(
+            self,
+            sender,
+            data,
+    ):
+        value, = struct.unpack("<f", data)
+
+        self.controller_output_torque._update_right(
             value
         )
 
@@ -562,6 +595,16 @@ class BluetoothManager:
                 await client.start_notify(
                     RIGHT_INTERMEDIATE_TORQUE_UUID,
                     self._fetch_right_intermediate_torque,
+                )
+
+                await client.start_notify(
+                    LEFT_CONTROLLER_OUTPUT_TORQUE_UUID,
+                    self._fetch_left_controller_output_torque,
+                )
+
+                await client.start_notify(
+                    RIGHT_CONTROLLER_OUTPUT_TORQUE_UUID,
+                    self._fetch_right_controller_output_torque,
                 )
 
                 for side in Side:

@@ -46,21 +46,23 @@ struct PowerReadings
 
 struct TransparentControllerParameters
 {
-	bool enabled;			// to enable / disable it
+    bool enabled; // enabled state => whenn set to false, transparent controller simply doesn't run
 
-    float kp;               // Proportional gain
-    float kd;               // Derivative gain
+    float input_hp_cutoff_hz;
+    float input_lp_cutoff_hz;
 
-    float a_derivative;     // Derivative filter alpha
-    float a_friction;       // Friction compensation filter alpha
-    float a_torque;         // Measured torque filter alpha
+    float derivative_lp_cutoff_hz;
+    float friction_lp_cutoff_hz;
 
-    float comp_torque;      // Cable friction compensation torque
+    float kp;
+    float kd;
 
-    float trigger_on_trq;   // Friction hysteresis ON threshold
-    float trigger_off_trq;  // Friction hysteresis OFF threshold
+    float comp_torque;
 
-    float max_abs_out_trq;  // Maximum absolute output torque
+    float trigger_on_trq;
+    float trigger_off_trq;
+
+    float max_abs_out_trq;
 };
 
 // to distinguish between Nano and
@@ -92,8 +94,11 @@ enum class EndpointId : uint8_t
    	LeftMotorTransparentParams,
    	RightMotorTransparentParams,
 
-	LeftMotorTransparentTorque,
-	RightMotorTransparentTorque,
+    LeftMotorTransparentTorque,
+    RightMotorTransparentTorque,
+
+    LeftMotorTransparentCommand,
+    RightMotorTransparentCommand,
 
     Ina232Snapshot, // PCB voltage and current readings from INA232
 	LoggingState,
@@ -140,16 +145,18 @@ struct TopicRoute
     X(LoadCellSnapshot,             LoadCellTorques,                  Both)   \
     X(LeftMotorSnapshot,            MotorFeedback,                   Both)   \
     X(RightMotorSnapshot,           MotorFeedback,                   Both)   \
-    X(LeftMotorCommand,             float,                           Teensy) \
-    X(RightMotorCommand,            float,                           Teensy) \
+    X(LeftMotorCommand,             float,                           Both) \
+    X(RightMotorCommand,            float,                           Both) \
     X(Ina232Snapshot,               PowerReadings,                   Both)   \
     X(LeftMotorEnabled,             bool,                            Teensy) \
     X(RightMotorEnabled,            bool,                            Teensy) \
     X(LoggingState,                 LoggingState,                    Both)   \
     X(LeftMotorTransparentParams,   TransparentControllerParameters, Both)   \
     X(RightMotorTransparentParams,  TransparentControllerParameters, Both)   \
-    X(LeftMotorTransparentTorque,   float,                           Both)   \
-    X(RightMotorTransparentTorque,  float,                           Both)
+    X(LeftMotorTransparentCommand,   float,                           Nano)   \
+    X(RightMotorTransparentCommand,  float,                           Nano) \
+    X(LeftMotorTransparentTorque,    float,                           Nano) \
+    X(RightMotorTransparentTorque,   float,                           Nano)
 
 template<EndpointId Id>
 struct EndpointTraits;
@@ -167,6 +174,9 @@ ENDPOINT_LIST(DEFINE_ENDPOINT_TRAIT)
 
 inline constexpr PlatformMask Teensy =
     platformBit(PlatformId::Teensy);
+
+inline constexpr PlatformMask Nano =
+    platformBit(PlatformId::Nano);
 
 inline constexpr PlatformMask Both =
     platformBit(PlatformId::Teensy) |

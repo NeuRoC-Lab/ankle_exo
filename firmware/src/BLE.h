@@ -85,6 +85,12 @@ constexpr char leftIntermediateTorqueCharacteristicUUID[] =
 constexpr char rightIntermediateTorqueCharacteristicUUID[] =
     "B50F6E44-AB02-4C7A-A801-74A85815B002";
 
+constexpr char leftControllerOutputTorqueCharacteristicUUID[] =
+    "B50F6E44-AB02-4C7A-A801-74A85815B003";
+
+constexpr char rightControllerOutputTorqueCharacteristicUUID[] =
+    "B50F6E44-AB02-4C7A-A801-74A85815B004";
+
 // =========================================================
 // BLE BRIDGE
 // =========================================================
@@ -95,14 +101,16 @@ class BLEBridge final :
 public:
 
 BLEBridge(
-    MessageBus& bus,
-    Topic<EncoderPositions>& encoder,
-    Topic<LoadCellTorques>& loadCells,
-    Topic<MotorFeedback>& leftMotor,
-    Topic<MotorFeedback>& rightMotor,
-    Topic<PowerReadings>& power,
-    Topic<float>& leftIntermediateTorque,
-    Topic<float>& rightIntermediateTorque)
+        MessageBus& bus,
+        Topic<EncoderPositions>& encoder,
+        Topic<LoadCellTorques>& loadCells,
+        Topic<MotorFeedback>& leftMotor,
+        Topic<MotorFeedback>& rightMotor,
+        Topic<PowerReadings>& power,
+        Topic<float>& leftIntermediateTorque,
+        Topic<float>& rightIntermediateTorque,
+        Topic<float>& leftControllerOutputTorque,
+        Topic<float>& rightControllerOutputTorque)
     :
     m_bus(bus),
 
@@ -120,6 +128,14 @@ BLEBridge(
 
     m_rightIntermediateTorque(
         rightIntermediateTorque
+    ),
+
+    m_leftControllerOutputTorque(
+        leftControllerOutputTorque
+    ),
+
+    m_rightControllerOutputTorque(
+        rightControllerOutputTorque
     ),
 
     // -------------------------------------------------
@@ -160,6 +176,18 @@ BLEBridge(
 
     m_rightIntermediateTorqueCharacteristic(
         rightIntermediateTorqueCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(float)
+    ),
+
+    m_leftControllerOutputTorqueCharacteristic(
+        leftControllerOutputTorqueCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(float)
+    ),
+
+    m_rightControllerOutputTorqueCharacteristic(
+        rightControllerOutputTorqueCharacteristicUUID,
         BLERead | BLENotify,
         sizeof(float)
     ),
@@ -246,17 +274,15 @@ BLEBridge(
     {
         if (!BLE.begin())
         {
+            Serial.println("Failed to start BLE");
             return false;
         }
 
 
-        BLE.setLocalName(
-            "AnkleExo"
-        );
+        BLE.setLocalName("AnkleExo");
+        BLE.setDeviceName("AnkleExo");
 
-        BLE.setAdvertisedService(
-            m_service
-        );
+        BLE.setAdvertisedService(m_service);
 
 
         // -------------------------------------------------
@@ -337,6 +363,14 @@ BLEBridge(
     	m_rightTransparentModeControllerCharacteristic
 		);
 
+    m_service.addCharacteristic(
+        m_leftControllerOutputTorqueCharacteristic
+    );
+
+    m_service.addCharacteristic(
+        m_rightControllerOutputTorqueCharacteristic
+    );
+
 
         // -------------------------------------------------
         // Left motor callbacks
@@ -404,7 +438,11 @@ BLEBridge(
             m_service
         );
 
-        BLE.advertise();
+        if (!BLE.advertise()) {
+            Serial.println("BLE.advertise FAILED");
+            return false;
+        }
+    Serial.println("BLE: advertising");
 
         return true;
     }
@@ -414,15 +452,30 @@ BLEBridge(
     // TASK UPDATE
     // =====================================================
 
-    void update(
-        uint32_t) override
+    void update(uint32_t nowUs) override
     {
         BLE.poll();
 
-        if (!BLE.connected())
-        {
+        static bool wasConnected = false;
+        const bool connected = BLE.connected();
+
+        if (wasConnected && !connected) {
+            Serial.println("BLE CENTRAL DISCONNECTED");
+        }
+
+        wasConnected = connected;
+
+        if (!connected) {
             return;
         }
+
+        constexpr uint32_t BLE_PERIOD_US = 20'000; // 50 Hz
+
+        if (nowUs - m_lastBlePublishUs < BLE_PERIOD_US) {
+            return;
+        }
+
+        m_lastBlePublishUs += BLE_PERIOD_US;
 
         publishChangedTopics();
     }
@@ -433,6 +486,7 @@ private:
     // =====================================================
     // TELEMETRY PUBLISHING
     // =====================================================
+    uint32_t m_lastBlePublishUs{0};
 
     void publishChangedTopics()
     {
@@ -476,6 +530,18 @@ private:
             m_rightIntermediateTorque,
             m_rightIntermediateTorqueCharacteristic,
             m_rightIntermediateTorqueSequence
+        );
+
+        publishIfChanged(
+            m_leftControllerOutputTorque,
+            m_leftControllerOutputTorqueCharacteristic,
+            m_leftControllerOutputTorqueSequence
+        );
+
+        publishIfChanged(
+            m_rightControllerOutputTorque,
+            m_rightControllerOutputTorqueCharacteristic,
+            m_rightControllerOutputTorqueSequence
         );
     }
 
@@ -856,6 +922,12 @@ private:
     Topic<float>&
         m_rightIntermediateTorque;
 
+    Topic<float>&
+        m_leftControllerOutputTorque;
+
+    Topic<float>&
+        m_rightControllerOutputTorque;
+
 
 
 
@@ -884,6 +956,12 @@ private:
     uint32_t
         m_rightIntermediateTorqueSequence{0};
 
+    uint32_t
+        m_leftControllerOutputTorqueSequence{0};
+
+    uint32_t
+        m_rightControllerOutputTorqueSequence{0};
+
 
     // =====================================================
     // BLE SERVICE
@@ -910,6 +988,12 @@ private:
 
 	BLECharacteristic
     	m_rightIntermediateTorqueCharacteristic;
+
+    BLECharacteristic
+        m_leftControllerOutputTorqueCharacteristic;
+
+    BLECharacteristic
+        m_rightControllerOutputTorqueCharacteristic;
 
 
     // =====================================================

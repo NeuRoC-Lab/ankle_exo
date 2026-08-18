@@ -839,4 +839,42 @@ private:
         m_writeErrors{0};
 };
 
+template<EndpointId Id>
+class TopicForwarder final : public ITask
+{
+public:
+    using Payload =
+        typename EndpointTraits<Id>::Payload;
+
+    TopicForwarder(
+        Topic<Payload>& topic,
+        MessageBus& bus)
+        :
+        m_topic(topic),
+        m_bus(bus)
+    {}
+
+    void update(uint32_t) override
+    {
+        if (!m_topic.valid()) {
+            return;
+        }
+
+        if (m_topic.sequence() == m_lastSequence) {
+            return;
+        }
+
+        m_lastSequence = m_topic.sequence();
+
+        m_bus.publish<Id>(
+            m_topic.latest()
+        );
+    }
+
+private:
+    Topic<Payload>& m_topic;
+    MessageBus& m_bus;
+    uint32_t m_lastSequence{0};
+};
+
 #endif
