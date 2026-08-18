@@ -190,7 +190,7 @@ class BluetoothManager:
         self.motors[side]._update(*values)
 
     def _fetch_loadcells(self, sender, data):
-        values = struct.unpack("<4f", data)
+        values = struct.unpack("<2f", data)
         if self.loadcells is not None:
             self.loadcells._update(*values)
 

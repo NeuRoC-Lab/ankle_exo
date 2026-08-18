@@ -62,26 +62,21 @@ class Encoders:
 class LoadCells:
     def __init__(self):
 
-        self.left1 = 0.0
-        self.left2 = 0.0
-        self.right1 = 0.0
-        self.right2 = 0.0
+        self.leftTorque = 0.0
+        self.rightTorque = 0.0
         self.lock = threading.Lock()
 
-    def _update(self,left1,left2,right1,right2):
+    def _update(self,leftTorque,rightTorque):
         with self.lock:
-            self.left1 = left1
-            self.left2 = left2
-            self.right1 = right1
-            self.right2 = right2
+            self.leftTorque = leftTorque
+            self.rightTorque = rightTorque
+
     def get_values(self):
-        """returns all four load cell forces in Newton (N)"""
+        """returns the net torque (Nm) for each side of the exo"""
         with self.lock:
             return (
-                self.left1,
-                self.left2,
-                self.right1,
-                self.right2,
+                self.leftTorque,
+                self.rightTorque,
             )
 
 # ==================== MOTOR LOGIC =======================

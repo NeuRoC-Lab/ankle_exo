@@ -282,18 +282,8 @@ void setup()
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.addTopic<EndpointId::LeftMotorTransparentParams>(leftMotorControllerParams);
     messageBus.addTopic<EndpointId::RightMotorTransparentParams>(rightMotorControllerParams);
-// NEW
-messageBus.addTopic<
-    EndpointId::LeftMotorTransparentTorque
->(
-    leftLegIntermediateTorque
-);
-
-messageBus.addTopic<
-    EndpointId::RightMotorTransparentTorque
->(
-    rightLegIntermediateTorque
-);
+    messageBus.addTopic<EndpointId::LeftMotorTransparentTorque>(leftLegIntermediateTorque);
+    messageBus.addTopic<EndpointId::RightMotorTransparentTorque>(rightLegIntermediateTorque);
     messageBus.begin();
 
     scheduler.add(messageBus);

@@ -386,16 +386,16 @@ BLEBridge(
         // Transparent Mode Controller Callback
         // -------------------------------------------------
 
-m_leftTransparentModeControllerCharacteristic
-    .setEventHandler(
-        BLEWritten,
-        leftTransparentModeControllerWrittenCallback
-    );
+    m_leftTransparentModeControllerCharacteristic
+        .setEventHandler(
+            BLEWritten,
+            leftTransparentModeControllerWrittenCallback
+        );
 
-m_rightTransparentModeControllerCharacteristic
-    .setEventHandler(
-        BLEWritten,
-        rightTransparentModeControllerWrittenCallback
+    m_rightTransparentModeControllerCharacteristic
+        .setEventHandler(
+            BLEWritten,
+            rightTransparentModeControllerWrittenCallback
     );
 
 
@@ -466,17 +466,17 @@ private:
             m_rightMotorSequence
         );
 
-publishIfChanged(
-    m_leftIntermediateTorque,
-    m_leftIntermediateTorqueCharacteristic,
-    m_leftIntermediateTorqueSequence
-);
+        publishIfChanged(
+            m_leftIntermediateTorque,
+            m_leftIntermediateTorqueCharacteristic,
+            m_leftIntermediateTorqueSequence
+        );
 
-publishIfChanged(
-    m_rightIntermediateTorque,
-    m_rightIntermediateTorqueCharacteristic,
-    m_rightIntermediateTorqueSequence
-);
+        publishIfChanged(
+            m_rightIntermediateTorque,
+            m_rightIntermediateTorqueCharacteristic,
+            m_rightIntermediateTorqueSequence
+        );
     }
 
 
@@ -850,11 +850,11 @@ private:
     Topic<PowerReadings>&
         m_power;
 
-Topic<float>&
-    m_leftIntermediateTorque;
+    Topic<float>&
+        m_leftIntermediateTorque;
 
-Topic<float>&
-    m_rightIntermediateTorque;
+    Topic<float>&
+        m_rightIntermediateTorque;
 
 
 
@@ -878,11 +878,11 @@ Topic<float>&
     uint32_t
         m_rightMotorSequence{0};
 
-uint32_t
-    m_leftIntermediateTorqueSequence{0};
+    uint32_t
+        m_leftIntermediateTorqueSequence{0};
 
-uint32_t
-    m_rightIntermediateTorqueSequence{0};
+    uint32_t
+        m_rightIntermediateTorqueSequence{0};
 
 
     // =====================================================
