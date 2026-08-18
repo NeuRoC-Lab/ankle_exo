@@ -8,9 +8,7 @@
 
 #include "board.h"
 
-// Keep this type available on BOTH MCUs because the Teensy needs to
-// deserialize LoadCellSnapshot messages even though it does not own the ADC.
-using LoadCellForces = std::array<float, LoadCellCount>;
+
 
 #if defined(PLATFORM_NANO)
 

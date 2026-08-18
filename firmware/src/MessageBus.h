@@ -41,94 +41,6 @@ public:
     virtual void update(uint32_t nowUs) = 0;
 };
 
-template<EndpointId Id>
-struct EndpointTraits;
-
-template<>
-struct EndpointTraits<
-    EndpointId::EncoderSnapshot>
-{
-    using Payload = EncoderPositions;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::LoadCellSnapshot>
-{
-    using Payload = LoadCellForces;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::LeftMotorSnapshot>
-{
-    using Payload = MotorFeedback;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::RightMotorSnapshot>
-{
-    using Payload = MotorFeedback;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::LeftMotorCommand>
-{
-    using Payload = float;
-};
-
-
-template<>
-struct EndpointTraits<
-    EndpointId::Ina232Snapshot>
-{
-    using Payload = PowerReadings;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::LeftMotorEnabled>
-{
-    using Payload = bool;
-};
-template<>
-struct EndpointTraits<
-    EndpointId::LoggingState>
-{
-    using Payload = LoggingState;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::RightMotorCommand>
-{
-    using Payload = float;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::RightMotorEnabled>
-{
-    using Payload = bool;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::LeftMotorTransparentParams>
-{
-    using Payload = TransparentControllerParameters;
-};
-
-template<>
-struct EndpointTraits<
-    EndpointId::RightMotorTransparentParams>
-{
-    using Payload = TransparentControllerParameters;
-};
-
-
 template<typename T>
 /**
  * @brief Publishes a new value to the topic.
@@ -191,122 +103,6 @@ private:
 };
 
 
-
-
-using PlatformMask = uint8_t; // a mask for indicating if a topic belongs to teensy or nano
-
-constexpr PlatformMask platformBit(
-    PlatformId platform)
-{
-    return static_cast<PlatformMask>(1U << static_cast<uint8_t>(platform));
-}
-
-struct TopicRoute
-{
-    PlatformMask subscribers{0};
-};
-
-inline constexpr std::array<TopicRoute,EndpointCount> TopicRoutes = []()
-{
-    std::array<
-        TopicRoute,
-        EndpointCount
-    > routes{};
-
-    const PlatformMask both =
-        platformBit(PlatformId::Teensy) |
-        platformBit(PlatformId::Nano);
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::EncoderSnapshot
-        )
-    ].subscribers = both;
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::LoadCellSnapshot
-        )
-    ].subscribers = both;
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::LeftMotorSnapshot
-        )
-    ].subscribers = both;
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::RightMotorSnapshot
-        )
-    ].subscribers = both;
-
-	routes[
-    static_cast<size_t>(
-        EndpointId::RightMotorCommand
-    )
-	].subscribers =
-    platformBit(
-        PlatformId::Teensy
-    );
-
-	routes[
-    static_cast<size_t>(
-        EndpointId::RightMotorEnabled
-    )
-	].subscribers =
-    platformBit(
-        PlatformId::Teensy
-    );
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::LeftMotorCommand
-        )
-    ].subscribers =
-        platformBit(PlatformId::Teensy);
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::Ina232Snapshot
-        )
-    ].subscribers =
-        platformBit(PlatformId::Teensy) |
-        platformBit(PlatformId::Nano);
-
-    routes[
-        static_cast<size_t>(
-            EndpointId::LeftMotorEnabled
-        )
-    ].subscribers =
-        platformBit(PlatformId::Teensy);
-
-	routes[
-    	static_cast<size_t>(
-        	EndpointId::LoggingState
-    	)
-	].subscribers =
-    	platformBit(PlatformId::Teensy) |
-		platformBit(PlatformId::Nano);
-
-	routes[
-    	static_cast<size_t>(
-        	EndpointId::LeftMotorTransparentParams
-    	)
-	].subscribers =
-    	platformBit(PlatformId::Teensy) |
-		platformBit(PlatformId::Nano);
-
-	routes[
-    	static_cast<size_t>(
-        	EndpointId::RightMotorTransparentParams
-    	)
-	].subscribers =
-    	platformBit(PlatformId::Teensy) |
-		platformBit(PlatformId::Nano);
-
-    return routes;
-}();
 
 template<typename T, size_t Capacity>
 class FixedQueue
@@ -620,7 +416,7 @@ public:
 
     SDLogger(
         SDCardDriver& sdCard,
-        Topic<LoadCellForces>& loadCells,
+        Topic<LoadCellTorques>& loadCells,
         Topic<EncoderPositions>& encoders,
         Topic<MotorFeedback>& leftMotor,
         Topic<MotorFeedback>& rightMotor,
@@ -1008,7 +804,7 @@ private:
     // =====================================================
 
     SDCardDriver& m_sdCard;
-    Topic<LoadCellForces>& m_loadCells;
+    Topic<LoadCellTorques>& m_loadCells;
     Topic<EncoderPositions>& m_encoders;
     Topic<MotorFeedback>& m_leftMotor;
 	Topic<MotorFeedback>& m_rightMotor;

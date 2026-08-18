@@ -19,7 +19,7 @@ UARTHandler uart(
 
 MessageBus messageBus(uart);
 
-Topic<LoadCellForces> loadCellTopic;
+Topic<LoadCellTorques> loadCellTopic;
 
 // make a virtual copy / "mirror" of the topics that are on the teensy to forward the communications to/from the BLE
 Topic<EncoderPositions> encoderTopic;
@@ -29,13 +29,15 @@ Topic<PowerReadings> ina232Topic;
 Topic<LoggingState> loggingStateTopic;
 Topic<TransparentControllerParameters> leftMotorControllerParams;
 Topic<TransparentControllerParameters> rightMotorControllerParams;
+Topic<float> leftLegIntermediateTorque;
+Topic<float> rightLegIntermediateTorque;
 
 LoadCellDriver loadCellDriver;
 
 PollingPublisher<
     LoadCellDriver,
     EndpointId::LoadCellSnapshot,
-    500 //TODO this is experimental, try a more conservative value like 1,000 (1kHz) if load cell values drop
+    1000 //TODO this is experimental, try a more conservative value like 1,000 (1kHz) if load cell values drop
 > loadCellPublisher(
     loadCellDriver,
     messageBus
@@ -47,7 +49,9 @@ BLEBridge bleBridge(
     loadCellTopic,
     leftMotorTopic,
     rightMotorTopic,
-    ina232Topic
+    ina232Topic,
+	leftLegIntermediateTorque,
+	rightLegIntermediateTorque
 );
 
 void setup()
@@ -74,6 +78,17 @@ void setup()
     messageBus.addTopic<EndpointId::RightMotorSnapshot>(rightMotorTopic);
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
+messageBus.addTopic<
+    EndpointId::LeftMotorTransparentTorque
+>(
+    leftLegIntermediateTorque
+);
+
+messageBus.addTopic<
+    EndpointId::RightMotorTransparentTorque
+>(
+    rightLegIntermediateTorque
+);
     messageBus.begin();
 
     if (!bleBridge.begin())

@@ -77,6 +77,14 @@ constexpr char leftTransparentModeControllerUUID[] =
 constexpr char rightTransparentModeControllerUUID[] =
     "A8B58E7F-4B57-4C5F-85E4-55F38A6CE271";
 
+// TENMPORARY
+
+constexpr char leftIntermediateTorqueCharacteristicUUID[] =
+    "B50F6E44-AB02-4C7A-A801-74A85815B001";
+
+constexpr char rightIntermediateTorqueCharacteristicUUID[] =
+    "B50F6E44-AB02-4C7A-A801-74A85815B002";
+
 // =========================================================
 // BLE BRIDGE
 // =========================================================
@@ -86,123 +94,148 @@ class BLEBridge final :
 {
 public:
 
-    BLEBridge(
-        MessageBus& bus,
-        Topic<EncoderPositions>& encoder,
-        Topic<LoadCellForces>& loadCells,
-        Topic<MotorFeedback>& leftMotor,
-        Topic<MotorFeedback>& rightMotor,
-        Topic<PowerReadings>& power)
-        :
-        m_bus(bus),
+BLEBridge(
+    MessageBus& bus,
+    Topic<EncoderPositions>& encoder,
+    Topic<LoadCellTorques>& loadCells,
+    Topic<MotorFeedback>& leftMotor,
+    Topic<MotorFeedback>& rightMotor,
+    Topic<PowerReadings>& power,
+    Topic<float>& leftIntermediateTorque,
+    Topic<float>& rightIntermediateTorque)
+    :
+    m_bus(bus),
 
-        m_encoder(encoder),
-        m_loadCells(loadCells),
+    m_encoder(encoder),
+    m_loadCells(loadCells),
 
-        m_leftMotor(leftMotor),
-        m_rightMotor(rightMotor),
+    m_leftMotor(leftMotor),
+    m_rightMotor(rightMotor),
 
-        m_power(power),
+    m_power(power),
 
-        m_service(
-            dataServiceUUID
-        ),
+    m_leftIntermediateTorque(
+        leftIntermediateTorque
+    ),
 
-        // -------------------------------------------------
-        // Shared telemetry
-        // -------------------------------------------------
+    m_rightIntermediateTorque(
+        rightIntermediateTorque
+    ),
 
-        m_encoderCharacteristic(
-            encoderCharacteristicUUID,
-            BLERead | BLENotify,
-            sizeof(EncoderPositions)
-        ),
+    // -------------------------------------------------
+    // BLE service
+    // -------------------------------------------------
 
-        m_loadCellCharacteristic(
-            loadCellCharacteristicUUID,
-            BLERead | BLENotify,
-            sizeof(LoadCellForces)
-        ),
+    m_service(
+        dataServiceUUID
+    ),
 
-        m_powerCharacteristic(
-            powerCharacteristicUUID,
-            BLERead | BLENotify,
-            sizeof(PowerReadings)
-        ),
+    // -------------------------------------------------
+    // Shared telemetry
+    // -------------------------------------------------
 
-        // -------------------------------------------------
-        // Left motor
-        // -------------------------------------------------
+    m_encoderCharacteristic(
+        encoderCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(EncoderPositions)
+    ),
 
-        m_leftMotorReplyCharacteristic(
-            leftMotorFeedbackCharacteristicUUID,
-            BLERead | BLENotify,
-            sizeof(MotorFeedback)
-        ),
+    m_loadCellCharacteristic(
+        loadCellCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(LoadCellTorques)
+    ),
 
-        m_leftMotorCommandCharacteristic(
-            leftMotorCommandCharacteristicUUID,
-            BLEWrite | BLEWriteWithoutResponse,
-            sizeof(float)
-        ),
+    m_powerCharacteristic(
+        powerCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(PowerReadings)
+    ),
 
-        m_leftMotorControlCharacteristic(
-            leftMotorControlCharacteristicUUID,
-            BLEWrite | BLEWriteWithoutResponse,
-            sizeof(bool)
-        ),
+    m_leftIntermediateTorqueCharacteristic(
+        leftIntermediateTorqueCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(float)
+    ),
 
-        // -------------------------------------------------
-        // Right motor
-        // -------------------------------------------------
+    m_rightIntermediateTorqueCharacteristic(
+        rightIntermediateTorqueCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(float)
+    ),
 
-        m_rightMotorReplyCharacteristic(
-            rightMotorFeedbackCharacteristicUUID,
-            BLERead | BLENotify,
-            sizeof(MotorFeedback)
-        ),
+    // -------------------------------------------------
+    // Left motor
+    // -------------------------------------------------
 
-        m_rightMotorCommandCharacteristic(
-            rightMotorCommandCharacteristicUUID,
-            BLEWrite | BLEWriteWithoutResponse,
-            sizeof(float)
-        ),
+    m_leftMotorReplyCharacteristic(
+        leftMotorFeedbackCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(MotorFeedback)
+    ),
 
-        m_rightMotorControlCharacteristic(
-            rightMotorControlCharacteristicUUID,
-            BLEWrite | BLEWriteWithoutResponse,
-            sizeof(bool)
-        ),
+    m_leftMotorCommandCharacteristic(
+        leftMotorCommandCharacteristicUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(float)
+    ),
 
-        // -------------------------------------------------
-        // SD logger
-        // -------------------------------------------------
+    m_leftMotorControlCharacteristic(
+        leftMotorControlCharacteristicUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(bool)
+    ),
 
-        m_loggingControlCharacteristic(
-            loggingControlCharacteristicUUID,
-            BLEWrite | BLEWriteWithoutResponse,
-            sizeof(LoggingState)
-        ),
+    // -------------------------------------------------
+    // Right motor
+    // -------------------------------------------------
 
-        // -------------------------------------------------
-        // Transparent Mode controller
-        // -------------------------------------------------
+    m_rightMotorReplyCharacteristic(
+        rightMotorFeedbackCharacteristicUUID,
+        BLERead | BLENotify,
+        sizeof(MotorFeedback)
+    ),
 
-        m_leftTransparentModeControllerCharacteristic(
-    	leftTransparentModeControllerUUID,
-    	BLEWrite | BLEWriteWithoutResponse,
-    	sizeof(TransparentControllerParameters)
-	),
+    m_rightMotorCommandCharacteristic(
+        rightMotorCommandCharacteristicUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(float)
+    ),
 
-		m_rightTransparentModeControllerCharacteristic(
-    rightTransparentModeControllerUUID,
-    BLEWrite | BLEWriteWithoutResponse,
-    sizeof(TransparentControllerParameters)
-	)
+    m_rightMotorControlCharacteristic(
+        rightMotorControlCharacteristicUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(bool)
+    ),
 
-    {
-        s_instance = this;
-    }
+    // -------------------------------------------------
+    // SD logger
+    // -------------------------------------------------
+
+    m_loggingControlCharacteristic(
+        loggingControlCharacteristicUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(LoggingState)
+    ),
+
+    // -------------------------------------------------
+    // Transparent mode controller
+    // -------------------------------------------------
+
+    m_leftTransparentModeControllerCharacteristic(
+        leftTransparentModeControllerUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(TransparentControllerParameters)
+    ),
+
+    m_rightTransparentModeControllerCharacteristic(
+        rightTransparentModeControllerUUID,
+        BLEWrite | BLEWriteWithoutResponse,
+        sizeof(TransparentControllerParameters)
+    )
+{
+    s_instance = this;
+}
 
 
     // =====================================================
@@ -242,6 +275,13 @@ public:
             m_powerCharacteristic
         );
 
+		m_service.addCharacteristic(
+   		 m_leftIntermediateTorqueCharacteristic
+		);
+
+		m_service.addCharacteristic(
+    		m_rightIntermediateTorqueCharacteristic
+		);
 
         // -------------------------------------------------
         // Left motor
@@ -425,6 +465,18 @@ private:
             m_rightMotorReplyCharacteristic,
             m_rightMotorSequence
         );
+
+publishIfChanged(
+    m_leftIntermediateTorque,
+    m_leftIntermediateTorqueCharacteristic,
+    m_leftIntermediateTorqueSequence
+);
+
+publishIfChanged(
+    m_rightIntermediateTorque,
+    m_rightIntermediateTorqueCharacteristic,
+    m_rightIntermediateTorqueSequence
+);
     }
 
 
@@ -786,7 +838,7 @@ private:
     Topic<EncoderPositions>&
         m_encoder;
 
-    Topic<LoadCellForces>&
+    Topic<LoadCellTorques>&
         m_loadCells;
 
     Topic<MotorFeedback>&
@@ -797,6 +849,12 @@ private:
 
     Topic<PowerReadings>&
         m_power;
+
+Topic<float>&
+    m_leftIntermediateTorque;
+
+Topic<float>&
+    m_rightIntermediateTorque;
 
 
 
@@ -820,6 +878,12 @@ private:
     uint32_t
         m_rightMotorSequence{0};
 
+uint32_t
+    m_leftIntermediateTorqueSequence{0};
+
+uint32_t
+    m_rightIntermediateTorqueSequence{0};
+
 
     // =====================================================
     // BLE SERVICE
@@ -840,6 +904,12 @@ private:
 
     BLECharacteristic
         m_powerCharacteristic;
+
+	BLECharacteristic
+    	m_leftIntermediateTorqueCharacteristic;
+
+	BLECharacteristic
+    	m_rightIntermediateTorqueCharacteristic;
 
 
     // =====================================================
@@ -881,11 +951,11 @@ private:
     //TRANSPARENT MODE CONTROLLER CHARACTERISTIC
     // =====================================================
 
-BLECharacteristic
-    m_leftTransparentModeControllerCharacteristic;
+	BLECharacteristic
+    	m_leftTransparentModeControllerCharacteristic;
 
-BLECharacteristic
-    m_rightTransparentModeControllerCharacteristic;
+	BLECharacteristic
+    	m_rightTransparentModeControllerCharacteristic;
 };
 
 #endif

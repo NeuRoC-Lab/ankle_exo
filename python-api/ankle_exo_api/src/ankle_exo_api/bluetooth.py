@@ -15,6 +15,7 @@ from .peripherals import (
     SDLoggerControlCmd,
     Power,
     TransparentControlCommand,
+    IntermediateTorque,
 )
 
 class Side(Enum):
@@ -81,14 +82,25 @@ TRANSPARENT_CONTROLLER_UUIDS = {
         RIGHT_TRANSPARENT_CONTROLLER_UUID,
 }
 
+LEFT_INTERMEDIATE_TORQUE_UUID = (
+    "B50F6E44-AB02-4C7A-A801-74A85815B001"
+)
+
+RIGHT_INTERMEDIATE_TORQUE_UUID = (
+    "B50F6E44-AB02-4C7A-A801-74A85815B002"
+)
+
+
 class BluetoothManager:
     """Owns the BLE connection with the Arduino Nano"""
-    def __init__(self,
+    def __init__(
+            self,
             encoders: Encoders,
             loadcells: LoadCells,
             power: Power,
             left_motor: Motor,
             right_motor: Motor,
+            intermediate_torque: IntermediateTorque,
             stop_event):
 
         self.encoders = encoders # two encoders
@@ -124,6 +136,8 @@ class BluetoothManager:
         #TODO determine if that is really necessary
 
         self.ble_thread = None
+
+        self.intermediate_torque = intermediate_torque
 
 
     def connect(self):
@@ -161,6 +175,8 @@ class BluetoothManager:
             or not self.control_queues[Side.LEFT].empty()
             or not self.control_queues[Side.RIGHT].empty()
             or not self.sd_queue.empty()
+            or not self.transparent_queues.values()[Side.LEFT].empty()
+            or not self.transparent_queues.values()[Side.RIGHT].empty()
         )
 
     def _fetch_motor(self, sender, data, side: Side):
@@ -177,6 +193,33 @@ class BluetoothManager:
         values = struct.unpack("<4f", data)
         if self.loadcells is not None:
             self.loadcells._update(*values)
+
+    def _fetch_left_intermediate_torque(self,sender,data):
+
+        value, = struct.unpack(
+            "<f",
+            data
+        )
+
+        self.intermediate_torque._update_left(
+            value
+    )
+
+
+    def _fetch_right_intermediate_torque(
+            self,
+            sender,
+            data):
+
+        value, = struct.unpack(
+            "<f",
+            data
+        )
+
+        self.intermediate_torque._update_right(
+            value
+        )
+
     def _fetch_power(self, sender, data):
         values = struct.unpack("<3f", data)
         if self.power is None:
@@ -509,6 +552,16 @@ class BluetoothManager:
                 await client.start_notify(
                     POWER_UUID,
                     self._fetch_power,
+                )
+
+                await client.start_notify(
+                    LEFT_INTERMEDIATE_TORQUE_UUID,
+                    self._fetch_left_intermediate_torque,
+                )
+
+                await client.start_notify(
+                    RIGHT_INTERMEDIATE_TORQUE_UUID,
+                    self._fetch_right_intermediate_torque,
                 )
 
                 for side in Side:

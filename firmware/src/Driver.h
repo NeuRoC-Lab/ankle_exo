@@ -23,12 +23,7 @@ public:
 };
 
 
-struct PowerReadings
-{
-    float batteryVoltage;
-    float pcbCurrent;
-    float pcbPower;
-};
+
 
 #if defined(PLATFORM_TEENSY)
 
@@ -633,7 +628,7 @@ private:
 #if defined(PLATFORM_NANO)
 
 class LoadCellDriver :
-    public Driver<LoadCellForces>
+    public Driver<LoadCellTorques>
 {
 public:
     bool begin() override
@@ -677,13 +672,13 @@ public:
         return true;
     }
 
-    LoadCellForces sample() override
+    LoadCellTorques sample() override
     {
         if (!performScan()) {
             return {};
         }
 
-        LoadCellForces forces{};
+        LoadCellTorques torques{};
 
         for (size_t i = 0; i < LoadCellCount; ++i)
         {
@@ -691,11 +686,12 @@ public:
                 rawToDiffVoltage(m_rawBuffer[i])
             );
 
-            forces[i] =
-                m_loadCells[i].sampleForce();
+            torques[i] =
+                LOAD_CELL_LEVER_ARM * (m_loadCells[i].sampleForce() - m_loadCells[i+1].sampleForce());
+                //TODO determine if the substraction needs to be reversed for the force substraction. Or change the order in board.h
         }
 
-        return forces;
+        return torques;
     }
 
 private:

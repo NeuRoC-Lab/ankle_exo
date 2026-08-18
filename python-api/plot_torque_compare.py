@@ -106,14 +106,36 @@ def analyze_file(filename, side):
             f"No gait cycles found in {filename}"
         )
 
+    # Mean and SD torque waveform
     mean = np.mean(cycles, axis=0)
     std = np.std(cycles, axis=0)
+
+    # -------------------------------------------------
+    # Mean Absolute Interaction Torque (MAIT)
+    # -------------------------------------------------
+    # Calculate MAIT separately for every gait cycle.
+    #
+    # Because every cycle has been resampled uniformly
+    # over 0–100% gait, the mean absolute torque is
+    # equivalent to the normalized integral:
+    #
+    # MAIT = (1 / gait_cycle) * integral(|torque| dphase)
+    #
+    mait_cycles = np.mean(np.abs(cycles), axis=1)
+
+    mait_mean = np.mean(mait_cycles)
+    mait_std = np.std(mait_cycles, ddof=1)
 
     print(
         f"{filename}: {len(cycles)} gait cycles"
     )
 
-    return gait, mean, std
+    print(
+        f"  MAIT = {mait_mean:.3f} +/- "
+        f"{mait_std:.3f} N m"
+    )
+
+    return gait, mean, std, mait_cycles
 
 
 parser = argparse.ArgumentParser()
@@ -130,24 +152,71 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-gait1, mean1, std1 = analyze_file(
+gait1, mean1, std1, mait1 = analyze_file(
     args.file1,
     args.side
 )
 
-gait2, mean2, std2 = analyze_file(
+gait2, mean2, std2, mait2 = analyze_file(
     args.file2,
     args.side
 )
 
 
+# -------------------------------------------------
+# Compare MAIT
+# -------------------------------------------------
+
+mait_mean1 = np.mean(mait1)
+mait_mean2 = np.mean(mait2)
+
+reduction = mait_mean1 - mait_mean2
+
+if mait_mean1 != 0:
+    reduction_percent = (
+                                reduction / mait_mean1
+                        ) * 100
+else:
+    reduction_percent = np.nan
+
+
+print()
+print("MAIT comparison")
+print("----------------")
+
+print(
+    f"{Path(args.file1).stem}: "
+    f"{mait_mean1:.3f} N m"
+)
+
+print(
+    f"{Path(args.file2).stem}: "
+    f"{mait_mean2:.3f} N m"
+)
+
+print(
+    f"Difference: "
+    f"{reduction:.3f} N m"
+)
+
+print(
+    f"Reduction: "
+    f"{reduction_percent:.1f} %"
+)
+
+
+# -------------------------------------------------
 # Plot
+# -------------------------------------------------
 
 plt.plot(
     gait1,
     mean1,
     linewidth=2,
-    label=Path(args.file1).stem
+    label=(
+        f"{Path(args.file1).stem} "
+        f"(MAIT={mait_mean1:.2f} N m)"
+    )
 )
 
 plt.fill_between(
@@ -161,7 +230,10 @@ plt.plot(
     gait2,
     mean2,
     linewidth=2,
-    label=Path(args.file2).stem
+    label=(
+        f"{Path(args.file2).stem} "
+        f"(MAIT={mait_mean2:.2f} N m)"
+    )
 )
 
 plt.fill_between(

@@ -29,6 +29,7 @@ from .peripherals import (
     MotorControlCmd,
     SDLoggerControlCmd,
     TransparentControlCommand,
+    IntermediateTorque,
 )
 
 
@@ -50,6 +51,9 @@ class Exoskeleton:
 
         self.encoders = Encoders()
         self.loadcells = LoadCells()
+        self.intermediate_torque = (
+            IntermediateTorque()
+        )
         self.power = Power()
 
 
@@ -93,12 +97,19 @@ class Exoskeleton:
             encoders=self.encoders,
             loadcells=self.loadcells,
             power=self.power,
+
             left_motor=self.motors[
                 Side.LEFT
             ],
+
             right_motor=self.motors[
                 Side.RIGHT
             ],
+
+            intermediate_torque=(
+                self.intermediate_torque
+            ),
+
             stop_event=self.stop_event,
         )
 
@@ -249,25 +260,30 @@ class Exoskeleton:
     # TRANSPARENT MODE CONTROL
     # =====================================================
 
-    def update_transparent_params(self,side:Side,updates: dict):
+    def update_transparent_params(self, side: Side, updates: dict):
         self._check_connection()
-        update = self.transparent[side]
-        try:
-            update.enabled = updates["enabled"]
-            update.kp = updates["kp"]
-            update.kd = updates["kd"]
-            update.a_derivative = updates["a_derivative"]
-            update.a_friction = updates["a_friction"]
-            update.a_torque = updates["a_torque"]
-            update.comp_torque = updates["comp_torque"]
-            update.trigger_on_trq = updates["trigger_on_trq"]
-            update.trigger_off_trq = updates["trigger_off_trq"]
-            update.max_abs_out_trq = updates["max_abs_out_trq"]
 
-            self.bluetooth.queue_transparent_command(side,update)
+        try:
+            command = TransparentControlCommand() # CREATE A SNAPSHOT INSTEAD OF COPYING BY REFERENCE
+
+            command.enabled = updates["enabled"]
+            command.kp = updates["kp"]
+            command.kd = updates["kd"]
+            command.a_derivative = updates["a_derivative"]
+            command.a_friction = updates["a_friction"]
+            command.a_torque = updates["a_torque"]
+            command.comp_torque = updates["comp_torque"]
+            command.trigger_on_trq = updates["trigger_on_trq"]
+            command.trigger_off_trq = updates["trigger_off_trq"]
+            command.max_abs_out_trq = updates["max_abs_out_trq"]
+
+            self.bluetooth.queue_transparent_command(
+                side,
+                command
+            )
+
         except KeyError:
             print("Invalid or missing parameters")
-            return
 
     # =====================================================
     # MOTOR MIT COMMAND to fix (OUTDATED)
@@ -485,6 +501,26 @@ class Exoskeleton:
     # =====================================================
     # ENCODERS
     # =====================================================
+
+    # =====================================================
+# INTERMEDIATE / FILTERED TORQUE
+# =====================================================
+
+    def get_intermediate_torque(
+            self,
+            side: Side):
+
+        self._check_connection()
+
+        left, right = (
+            self.intermediate_torque
+            .get_values()
+        )
+
+        if side == Side.LEFT:
+            return left
+
+        return right
 
     def get_encoder(
             self,

@@ -197,3 +197,35 @@ class SDLoggerControlCmd(ByteCommand):
     STOP_RECORDING = 0
     START_RECORDING = 1
 
+# ==================== INTERMEDIATE TORQUE =======================
+
+class IntermediateTorque:
+    """
+    Stores the HP-filtered interaction torque
+    received from the embedded controller.
+    """
+
+    def __init__(self):
+
+        self.left = 0.0
+        self.right = 0.0
+
+        self.lock = threading.Lock()
+
+
+    def _update_left(self, value):
+        with self.lock:
+            self.left = float(value)
+
+
+    def _update_right(self, value):
+        with self.lock:
+            self.right = float(value)
+
+
+    def get_values(self):
+        with self.lock:
+            return (
+                self.left,
+                self.right,
+            )

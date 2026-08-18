@@ -4,6 +4,65 @@
 #include <cstddef>
 #include <cstdint>
 
+// ENCODER TYPES
+
+struct EncoderRawPositions
+{
+    uint16_t left;
+    uint16_t right;
+};
+
+struct EncoderPositions
+{
+    float left;
+    float right;
+};
+
+//LOAD CELL TYPES
+
+// load cell torques are more useful than raw forces
+using LoadCellTorques = std::array<float, 2>;
+
+//MOTOR TYPES
+
+//note : a new struct which only transmits useful informations to the user. If you need position and/or velocity add it here
+struct MotorFeedback
+{
+   float torque{0.0f};
+   uint8_t temperature{0};
+   uint8_t error{0};
+};
+
+// INA232
+
+struct PowerReadings
+{
+    float batteryVoltage;
+    float pcbCurrent;
+    float pcbPower;
+};
+
+// Motor controllers
+
+struct TransparentControllerParameters
+{
+	bool enabled;			// to enable / disable it
+
+    float kp;               // Proportional gain
+    float kd;               // Derivative gain
+
+    float a_derivative;     // Derivative filter alpha
+    float a_friction;       // Friction compensation filter alpha
+    float a_torque;         // Measured torque filter alpha
+
+    float comp_torque;      // Cable friction compensation torque
+
+    float trigger_on_trq;   // Friction hysteresis ON threshold
+    float trigger_off_trq;  // Friction hysteresis OFF threshold
+
+    float max_abs_out_trq;  // Maximum absolute output torque
+};
+
 // to distinguish between Nano and
 enum class PlatformId : uint8_t
 {
@@ -33,6 +92,9 @@ enum class EndpointId : uint8_t
    	LeftMotorTransparentParams,
    	RightMotorTransparentParams,
 
+	LeftMotorTransparentTorque,
+	RightMotorTransparentTorque,
+
     Ina232Snapshot, // PCB voltage and current readings from INA232
 	LoggingState,
 
@@ -59,40 +121,68 @@ struct BusMessage
     std::array<uint8_t, MaxPayloadSize> payload{}; // bounded array for safety
 };
 
-struct TransparentControllerParameters
+
+using PlatformMask = uint8_t; // a mask for indicating if a topic belongs to teensy or nano
+
+constexpr PlatformMask platformBit(
+    PlatformId platform)
 {
-	bool enabled;			// to enable / disable it
+    return static_cast<PlatformMask>(1U << static_cast<uint8_t>(platform));
+}
 
-    float kp;               // Proportional gain
-    float kd;               // Derivative gain
-
-    float a_derivative;     // Derivative filter alpha
-    float a_friction;       // Friction compensation filter alpha
-    float a_torque;         // Measured torque filter alpha
-
-    float comp_torque;      // Cable friction compensation torque
-
-    float trigger_on_trq;   // Friction hysteresis ON threshold
-    float trigger_off_trq;  // Friction hysteresis OFF threshold
-
-    float max_abs_out_trq;  // Maximum absolute output torque
+struct TopicRoute
+{
+    PlatformMask subscribers{0};
 };
 
-constexpr TransparentControllerParameters
-    DEFAULT_TRANSPARENT_CONTROLLER_PARAMETERS
+#define ENDPOINT_LIST(X)                                                \
+    X(EncoderSnapshot,              EncoderPositions,                Both)   \
+    X(LoadCellSnapshot,             LoadCellTorques,                  Both)   \
+    X(LeftMotorSnapshot,            MotorFeedback,                   Both)   \
+    X(RightMotorSnapshot,           MotorFeedback,                   Both)   \
+    X(LeftMotorCommand,             float,                           Teensy) \
+    X(RightMotorCommand,            float,                           Teensy) \
+    X(Ina232Snapshot,               PowerReadings,                   Both)   \
+    X(LeftMotorEnabled,             bool,                            Teensy) \
+    X(RightMotorEnabled,            bool,                            Teensy) \
+    X(LoggingState,                 LoggingState,                    Both)   \
+    X(LeftMotorTransparentParams,   TransparentControllerParameters, Both)   \
+    X(RightMotorTransparentParams,  TransparentControllerParameters, Both)   \
+    X(LeftMotorTransparentTorque,   float,                           Both)   \
+    X(RightMotorTransparentTorque,  float,                           Both)
+
+template<EndpointId Id>
+struct EndpointTraits;
+
+#define DEFINE_ENDPOINT_TRAIT(name, payload, subscribers) \
+    template<>                                            \
+    struct EndpointTraits<EndpointId::name>               \
+    {                                                     \
+        using Payload = payload;                          \
+    };
+
+ENDPOINT_LIST(DEFINE_ENDPOINT_TRAIT)
+
+#undef DEFINE_ENDPOINT_TRAIT
+
+inline constexpr PlatformMask Teensy =
+    platformBit(PlatformId::Teensy);
+
+inline constexpr PlatformMask Both =
+    platformBit(PlatformId::Teensy) |
+    platformBit(PlatformId::Nano);
+
+inline constexpr std::array<TopicRoute, EndpointCount> TopicRoutes = []()
 {
-	.enabled 		= false,
-    .kp              = 0.5f,
-    .kd              = 0.01f,
+    std::array<TopicRoute, EndpointCount> routes{};
 
-    .a_derivative    = 0.05f,
-    .a_friction      = 0.10f,
-    .a_torque        = 0.15f,
+#define DEFINE_ROUTE(name, payload, subscriber_mask)                \
+    routes[static_cast<size_t>(EndpointId::name)].subscribers =     \
+        subscriber_mask;
 
-    .comp_torque     = 0.08f,
+    ENDPOINT_LIST(DEFINE_ROUTE)
 
-    .trigger_on_trq  = 0.025f,
-    .trigger_off_trq = 0.010f,
+#undef DEFINE_ROUTE
 
-    .max_abs_out_trq = 0.4f
-};
+    return routes;
+}();

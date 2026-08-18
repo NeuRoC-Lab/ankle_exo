@@ -6,23 +6,6 @@
 
 #include "board.h"
 
-enum class Side : uint8_t
-{
-    Left,
-    Right,
-};
-
-struct EncoderRawPositions
-{
-    uint16_t left;
-    uint16_t right;
-};
-
-struct EncoderPositions
-{
-    float left;
-    float right;
-};
 
 #if defined(PLATFORM_TEENSY)
 

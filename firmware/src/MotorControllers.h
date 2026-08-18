@@ -8,6 +8,29 @@
 #include <cstdint>
 
 
+// default values for the transparent controller. By default disable it btw
+// these values were tested safely on the test bench, however it hasn't been validated when the exo is worn.
+
+constexpr TransparentControllerParameters
+    DEFAULT_TRANSPARENT_CONTROLLER_PARAMETERS
+{
+	.enabled 		= false,
+    .kp              = 0.5f,
+    .kd              = 0.01f,
+
+    .a_derivative    = 0.05f,
+    .a_friction      = 0.10f,
+    .a_torque        = 0.15f,
+
+    .comp_torque     = 0.08f,
+
+    .trigger_on_trq  = 0.025f,
+    .trigger_off_trq = 0.010f,
+
+    .max_abs_out_trq = 0.4f
+};
+
+
 #if defined(PLATFORM_TEENSY)
 
 class MotorCommandTask : public ITask
@@ -31,7 +54,7 @@ public:
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t PERIOD_US = 1'000;
+        static constexpr uint32_t PERIOD_US = 1'000; // update at 1kHz
 
         processmotorEnabled();
 
@@ -42,7 +65,7 @@ public:
 
         if (!m_enabled)
         {
-            m_motor.apply(0.0f);
+            m_motor.apply(0.0f); // set a zero torque command to disable the motor
             return;
         }
 
@@ -63,7 +86,7 @@ private:
             return;
 
         if (m_motorEnabled.sequence() == m_lastControlSequence)
-            return;
+            return; // only accept new commands
 
         m_lastControlSequence = m_motorEnabled.sequence();
 
@@ -78,6 +101,8 @@ private:
     bool m_lastControlSequence{0};
     uint32_t m_previousUs{0};
 };
+
+//to fix : find an alternative way to using a ring buffer or move it to a separate header file
 
 template<typename T, size_t Capacity>
 class RingBuffer
@@ -132,6 +157,7 @@ private:
 
     volatile size_t m_dropped{0};
 };
+
 
 class MotorCanReceiver final : public ITask
 {
@@ -195,7 +221,7 @@ class DummyController final :
 public:
     DummyController(
         Topic<EncoderPositions>& encoders,
-        Topic<LoadCellForces>& loadCells,
+        Topic<LoadCellTorques>& loadCells,
         Topic<MotorFeedback>& leftMotor,
 		Topic<MotorFeedback>& rightMotor,
         Topic<PowerReadings>& power)
@@ -346,7 +372,7 @@ private:
 
 private:
     Topic<EncoderPositions>& m_encoders;
-    Topic<LoadCellForces>& m_loadCells;
+    Topic<LoadCellTorques>& m_loadCells;
     Topic<MotorFeedback>& m_leftMotor;
     Topic<PowerReadings>& m_power;
     Topic<MotorFeedback>& m_rightMotor;
@@ -354,13 +380,10 @@ private:
     uint32_t m_previousPrintUs{0};
 };
 
-enum class ExoSide : uint8_t
-{
-    Left,
-    Right
-};
 
-template<ExoSide Side>
+// =========== JOINT LIMIT CONTROLLER = POSITION CONTROL ============
+
+template<Side side>
 class JointLimitController final :
     public ITask
 {
@@ -379,10 +402,7 @@ public:
         static constexpr uint32_t
             PERIOD_US = 5'000; // 200 Hz
 
-        if (
-            nowUs - m_previousUpdateUs <
-            PERIOD_US
-        )
+        if (nowUs - m_previousUpdateUs < PERIOD_US)
         {
             return;
         }
@@ -396,41 +416,23 @@ public:
         }
 
 
-        const float position =
-            getPosition(
-                m_encoders.latest()
-            );
-
-
+        const float position = getPosition(m_encoders.latest());
         /*
          * Absolute limit:
          * immediately request that the
          * selected motor exits motor mode.
          */
-        if (
-            fabsf(position) >=
-            ABSOLUTE_LIMIT
-        )
+        if (fabsf(position) >= ABSOLUTE_LIMIT)
         {
             if (!m_limitTriggered)
             {
                 m_motorControl.publish(false);
-
                 m_limitTriggered = true;
-
-                Serial.print(
-                    sideName()
-                );
-
-                Serial.println(
-                    " absolute joint limit breached"
-                );
+                Serial.print(sideName());
+                Serial.println("absolute joint limit breached");
             }
-
             return;
         }
-
-
         /*
          * Once the joint returns inside the
          * absolute limit, allow the safety
@@ -446,10 +448,7 @@ public:
          * You can later use this region for
          * torque limiting / soft-stop behavior.
          */
-        if (
-            fabsf(position) >=
-            SOFTWARE_LIMIT
-        )
+        if (fabsf(position) >=SOFTWARE_LIMIT)
         {
             // Optional:
             //
@@ -462,12 +461,12 @@ public:
 
 
 private:
+    //to fix : think about moving this to Encoders.h
 
-    static float getPosition(
-        const EncoderPositions& encoders)
+    static float getPosition(const EncoderPositions& encoders)
     {
         if constexpr (
-            Side == ExoSide::Left
+            side == Side::Left
         )
         {
             return static_cast<float>(
@@ -487,7 +486,7 @@ private:
     sideName()
     {
         if constexpr (
-            Side == ExoSide::Left
+            side == Side::Left
         )
         {
             return "LEFT";
@@ -521,104 +520,92 @@ private:
         m_limitTriggered{false};
 };
 
-
-
-
-
-template<ExoSide Side>
-class TransparentModeController final :
-    public ITask
+// =========================== MAIN TRANSPARENT MODE CONTROLLER =====================================
+template<Side side>
+class TransparentModeController final : public ITask
 {
 public:
     TransparentModeController(
-        Topic<EncoderPositions>& encoders,
-        Topic<LoadCellForces>& loadCells,
+        Topic<LoadCellTorques>& loadCells,
         Topic<MotorFeedback>& motorFeed,
         Topic<float>& motorCmd,
-        Topic<TransparentControllerParameters>& params)
+        Topic<TransparentControllerParameters>& params,
+		Topic<float>& loadCellsIntermediateTorque
+		)
         :
-        m_encoders(encoders),
         m_loadcells(loadCells),
         m_motorFeed(motorFeed),
         m_motorCmd(motorCmd),
-        m_params(params)
+        m_params(params),
+		m_loadCellsIntermediateTorque(loadCellsIntermediateTorque)
     {}
 
 
     void update(uint32_t nowUs) override
     {
-        static constexpr uint32_t
-            PERIOD_US = 1'000;
+        static constexpr uint32_t PERIOD_US = 1'000; // 1 kHz
 
-        if (
-            nowUs - m_previousUpdateUs <
-            PERIOD_US
-        )
+        if (nowUs - m_previousUpdateUs < PERIOD_US)
         {
             return;
         }
 
         m_previousUpdateUs = nowUs;
 
-        if (
-            !m_loadcells.valid() ||
-            !m_params.valid()
-        )
+        if (!m_loadcells.valid() || !m_params.valid())
         {
             return;
         }
 
-        if(!m_params.latest().enabled){
+        if (!m_params.latest().enabled)
+        {
             return;
         }
 
-        /*
-         * Snapshot the parameters once for this control iteration.
-         *
-         * This guarantees that every calculation in this update
-         * uses the same parameter set.
-         */
-        const auto& params =
-            m_params.latest();
+        const auto& params = m_params.latest();
 
-        const auto& loadcellSnapshot =
-            m_loadcells.latest();
+        const auto& loadcellSnapshot = m_loadcells.latest();
+
+        const float measuredTorque = loadcellSnapshot[static_cast<uint8_t>(side)]; // to differentiate left and right
 
 
-        const float force1 =
-            loadcellSnapshot[
-                static_cast<size_t>(
-                    firstLoadCell()
-                )
-            ];
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
 
-        const float force2 =
-            loadcellSnapshot[
-                static_cast<size_t>(
-                    secondLoadCell()
-                )
-            ];
-
-
-        const float measuredTorque =
-            torqueSign()
-            *
-            (force1 - force2)
-            *
-            LOAD_CELL_LEVER_ARM;
-
-
-        /*
-         * Initialize filter states with the first valid
-         * torque measurement.
-         */
         if (!m_initialized)
         {
-            m_filteredTorque =
+            /*
+             * Initialize the HP input history to the
+             * current measured value.
+             *
+             * This prevents the initial DC offset from
+             * appearing as a huge transient.
+             */
+            m_hpPreviousInput =
                 measuredTorque;
 
+            m_hpPreviousOutput =
+                0.0f;
+
+
+            /*
+             * The high-pass output starts at zero,
+             * therefore initialize the low-pass state
+             * around zero as well.
+             */
+            m_lpX1 = 0.0f;
+            m_lpX2 = 0.0f;
+
+            m_lpY1 = 0.0f;
+            m_lpY2 = 0.0f;
+
+
+            m_filteredTorque =
+                0.0f;
+
             m_previousFilteredTorque =
-                measuredTorque;
+                0.0f;
 
             m_filteredTorqueDerivative =
                 0.0f;
@@ -649,25 +636,76 @@ public:
         }
 
 
-        /*
-         * Measured torque low-pass filter.
-         */
-        m_filteredTorque =
-            params.a_torque
-            *
-            measuredTorque
+        // =====================================================
+        // 1) HIGH-PASS FILTER
+        //
+        // 1st-order Butterworth
+        // fc = 0.5 Hz
+        // fs = 1000 Hz
+        // =====================================================
+
+        const float highPassTorque =
+            HP_B0 * measuredTorque
             +
-            (
-                1.0f -
-                params.a_torque
-            )
-            *
-            m_filteredTorque;
+            HP_B1 * m_hpPreviousInput
+            -
+            HP_A1 * m_hpPreviousOutput;
+
+
+        m_hpPreviousInput =
+            measuredTorque;
+
+        m_hpPreviousOutput =
+            highPassTorque;
+
+
+
+        // =====================================================
+        // 2) LOW-PASS FILTER
+        //
+        // 2nd-order Butterworth
+        // fc = 2.0 Hz
+        // fs = 1000 Hz
+        // =====================================================
+
+        const float lowPassTorque =
+            LP_B0 * highPassTorque
+            +
+            LP_B1 * m_lpX1
+            +
+            LP_B2 * m_lpX2
+            -
+            LP_A1 * m_lpY1
+            -
+            LP_A2 * m_lpY2;
 
 
         /*
-         * Torque derivative.
+         * Shift low-pass filter history.
          */
+        m_lpX2 = m_lpX1;
+        m_lpX1 = highPassTorque;
+
+        m_lpY2 = m_lpY1;
+        m_lpY1 = lowPassTorque;
+
+
+        /*
+         * This is now the torque used by the
+         * PD controller.
+         */
+		m_loadCellsIntermediateTorque.publish(
+    		highPassTorque
+		);
+
+        m_filteredTorque =
+            highPassTorque;
+
+
+        // =====================================================
+        // TORQUE DERIVATIVE
+        // =====================================================
+
         const float rawTorqueDerivative =
             (
                 m_filteredTorque
@@ -678,9 +716,10 @@ public:
             dt;
 
 
-        /*
-         * Derivative low-pass filter.
-         */
+        // =====================================================
+        // DERIVATIVE LOW-PASS FILTER
+        // =====================================================
+
         m_filteredTorqueDerivative =
             params.a_derivative
             *
@@ -701,9 +740,10 @@ public:
             -m_filteredTorqueDerivative;
 
 
-        /*
-         * PD transparent-mode feedback.
-         */
+        // =====================================================
+        // PD CONTROLLER
+        // =====================================================
+
         const float feedbackTorque =
             params.kp
             *
@@ -713,6 +753,10 @@ public:
             *
             errorDerivative;
 
+
+        // =====================================================
+        // FRICTION COMPENSATION
+        // =====================================================
 
         updateFrictionDirection(
             feedbackTorque,
@@ -739,9 +783,6 @@ public:
         }
 
 
-        /*
-         * Smooth friction compensation.
-         */
         m_filteredFrictionComp =
             params.a_friction
             *
@@ -774,6 +815,10 @@ public:
         );
 
 
+        // =====================================================
+        // UPDATE STATE
+        // =====================================================
+
         m_previousFilteredTorque =
             m_filteredTorque;
 
@@ -783,45 +828,6 @@ public:
 
 
 private:
-
-    static constexpr LoadCellId
-    firstLoadCell()
-    {
-        if constexpr (
-            Side == ExoSide::Left
-        )
-        {
-            return LoadCellId::Left1;
-        }
-        else
-        {
-            return LoadCellId::Right1;
-        }
-    }
-
-
-    static constexpr LoadCellId
-    secondLoadCell()
-    {
-        if constexpr (
-            Side == ExoSide::Left
-        )
-        {
-            return LoadCellId::Left2;
-        }
-        else
-        {
-            return LoadCellId::Right2;
-        }
-    }
-
-
-    static constexpr float
-    //TODO completely remove that function
-    torqueSign()
-    {
-      return 1.0f;
-    }
 
 
     void updateFrictionDirection(
@@ -858,24 +864,70 @@ private:
 
 private:
 
-    static constexpr float
-        LOAD_CELL_LEVER_ARM =
-            0.055f;
+    // =========================================================
+    // FILTER COEFFICIENTS
+    //
+    // fs = 1000 Hz
+    // =========================================================
+
+    /*
+     * 1st-order Butterworth high-pass
+     *
+     * fc = 0.5 Hz
+     *
+     * Difference equation:
+     *
+     * y[n] =
+     *     b0*x[n]
+     *   + b1*x[n-1]
+     *   - a1*y[n-1]
+     */
+    static constexpr float HP_B0 =
+        0.99843167f;
+
+    static constexpr float HP_B1 =
+        -0.99843167f;
+
+    static constexpr float HP_A1 =
+        -0.99686333f;
 
 
     /*
-     * TODO:
-     * Remove torque signs and encode the correct
-     * load-cell order in Board.h instead.
+     * 2nd-order Butterworth low-pass
+     *
+     * fc = 2.0 Hz
+     *
+     * Difference equation:
+     *
+     * y[n] =
+     *     b0*x[n]
+     *   + b1*x[n-1]
+     *   + b2*x[n-2]
+     *   - a1*y[n-1]
+     *   - a2*y[n-2]
      */
+    static constexpr float LP_B0 =
+        0.0000391302054f;
+
+    static constexpr float LP_B1 =
+        0.0000782604108f;
+
+    static constexpr float LP_B2 =
+        0.0000391302054f;
+
+    static constexpr float LP_A1 =
+        -1.98222893f;
+
+    static constexpr float LP_A2 =
+        0.98238545f;
 
 
 
+    // =========================================================
+    // TOPICS
+    // =========================================================
 
-    Topic<EncoderPositions>&
-        m_encoders;
-
-    Topic<LoadCellForces>&
+    Topic<LoadCellTorques>&
         m_loadcells;
 
     Topic<MotorFeedback>&
@@ -887,6 +939,41 @@ private:
     Topic<TransparentControllerParameters>&
         m_params;
 
+	Topic<float>&
+    	m_loadCellsIntermediateTorque;
+
+
+    // =========================================================
+    // HIGH-PASS FILTER STATE
+    // =========================================================
+
+    float
+        m_hpPreviousInput{0.0f};
+
+    float
+        m_hpPreviousOutput{0.0f};
+
+
+    // =========================================================
+    // LOW-PASS FILTER STATE
+    // =========================================================
+
+    float
+        m_lpX1{0.0f};
+
+    float
+        m_lpX2{0.0f};
+
+    float
+        m_lpY1{0.0f};
+
+    float
+        m_lpY2{0.0f};
+
+
+    // =========================================================
+    // CONTROLLER STATE
+    // =========================================================
 
     float
         m_filteredTorque{0.0f};
@@ -914,7 +1001,7 @@ private:
 };
 
 // NEW FOR NOW : TORQUE BANDWIDTH CONTROLLER FOR BANDWIDTH EVALUATION
-
+/*
 template<ExoSide Side>
 class TorqueBandwidthController final :
     public ITask
@@ -1098,22 +1185,11 @@ public:
         // SINUSOIDAL TORQUE COMMAND
         // =================================================
 
-        const float phase =
-            TWO_PI
-            *
-            frequencyHz
-            *
-            elapsedSeconds;
+        const float phase = TWO_PI*frequencyHz*elapsedSeconds;
 
 
         const float torque =
-            torqueSign()
-            *
-            m_amplitudeNm
-            *
-            sinf(
-                phase
-            );
+            m_amplitudeNm*sinf(phase);
 
 
         float command{};
@@ -1216,22 +1292,12 @@ private:
     }
 
 
-    // =====================================================
-    // SIDE
-    // =====================================================
-    //TODO get completely rid of that function
-    static constexpr float
-    torqueSign()
-    {
-       return 1.0f;
-    }
-
 
     static constexpr const char*
     sideName()
     {
         if constexpr (
-            Side == ExoSide::Left
+            Side == Side::Left
         )
         {
             return "LEFT";
@@ -1363,5 +1429,6 @@ private:
     bool m_running{false};
 	Topic<LoggingState>& m_loggingState;
 };
+*/
 #else
 #endif

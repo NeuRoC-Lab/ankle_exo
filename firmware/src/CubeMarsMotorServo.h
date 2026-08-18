@@ -58,13 +58,6 @@ struct MotorReply
     uint8_t error{0};
 };
 
-//note : a new struct which only transmits useful informations to the user. If you need position and/or velocity add it here
-struct MotorFeedback
-{
-   float torque{0.0f};
-   uint8_t temperature{0};
-   uint8_t error{0};
-};
 
 // -----------------
 

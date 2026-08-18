@@ -12,7 +12,7 @@
 #include "MotorControllers.h"
 #include "Scheduler.h"
 
-Scheduler<13> scheduler;
+Scheduler<14> scheduler;
 
 // UART bridge to Arduino Nano
 UARTHandler uart(
@@ -27,10 +27,12 @@ MessageBus messageBus(uart);
 //*** TOPIC INITIALISATION **//
 
 Topic<EncoderPositions> encoderTopic;
-Topic<LoadCellForces> loadCellTopic;
+Topic<LoadCellTorques> loadCellTopic;
 Topic<MotorFeedback> leftMotorTopic;
 Topic<MotorFeedback> rightMotorTopic;
 Topic<PowerReadings> ina232Topic;
+Topic<float> leftLegIntermediateTorque;
+Topic<float> rightLegIntermediateTorque;
 Topic<float> leftMotorCommandTopic;
 Topic<float> rightMotorCommandTopic;
 Topic<bool> leftMotorEnabled;
@@ -141,14 +143,14 @@ DummyController dummyController(
 
 /*
 JointLimitController<
-    ExoSide::Left
+    Side::Left
 > leftJointLimitController(
     encoderTopic,
     leftMotorMetaCommandTopic
 );
 
 JointLimitController<
-    ExoSide::Right
+    Side::Right
 > rightJointLimitController(
     encoderTopic,
     rightMotorMetaCommandTopic
@@ -157,31 +159,32 @@ JointLimitController<
 
 
 TransparentModeController<
-    ExoSide::Left
+    Side::Left
 > leftTransparentModeController(
-    encoderTopic,
     loadCellTopic,
     leftMotorTopic,
     leftMotorCommandTopic,
-	leftMotorControllerParams
+	leftMotorControllerParams,
+	leftLegIntermediateTorque
 );
 
 
+
 TransparentModeController<
-    ExoSide::Right
+    Side::Right
 > rightTransparentModeController(
-    encoderTopic,
     loadCellTopic,
     rightMotorTopic,
     rightMotorCommandTopic,
-	rightMotorControllerParams
+	rightMotorControllerParams,
+	rightLegIntermediateTorque
 );
 
 
 
 /*
 TorqueBandwidthController<
-    ExoSide::Left
+    Side::Left
 > leftBandwidthController(
     leftMotorCommandTopic,
     loggingStateTopic
@@ -279,6 +282,18 @@ void setup()
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.addTopic<EndpointId::LeftMotorTransparentParams>(leftMotorControllerParams);
     messageBus.addTopic<EndpointId::RightMotorTransparentParams>(rightMotorControllerParams);
+// NEW
+messageBus.addTopic<
+    EndpointId::LeftMotorTransparentTorque
+>(
+    leftLegIntermediateTorque
+);
+
+messageBus.addTopic<
+    EndpointId::RightMotorTransparentTorque
+>(
+    rightLegIntermediateTorque
+);
     messageBus.begin();
 
     scheduler.add(messageBus);

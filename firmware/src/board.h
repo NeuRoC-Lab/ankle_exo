@@ -9,6 +9,16 @@
 #endif
 
 
+enum class Side : uint8_t
+{
+    Left,
+    Right,
+};
+
+static constexpr float
+        LOAD_CELL_LEVER_ARM =
+            0.055f;
+
 constexpr uint8_t LoadCellCount = 4;
 
 using Pin = int; // defining a type for pins to make intent clearer
@@ -22,11 +32,11 @@ struct SingleEndedLoadCellPins
 // This ensures that we can address the load cells by their location and not by their raw pin
 enum class LoadCellId : std::uint8_t
 {
- Right2, // 2
- Right1, // 3
+ Right2, // 3
+ Right1, // 2
  Left2, // 0
  Left1 // 1
-}; //FLIPPED HERE
+};
 
 // these are now FIXED
 
