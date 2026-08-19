@@ -228,7 +228,7 @@ public:
     {
         m_sensor.begin(18, 19);
 
-        m_sensor.setRshunt(0.002f); //TODO fine tune it
+        m_sensor.setRshunt(0.002f);
         m_sensor.setImax(10.0f);
 
         return true;
@@ -239,16 +239,16 @@ public:
         if (m_sensor.dataReady())
         {
             return {
-                m_sensor.readBusVoltage()*(1.6f / 1.25f), //TODO TEST THAT THE CONVERSION FACTOR WORKS
-                m_sensor.readCurrent(),
-                m_sensor.readPower()
+                m_sensor.readBusVoltage()*(1.6f / 1.25f)
+                //m_sensor.readCurrent(),
+                //m_sensor.readPower() note : temporarily disabled current monitoring because it is only used internally in lower level controller, and the power is redundant information
             };
         }
 
         return {
-            -1.0f,
-            -1.0f,
             -1.0f
+            //-1.0f,
+            //-1.0f
         };
     }
 

@@ -54,6 +54,9 @@ class Exoskeleton:
         self.intermediate_torque = (
             IntermediateTorque()
         )
+        self.controller_output_torque = (
+            IntermediateTorque()
+        )
         self.power = Power()
 
 
@@ -108,6 +111,10 @@ class Exoskeleton:
 
             intermediate_torque=(
                 self.intermediate_torque
+            ),
+
+            controller_output_torque=(
+                self.controller_output_torque
             ),
 
             stop_event=self.stop_event,
@@ -504,8 +511,8 @@ class Exoskeleton:
     # =====================================================
 
     # =====================================================
-# INTERMEDIATE / FILTERED TORQUE
-# =====================================================
+    # INTERMEDIATE / FILTERED TORQUE
+    # =====================================================
 
     def get_intermediate_torque(
             self,
@@ -525,14 +532,21 @@ class Exoskeleton:
 
 
     def get_controller_output_torque(
-                self,
-                side: Side,
-        ):
+            self,
+            side: Side,
+    ):
+        self._check_connection()
+
+        left, right = (
+            self.controller_output_torque
+            .get_values()
+        )
+
         if side == Side.LEFT:
-                return self.bluetooth.controller_output_torque.left
+            return left
 
         if side == Side.RIGHT:
-            return self.bluetooth.controller_output_torque.right
+            return right
 
         raise ValueError(f"Invalid side: {side}")
     def get_encoder(

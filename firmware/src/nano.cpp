@@ -83,9 +83,9 @@ void setup()
     messageBus.addTopic<EndpointId::Ina232Snapshot>(ina232Topic);
 	messageBus.addTopic<EndpointId::LoggingState>(loggingStateTopic);
     messageBus.addTopic<EndpointId::LeftMotorTransparentTorque>(leftLegIntermediateTorque);
-    messageBus.addTopic<EndpointId::RightMotorTransparentTorque>(rightLegIntermediateTorque);
+    //messageBus.addTopic<EndpointId::RightMotorTransparentTorque>(rightLegIntermediateTorque);
     messageBus.addTopic<EndpointId::LeftMotorTransparentCommand>(leftMotorCommandTopic);
-    messageBus.addTopic<EndpointId::RightMotorTransparentCommand>(rightMotorCommandTopic);
+    //messageBus.addTopic<EndpointId::RightMotorTransparentCommand>(rightMotorCommandTopic);
     messageBus.begin();
 
     if (!bleBridge.begin())

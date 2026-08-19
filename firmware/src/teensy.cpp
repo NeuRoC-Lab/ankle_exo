@@ -178,35 +178,23 @@ TransparentModeController<
     rightLegIntermediateTorque
 );
 
+//note : define the list of topics that need to be forwarded HERE
 
-TopicForwarder<
-    EndpointId::LeftMotorTransparentTorque
-> leftIntermediateTorqueForwarder(
-    leftLegIntermediateTorque,
-    messageBus
-);
+#define TEENSY_FORWARDED_TOPICS(X)                                      \
+    X(LeftMotorTransparentTorque,  leftLegIntermediateTorque)            \
+    X(RightMotorTransparentTorque, rightLegIntermediateTorque)           \
+    X(LeftMotorTransparentCommand, leftControllerOutputTorqueTopic)      \
+    X(RightMotorTransparentCommand,rightControllerOutputTorqueTopic)
 
-TopicForwarder<
-    EndpointId::RightMotorTransparentTorque
-> rightIntermediateTorqueForwarder(
-    rightLegIntermediateTorque,
-    messageBus
-);
 
-// forward the trnapsrent mode's torque output
-TopicForwarder<
-    EndpointId::LeftMotorTransparentCommand
-> leftTransparentCommandForwarder(
-    leftControllerOutputTorqueTopic,
-    messageBus
-);
+#define DECLARE_TOPIC_FORWARDER(endpoint, topic)                         \
+    TopicForwarder<EndpointId::endpoint>                                 \
+        endpoint##Forwarder(topic, messageBus);
 
-TopicForwarder<
-    EndpointId::RightMotorTransparentCommand
-> rightTransparentCommandForwarder(
-    rightControllerOutputTorqueTopic,
-    messageBus
-);
+TEENSY_FORWARDED_TOPICS(DECLARE_TOPIC_FORWARDER)
+
+#undef DECLARE_TOPIC_FORWARDER
+
 
 /*
 TorqueBandwidthController<
@@ -310,6 +298,15 @@ void setup()
     messageBus.addTopic<EndpointId::RightMotorTransparentParams>(rightMotorControllerParams);
     messageBus.begin();
 
+	/* //note : optional to make it make scheduler add code shorter
+	#define ADD_TOPIC_FORWARDER(endpoint, topic) \
+    scheduler.add(endpoint##Forwarder);
+
+	TEENSY_FORWARDED_TOPICS(ADD_TOPIC_FORWARDER)
+
+	#undef ADD_TOPIC_FORWARDER
+	*/
+
     scheduler.add(messageBus);
     scheduler.add(encoderPublisher);
     scheduler.add(ina232Publisher);
@@ -317,11 +314,11 @@ void setup()
     scheduler.add(leftTransparentModeController);
     scheduler.add(rightTransparentModeController);
 
-    scheduler.add(leftIntermediateTorqueForwarder);
-    scheduler.add(rightIntermediateTorqueForwarder);
+    //scheduler.add(leftIntermediateTorqueForwarder);
+    //scheduler.add(rightIntermediateTorqueForwarder);
 
 
-    scheduler.add(leftTransparentCommandForwarder);
+    //scheduler.add(leftTransparentCommandForwarder);
 
     //scheduler.add(rightTransparentCommandForwarder);
 

@@ -116,12 +116,19 @@ class Power:
 
         self.lock = threading.Lock()
 
-    def _update(self,voltage,current,power):
-        """Meant to be used internally by bluetooth manager to update motor state"""
+    def _update(self, voltage, current=None, power=None):
+        """Update available power telemetry.
+
+        The current embedded PowerReadings packet only contains batteryVoltage.
+        Optional current/power arguments keep the existing Python API compatible
+        if those fields are restored on the embedded side later.
+        """
         with self.lock:
-            self.voltage = voltage
-            self.current = current
-            self.power = power
+            self.voltage = float(voltage)
+            if current is not None:
+                self.current = float(current)
+            if power is not None:
+                self.power = float(power)
         return False
     def get_values(self):
 
@@ -135,12 +142,57 @@ class Power:
         return False
 
 @dataclass
+class BLETelemetryPacket:
+    """Decoded high-rate telemetry packet from the Nano.
+
+    This layout must match BLETelemetry in the embedded BLE.h exactly.
+    MotorFeedback has two bytes of C++ tail padding, represented by ``2x``.
+    """
+
+    left_encoder: float
+    right_encoder: float
+    left_loadcell_torque: float
+    right_loadcell_torque: float
+
+    left_motor_torque: float
+    left_motor_temperature: int
+    left_motor_error: int
+
+    right_motor_torque: float
+    right_motor_temperature: int
+    right_motor_error: int
+
+    battery_voltage: float
+
+    left_intermediate_torque: float
+    right_intermediate_torque: float
+    left_controller_output_torque: float
+    right_controller_output_torque: float
+
+    FORMAT = "<4f fBB2x fBB2x 5f"
+
+    @classmethod
+    def size(cls) -> int:
+        return struct.calcsize(cls.FORMAT)
+
+    @classmethod
+    def from_bytes(cls, data: bytes):
+        if len(data) != cls.size():
+            raise ValueError(
+                f"Invalid BLE telemetry packet size: "
+                f"expected {cls.size()}, got {len(data)}"
+            )
+
+        return cls(*struct.unpack(cls.FORMAT, data))
+
+
+@dataclass
 class MotorCommand(StructPacket):
     #position: float = 0.0
     #velocity: float = 0.0
     torque: float = 0.0
     #kp: float = 0.0
-   # kd: float = 0.0
+    # kd: float = 0.0
 
     FORMAT = "<1f"
 

@@ -263,13 +263,14 @@ private:
             m_power.latest();
 
         Serial.print("V=");
-        Serial.print(value.batteryVoltage);
-
+        Serial.println(value.batteryVoltage);
+        /*
         Serial.print(" I=");
         Serial.print(value.pcbCurrent);
 
         Serial.print(" P=");
         Serial.println(value.pcbPower);
+        */
     }
     void printEncoder()
     {

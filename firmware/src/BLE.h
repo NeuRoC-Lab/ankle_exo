@@ -9,6 +9,38 @@
 #include "MessageBus.h"
 #include "BusTypes.h"
 
+// =========================================================
+// AGGREGATED BLE TELEMETRY
+// =========================================================
+//
+// All high-rate Nano -> PC telemetry is sent through ONE
+// BLE notification characteristic.
+//
+// This avoids sending many small BLE notifications every
+// 20 ms.
+//
+// IMPORTANT:
+// The Bleak side must deserialize this structure using the
+// exact same field layout.
+// =========================================================
+
+struct BLETelemetry
+{
+    EncoderPositions encoders;
+    LoadCellTorques loadCells;
+
+    MotorFeedback leftMotor;
+    MotorFeedback rightMotor;
+
+    PowerReadings power;
+
+    float leftIntermediateTorque;
+    float rightIntermediateTorque;
+
+    float leftControllerOutputTorque;
+    float rightControllerOutputTorque;
+};
+
 
 // =========================================================
 // BLE SERVICE
@@ -19,39 +51,23 @@ constexpr char dataServiceUUID[] =
 
 
 // =========================================================
-// SHARED TELEMETRY UUIDs
+// HIGH-RATE TELEMETRY CHARACTERISTIC
 // =========================================================
 
-constexpr char loadCellCharacteristicUUID[] =
-    "CA87289F-102B-4078-AD8C-8F53063547A6";
-
-constexpr char encoderCharacteristicUUID[] =
-    "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB";
-
-constexpr char powerCharacteristicUUID[] =
-    "4D92C3F7-848C-42C2-B26A-9D1D15CB361A";
+constexpr char telemetryUUID[] =
+    "348B92F4-EB75-476B-A124-5D8C97C35907";
 
 
 // =========================================================
-// LEFT MOTOR UUIDs
+// MOTOR COMMAND / CONTROL UUIDs
 // =========================================================
-
-constexpr char leftMotorFeedbackCharacteristicUUID[] =
-    "81DC2896-1B27-4195-A391-99A637FA50A4";
 
 constexpr char leftMotorCommandCharacteristicUUID[] =
     "E0D883F6-705C-4A11-B117-E2B0909CC68E";
 
 constexpr char leftMotorControlCharacteristicUUID[] =
-    "99F02A66-065C-41BE-B05E-4BE2B9035A8B"; // basically a bool to turn on / off the motor (virtual state)
+    "99F02A66-065C-41BE-B05E-4BE2B9035A8B";
 
-
-// =========================================================
-// RIGHT MOTOR UUIDs
-// =========================================================
-
-constexpr char rightMotorFeedbackCharacteristicUUID[] =
-    "2E38C871-902C-425F-8D3B-181CB21F0B67";
 
 constexpr char rightMotorCommandCharacteristicUUID[] =
     "09DC04D0-BFC0-4D7C-A88D-96D60857FE64";
@@ -67,8 +83,9 @@ constexpr char rightMotorControlCharacteristicUUID[] =
 constexpr char loggingControlCharacteristicUUID[] =
     "A06EE428-0AB6-4CD4-AA8A-91619F1AF577";
 
+
 // =========================================================
-// Transparent Mode Controller UUIDs
+// TRANSPARENT MODE CONTROLLER UUIDs
 // =========================================================
 
 constexpr char leftTransparentModeControllerUUID[] =
@@ -77,193 +94,137 @@ constexpr char leftTransparentModeControllerUUID[] =
 constexpr char rightTransparentModeControllerUUID[] =
     "A8B58E7F-4B57-4C5F-85E4-55F38A6CE271";
 
-// TENMPORARY
-
-constexpr char leftIntermediateTorqueCharacteristicUUID[] =
-    "B50F6E44-AB02-4C7A-A801-74A85815B001";
-
-constexpr char rightIntermediateTorqueCharacteristicUUID[] =
-    "B50F6E44-AB02-4C7A-A801-74A85815B002";
-
-constexpr char leftControllerOutputTorqueCharacteristicUUID[] =
-    "B50F6E44-AB02-4C7A-A801-74A85815B003";
-
-constexpr char rightControllerOutputTorqueCharacteristicUUID[] =
-    "B50F6E44-AB02-4C7A-A801-74A85815B004";
 
 // =========================================================
 // BLE BRIDGE
 // =========================================================
 
-class BLEBridge final :
-    public ITask
+class BLEBridge final : public ITask
 {
 public:
 
-BLEBridge(
+    BLEBridge(
         MessageBus& bus,
+
         Topic<EncoderPositions>& encoder,
         Topic<LoadCellTorques>& loadCells,
+
         Topic<MotorFeedback>& leftMotor,
         Topic<MotorFeedback>& rightMotor,
+
         Topic<PowerReadings>& power,
+
         Topic<float>& leftIntermediateTorque,
         Topic<float>& rightIntermediateTorque,
+
         Topic<float>& leftControllerOutputTorque,
         Topic<float>& rightControllerOutputTorque)
-    :
-    m_bus(bus),
 
-    m_encoder(encoder),
-    m_loadCells(loadCells),
+        :
+        m_bus(bus),
 
-    m_leftMotor(leftMotor),
-    m_rightMotor(rightMotor),
+        m_encoder(encoder),
+        m_loadCells(loadCells),
 
-    m_power(power),
+        m_leftMotor(leftMotor),
+        m_rightMotor(rightMotor),
 
-    m_leftIntermediateTorque(
-        leftIntermediateTorque
-    ),
+        m_power(power),
 
-    m_rightIntermediateTorque(
-        rightIntermediateTorque
-    ),
+        m_leftIntermediateTorque(
+            leftIntermediateTorque
+        ),
 
-    m_leftControllerOutputTorque(
-        leftControllerOutputTorque
-    ),
+        m_rightIntermediateTorque(
+            rightIntermediateTorque
+        ),
 
-    m_rightControllerOutputTorque(
-        rightControllerOutputTorque
-    ),
+        m_leftControllerOutputTorque(
+            leftControllerOutputTorque
+        ),
 
-    // -------------------------------------------------
-    // BLE service
-    // -------------------------------------------------
+        m_rightControllerOutputTorque(
+            rightControllerOutputTorque
+        ),
 
-    m_service(
-        dataServiceUUID
-    ),
+        // -------------------------------------------------
+        // BLE service
+        // -------------------------------------------------
 
-    // -------------------------------------------------
-    // Shared telemetry
-    // -------------------------------------------------
+        m_service(
+            dataServiceUUID
+        ),
 
-    m_encoderCharacteristic(
-        encoderCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(EncoderPositions)
-    ),
+        // -------------------------------------------------
+        // High-rate telemetry
+        // -------------------------------------------------
 
-    m_loadCellCharacteristic(
-        loadCellCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(LoadCellTorques)
-    ),
+        m_telemetryCharacteristic(
+            telemetryUUID,
+            BLERead | BLENotify,
+            sizeof(BLETelemetry)
+        ),
 
-    m_powerCharacteristic(
-        powerCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(PowerReadings)
-    ),
+        // -------------------------------------------------
+        // Left motor
+        // -------------------------------------------------
 
-    m_leftIntermediateTorqueCharacteristic(
-        leftIntermediateTorqueCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(float)
-    ),
+        m_leftMotorCommandCharacteristic(
+            leftMotorCommandCharacteristicUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(float)
+        ),
 
-    m_rightIntermediateTorqueCharacteristic(
-        rightIntermediateTorqueCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(float)
-    ),
+        m_leftMotorControlCharacteristic(
+            leftMotorControlCharacteristicUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(uint8_t)
+        ),
 
-    m_leftControllerOutputTorqueCharacteristic(
-        leftControllerOutputTorqueCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(float)
-    ),
+        // -------------------------------------------------
+        // Right motor
+        // -------------------------------------------------
 
-    m_rightControllerOutputTorqueCharacteristic(
-        rightControllerOutputTorqueCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(float)
-    ),
+        m_rightMotorCommandCharacteristic(
+            rightMotorCommandCharacteristicUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(float)
+        ),
 
-    // -------------------------------------------------
-    // Left motor
-    // -------------------------------------------------
+        m_rightMotorControlCharacteristic(
+            rightMotorControlCharacteristicUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(uint8_t)
+        ),
 
-    m_leftMotorReplyCharacteristic(
-        leftMotorFeedbackCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(MotorFeedback)
-    ),
+        // -------------------------------------------------
+        // SD logger
+        // -------------------------------------------------
 
-    m_leftMotorCommandCharacteristic(
-        leftMotorCommandCharacteristicUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(float)
-    ),
+        m_loggingControlCharacteristic(
+            loggingControlCharacteristicUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(uint8_t)
+        ),
 
-    m_leftMotorControlCharacteristic(
-        leftMotorControlCharacteristicUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(bool)
-    ),
+        // -------------------------------------------------
+        // Transparent mode controllers
+        // -------------------------------------------------
 
-    // -------------------------------------------------
-    // Right motor
-    // -------------------------------------------------
+        m_leftTransparentModeControllerCharacteristic(
+            leftTransparentModeControllerUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(TransparentControllerParameters)
+        ),
 
-    m_rightMotorReplyCharacteristic(
-        rightMotorFeedbackCharacteristicUUID,
-        BLERead | BLENotify,
-        sizeof(MotorFeedback)
-    ),
-
-    m_rightMotorCommandCharacteristic(
-        rightMotorCommandCharacteristicUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(float)
-    ),
-
-    m_rightMotorControlCharacteristic(
-        rightMotorControlCharacteristicUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(bool)
-    ),
-
-    // -------------------------------------------------
-    // SD logger
-    // -------------------------------------------------
-
-    m_loggingControlCharacteristic(
-        loggingControlCharacteristicUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(LoggingState)
-    ),
-
-    // -------------------------------------------------
-    // Transparent mode controller
-    // -------------------------------------------------
-
-    m_leftTransparentModeControllerCharacteristic(
-        leftTransparentModeControllerUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(TransparentControllerParameters)
-    ),
-
-    m_rightTransparentModeControllerCharacteristic(
-        rightTransparentModeControllerUUID,
-        BLEWrite | BLEWriteWithoutResponse,
-        sizeof(TransparentControllerParameters)
-    )
-{
-    s_instance = this;
-}
+        m_rightTransparentModeControllerCharacteristic(
+            rightTransparentModeControllerUUID,
+            BLEWrite | BLEWriteWithoutResponse,
+            sizeof(TransparentControllerParameters)
+        )
+    {
+        s_instance = this;
+    }
 
 
     // =====================================================
@@ -278,44 +239,26 @@ BLEBridge(
             return false;
         }
 
-
         BLE.setLocalName("AnkleExo");
         BLE.setDeviceName("AnkleExo");
 
-        BLE.setAdvertisedService(m_service);
+        BLE.setAdvertisedService(
+            m_service
+        );
 
 
         // -------------------------------------------------
-        // Shared telemetry
+        // ONE shared high-rate telemetry characteristic
         // -------------------------------------------------
 
         m_service.addCharacteristic(
-            m_encoderCharacteristic
+            m_telemetryCharacteristic
         );
 
-        m_service.addCharacteristic(
-            m_loadCellCharacteristic
-        );
-
-        m_service.addCharacteristic(
-            m_powerCharacteristic
-        );
-
-		m_service.addCharacteristic(
-   		 m_leftIntermediateTorqueCharacteristic
-		);
-
-		m_service.addCharacteristic(
-    		m_rightIntermediateTorqueCharacteristic
-		);
 
         // -------------------------------------------------
-        // Left motor
+        // Left motor commands
         // -------------------------------------------------
-
-        m_service.addCharacteristic(
-            m_leftMotorReplyCharacteristic
-        );
 
         m_service.addCharacteristic(
             m_leftMotorCommandCharacteristic
@@ -327,12 +270,8 @@ BLEBridge(
 
 
         // -------------------------------------------------
-        // Right motor
+        // Right motor commands
         // -------------------------------------------------
-
-        m_service.addCharacteristic(
-            m_rightMotorReplyCharacteristic
-        );
 
         m_service.addCharacteristic(
             m_rightMotorCommandCharacteristic
@@ -351,98 +290,97 @@ BLEBridge(
             m_loggingControlCharacteristic
         );
 
+
         // -------------------------------------------------
-        // Transparent Mode Controller
+        // Transparent mode controllers
         // -------------------------------------------------
 
-                m_service.addCharacteristic(
-    	m_leftTransparentModeControllerCharacteristic
-		);
+        m_service.addCharacteristic(
+            m_leftTransparentModeControllerCharacteristic
+        );
 
-		m_service.addCharacteristic(
-    	m_rightTransparentModeControllerCharacteristic
-		);
-
-    m_service.addCharacteristic(
-        m_leftControllerOutputTorqueCharacteristic
-    );
-
-    m_service.addCharacteristic(
-        m_rightControllerOutputTorqueCharacteristic
-    );
+        m_service.addCharacteristic(
+            m_rightTransparentModeControllerCharacteristic
+        );
 
 
         // -------------------------------------------------
         // Left motor callbacks
         // -------------------------------------------------
 
-        m_leftMotorCommandCharacteristic
-            .setEventHandler(
-                BLEWritten,
-                leftMotorCommandWrittenCallback
-            );
+        m_leftMotorCommandCharacteristic.setEventHandler(
+            BLEWritten,
+            leftMotorCommandWrittenCallback
+        );
 
-        m_leftMotorControlCharacteristic
-            .setEventHandler(
-                BLEWritten,
-                leftMotorControlWrittenCallback
-            );
+        m_leftMotorControlCharacteristic.setEventHandler(
+            BLEWritten,
+            leftMotorControlWrittenCallback
+        );
 
 
         // -------------------------------------------------
         // Right motor callbacks
         // -------------------------------------------------
 
-        m_rightMotorCommandCharacteristic
-            .setEventHandler(
-                BLEWritten,
-                rightMotorCommandWrittenCallback
-            );
+        m_rightMotorCommandCharacteristic.setEventHandler(
+            BLEWritten,
+            rightMotorCommandWrittenCallback
+        );
 
-        m_rightMotorControlCharacteristic
-            .setEventHandler(
-                BLEWritten,
-                rightMotorControlWrittenCallback
-            );
+        m_rightMotorControlCharacteristic.setEventHandler(
+            BLEWritten,
+            rightMotorControlWrittenCallback
+        );
 
 
         // -------------------------------------------------
         // SD logger callback
         // -------------------------------------------------
 
-        m_loggingControlCharacteristic
-            .setEventHandler(
-                BLEWritten,
-                loggingControlWrittenCallback
-            );
+        m_loggingControlCharacteristic.setEventHandler(
+            BLEWritten,
+            loggingControlWrittenCallback
+        );
+
 
         // -------------------------------------------------
-        // Transparent Mode Controller Callback
+        // Transparent mode callbacks
         // -------------------------------------------------
 
-    m_leftTransparentModeControllerCharacteristic
-        .setEventHandler(
+        m_leftTransparentModeControllerCharacteristic.setEventHandler(
             BLEWritten,
             leftTransparentModeControllerWrittenCallback
         );
 
-    m_rightTransparentModeControllerCharacteristic
-        .setEventHandler(
+        m_rightTransparentModeControllerCharacteristic.setEventHandler(
             BLEWritten,
             rightTransparentModeControllerWrittenCallback
-    );
+        );
 
 
+        // -------------------------------------------------
+        // Register service
+        // -------------------------------------------------
 
         BLE.addService(
             m_service
         );
 
-        if (!BLE.advertise()) {
+
+        // -------------------------------------------------
+        // Start advertising
+        // -------------------------------------------------
+
+        if (!BLE.advertise())
+        {
             Serial.println("BLE.advertise FAILED");
             return false;
         }
-    Serial.println("BLE: advertising");
+
+        Serial.print("BLE: advertising, telemetry size = ");
+        Serial.print(sizeof(BLETelemetry));
+        Serial.println(" bytes");
 
         return true;
     }
@@ -454,129 +392,157 @@ BLEBridge(
 
     void update(uint32_t nowUs) override
     {
+        // Service the BLE stack on every scheduler pass.
         BLE.poll();
 
-        static bool wasConnected = false;
-        const bool connected = BLE.connected();
+        const bool connected =
+            BLE.connected();
 
-        if (wasConnected && !connected) {
-            Serial.println("BLE CENTRAL DISCONNECTED");
+
+        // -------------------------------------------------
+        // Connection diagnostics
+        // -------------------------------------------------
+
+        if (!m_wasConnected && connected)
+        {
+            Serial.print("BLE CENTRAL CONNECTED at ");
+            Serial.print(millis());
+            Serial.println(" ms");
         }
 
-        wasConnected = connected;
+        if (m_wasConnected && !connected)
+        {
+            Serial.print("BLE CENTRAL DISCONNECTED at ");
+            Serial.print(millis());
+            Serial.println(" ms");
+        }
 
-        if (!connected) {
+        m_wasConnected =
+            connected;
+
+
+        if (!connected)
+        {
+            // Avoid carrying timing debt across disconnects.
+            m_lastBlePublishUs =
+                nowUs;
+
             return;
         }
 
-        constexpr uint32_t BLE_PERIOD_US = 20'000; // 50 Hz
 
-        if (nowUs - m_lastBlePublishUs < BLE_PERIOD_US) {
+        // -------------------------------------------------
+        // 50 Hz telemetry
+        // -------------------------------------------------
+
+        constexpr uint32_t BLE_PERIOD_US =
+            20'000;
+
+        if (
+            static_cast<uint32_t>(
+                nowUs - m_lastBlePublishUs
+            ) < BLE_PERIOD_US
+        )
+        {
             return;
         }
 
-        m_lastBlePublishUs += BLE_PERIOD_US;
 
-        publishChangedTopics();
+        // Do not try to "catch up" by transmitting several
+        // packets after a delayed scheduler iteration.
+        m_lastBlePublishUs =
+            nowUs;
+
+
+        publishTelemetry();
     }
 
 
 private:
 
     // =====================================================
-    // TELEMETRY PUBLISHING
+    // TELEMETRY
     // =====================================================
-    uint32_t m_lastBlePublishUs{0};
 
-    void publishChangedTopics()
+    void publishTelemetry()
     {
-        publishIfChanged(
-            m_encoder,
-            m_encoderCharacteristic,
-            m_encoderSequence
-        );
-
-        publishIfChanged(
-            m_loadCells,
-            m_loadCellCharacteristic,
-            m_loadCellSequence
-        );
-
-        publishIfChanged(
-            m_power,
-            m_powerCharacteristic,
-            m_powerSequence
-        );
-
-        publishIfChanged(
-            m_leftMotor,
-            m_leftMotorReplyCharacteristic,
-            m_leftMotorSequence
-        );
-
-        publishIfChanged(
-            m_rightMotor,
-            m_rightMotorReplyCharacteristic,
-            m_rightMotorSequence
-        );
-
-        publishIfChanged(
-            m_leftIntermediateTorque,
-            m_leftIntermediateTorqueCharacteristic,
-            m_leftIntermediateTorqueSequence
-        );
-
-        publishIfChanged(
-            m_rightIntermediateTorque,
-            m_rightIntermediateTorqueCharacteristic,
-            m_rightIntermediateTorqueSequence
-        );
-
-        publishIfChanged(
-            m_leftControllerOutputTorque,
-            m_leftControllerOutputTorqueCharacteristic,
-            m_leftControllerOutputTorqueSequence
-        );
-
-        publishIfChanged(
-            m_rightControllerOutputTorque,
-            m_rightControllerOutputTorqueCharacteristic,
-            m_rightControllerOutputTorqueSequence
-        );
-    }
+        BLETelemetry telemetry{};
 
 
-    template<typename T>
-    void publishIfChanged(
-        Topic<T>& topic,
-        BLECharacteristic& characteristic,
-        uint32_t& lastSequence)
-    {
-        if (!topic.valid())
+        // -------------------------------------------------
+        // Read latest values from topics
+        // -------------------------------------------------
+
+        //
+        // Topic::latest() is used directly here, matching
+        // the behavior of your existing implementation.
+        //
+
+        telemetry.encoders =
+            m_encoder.latest();
+
+        telemetry.loadCells =
+            m_loadCells.latest();
+
+
+        telemetry.leftMotor =
+            m_leftMotor.latest();
+
+        telemetry.rightMotor =
+            m_rightMotor.latest();
+
+
+        telemetry.power =
+            m_power.latest();
+
+
+        telemetry.leftIntermediateTorque =
+            m_leftIntermediateTorque.latest();
+
+        telemetry.rightIntermediateTorque =
+            m_rightIntermediateTorque.latest();
+
+
+        telemetry.leftControllerOutputTorque =
+            m_leftControllerOutputTorque.latest();
+
+        telemetry.rightControllerOutputTorque =
+            m_rightControllerOutputTorque.latest();
+
+
+        // -------------------------------------------------
+        // Send exactly ONE BLE notification/update
+        // -------------------------------------------------
+
+        const int result =
+            m_telemetryCharacteristic.writeValue(
+                reinterpret_cast<const uint8_t*>(
+                    &telemetry
+                ),
+                sizeof(telemetry)
+            );
+
+
+        if (!result)
         {
-            return;
+            ++m_bleWriteFailureCount;
+
+            Serial.print(
+                "BLE telemetry write failed: size="
+            );
+
+            Serial.print(
+                sizeof(BLETelemetry)
+            );
+
+            Serial.print(
+                ", failures="
+            );
+
+            Serial.println(
+                m_bleWriteFailureCount
+            );
         }
-
-        if (
-            topic.sequence() ==
-            lastSequence
-        )
-        {
-            return;
-        }
-
-        lastSequence =
-            topic.sequence();
-
-        const T& value =
-            topic.latest();
-
-        characteristic.writeValue(
-            reinterpret_cast<
-                const uint8_t*
-            >(&value),
-            sizeof(T)
-        );
     }
 
 
@@ -590,16 +556,37 @@ private:
     {
         float command{};
 
-        const int bytesRead = characteristic.readValue(reinterpret_cast<uint8_t*>(&command),sizeof(command));
+        const int bytesRead =
+            characteristic.readValue(
+                reinterpret_cast<uint8_t*>(
+                    &command
+                ),
+                sizeof(command)
+            );
 
-        if (bytesRead != static_cast<int>(sizeof(command)))
+
+        if (
+            bytesRead !=
+            static_cast<int>(
+                sizeof(command)
+            )
+        )
         {
-            Serial.print("Wrong float size: ");
-            Serial.println(bytesRead);
+            Serial.print(
+                "Wrong float size: "
+            );
+
+            Serial.println(
+                bytesRead
+            );
+
             return;
         }
 
-        m_bus.publish<Id>(command);
+
+        m_bus.publish<Id>(
+            command
+        );
     }
 
 
@@ -617,7 +604,13 @@ private:
         {
             return;
         }
-        s_instance->handleMotorCommand<EndpointId::LeftMotorCommand>(characteristic);
+
+        s_instance
+            ->handleMotorCommand<
+                EndpointId::LeftMotorCommand
+            >(
+                characteristic
+            );
     }
 
 
@@ -636,43 +629,68 @@ private:
             return;
         }
 
-        s_instance->handleMotorCommand<EndpointId::RightMotorCommand>(characteristic);
+        s_instance
+            ->handleMotorCommand<
+                EndpointId::RightMotorCommand
+            >(
+                characteristic
+            );
     }
 
 
     // =====================================================
-    // GENERIC MOTOR CONTROL CALLBACK
+    // GENERIC MOTOR CONTROL DECODER
     // =====================================================
 
     template<EndpointId Id>
-	void handleMotorControl(
-    BLECharacteristic& characteristic)
-{
-    uint8_t rawEnabled{};
-
-    const int bytesRead =
-        characteristic.readValue(&rawEnabled,sizeof(rawEnabled));
-
-    if (bytesRead != 1)
+    void handleMotorControl(
+        BLECharacteristic& characteristic)
     {
-        Serial.print("Wrong bool size: ");
-        Serial.println(bytesRead);
-        return;
-    }
+        uint8_t rawEnabled{};
 
-    if (rawEnabled > 1)
-    {
-        Serial.print("Invalid motor enabled value: ");
-        Serial.println(rawEnabled);
-        return;
-    }
+        const int bytesRead =
+            characteristic.readValue(
+                &rawEnabled,
+                sizeof(rawEnabled)
+            );
 
-    const bool enabled =
-        rawEnabled != 0;
-    m_bus.publish<Id>(
-        enabled
-    );
-}
+
+        if (bytesRead != 1)
+        {
+            Serial.print(
+                "Wrong bool size: "
+            );
+
+            Serial.println(
+                bytesRead
+            );
+
+            return;
+        }
+
+
+        if (rawEnabled > 1)
+        {
+            Serial.print(
+                "Invalid motor enabled value: "
+            );
+
+            Serial.println(
+                rawEnabled
+            );
+
+            return;
+        }
+
+
+        const bool enabled =
+            rawEnabled != 0;
+
+
+        m_bus.publish<Id>(
+            enabled
+        );
+    }
 
 
     // =====================================================
@@ -690,7 +708,12 @@ private:
             return;
         }
 
-        s_instance->handleMotorControl<EndpointId::LeftMotorEnabled>(characteristic);
+        s_instance
+            ->handleMotorControl<
+                EndpointId::LeftMotorEnabled
+            >(
+                characteristic
+            );
     }
 
 
@@ -709,7 +732,12 @@ private:
             return;
         }
 
-        s_instance->handleMotorControl<EndpointId::RightMotorEnabled>(characteristic);
+        s_instance
+            ->handleMotorControl<
+                EndpointId::RightMotorEnabled
+            >(
+                characteristic
+            );
     }
 
 
@@ -746,6 +774,7 @@ private:
                 sizeof(rawState)
             );
 
+
         if (bytesRead != 1)
         {
             Serial.print(
@@ -780,9 +809,7 @@ private:
 
 
         const auto state =
-            static_cast<
-                LoggingState
-            >(
+            static_cast<LoggingState>(
                 rawState
             );
 
@@ -803,81 +830,97 @@ private:
         );
     }
 
-template<EndpointId Id>
-void handleTransparentModeController(
-    BLECharacteristic& characteristic)
-{
-    TransparentControllerParameters params{};
 
-    const int bytesRead =
-        characteristic.readValue(
-            reinterpret_cast<uint8_t*>(
-                &params
-            ),
-            sizeof(params)
-        );
+    // =====================================================
+    // TRANSPARENT MODE CONTROLLER DECODER
+    // =====================================================
 
-    if (
-        bytesRead !=
-        static_cast<int>(
-            sizeof(params)
+    template<EndpointId Id>
+    void handleTransparentModeController(
+        BLECharacteristic& characteristic)
+    {
+        TransparentControllerParameters params{};
+
+        const int bytesRead =
+            characteristic.readValue(
+                reinterpret_cast<uint8_t*>(
+                    &params
+                ),
+                sizeof(params)
+            );
+
+
+        if (
+            bytesRead !=
+            static_cast<int>(
+                sizeof(params)
+            )
         )
-    )
-    {
-        Serial.print(
-            "Wrong TransparentControllerParameters size: "
-        );
+        {
+            Serial.print(
+                "Wrong TransparentControllerParameters size: "
+            );
 
-        Serial.println(
-            bytesRead
-        );
+            Serial.println(
+                bytesRead
+            );
 
-        return;
+            return;
+        }
+
+
+        m_bus.publish<Id>(
+            params
+        );
     }
 
-    m_bus.publish<Id>(
-        params
-    );
-}
 
-static void leftTransparentModeControllerWrittenCallback(
-    BLEDevice central,
-    BLECharacteristic characteristic)
-{
-    (void)central;
+    // =====================================================
+    // LEFT TRANSPARENT MODE CALLBACK
+    // =====================================================
 
-    if (s_instance == nullptr)
+    static void leftTransparentModeControllerWrittenCallback(
+        BLEDevice central,
+        BLECharacteristic characteristic)
     {
-        return;
+        (void)central;
+
+        if (s_instance == nullptr)
+        {
+            return;
+        }
+
+        s_instance
+            ->handleTransparentModeController<
+                EndpointId::LeftMotorTransparentParams
+            >(
+                characteristic
+            );
     }
 
-    s_instance
-        ->handleTransparentModeController<
-            EndpointId::LeftMotorTransparentParams
-        >(
-            characteristic
-        );
-}
 
+    // =====================================================
+    // RIGHT TRANSPARENT MODE CALLBACK
+    // =====================================================
 
-static void rightTransparentModeControllerWrittenCallback(
-    BLEDevice central,
-    BLECharacteristic characteristic)
-{
-    (void)central;
-
-    if (s_instance == nullptr)
+    static void rightTransparentModeControllerWrittenCallback(
+        BLEDevice central,
+        BLECharacteristic characteristic)
     {
-        return;
-    }
+        (void)central;
 
-    s_instance
-        ->handleTransparentModeController<
-            EndpointId::RightMotorTransparentParams
-        >(
-            characteristic
-        );
-}
+        if (s_instance == nullptr)
+        {
+            return;
+        }
+
+        s_instance
+            ->handleTransparentModeController<
+                EndpointId::RightMotorTransparentParams
+            >(
+                characteristic
+            );
+    }
 
 
 private:
@@ -894,7 +937,8 @@ private:
     // MESSAGE BUS
     // =====================================================
 
-    MessageBus& m_bus;
+    MessageBus&
+        m_bus;
 
 
     // =====================================================
@@ -907,20 +951,24 @@ private:
     Topic<LoadCellTorques>&
         m_loadCells;
 
+
     Topic<MotorFeedback>&
         m_leftMotor;
 
     Topic<MotorFeedback>&
         m_rightMotor;
 
+
     Topic<PowerReadings>&
         m_power;
+
 
     Topic<float>&
         m_leftIntermediateTorque;
 
     Topic<float>&
         m_rightIntermediateTorque;
+
 
     Topic<float>&
         m_leftControllerOutputTorque;
@@ -929,79 +977,39 @@ private:
         m_rightControllerOutputTorque;
 
 
-
-
     // =====================================================
-    // LAST BLE-PUBLISHED SEQUENCES
+    // BLE STATE
     // =====================================================
 
     uint32_t
-        m_encoderSequence{0};
+        m_lastBlePublishUs{0};
 
     uint32_t
-        m_loadCellSequence{0};
+        m_bleWriteFailureCount{0};
 
-    uint32_t
-        m_powerSequence{0};
-
-    uint32_t
-        m_leftMotorSequence{0};
-
-    uint32_t
-        m_rightMotorSequence{0};
-
-    uint32_t
-        m_leftIntermediateTorqueSequence{0};
-
-    uint32_t
-        m_rightIntermediateTorqueSequence{0};
-
-    uint32_t
-        m_leftControllerOutputTorqueSequence{0};
-
-    uint32_t
-        m_rightControllerOutputTorqueSequence{0};
+    bool
+        m_wasConnected{false};
 
 
     // =====================================================
     // BLE SERVICE
     // =====================================================
 
-    BLEService m_service;
+    BLEService
+        m_service;
 
 
     // =====================================================
-    // SHARED TELEMETRY CHARACTERISTICS
+    // HIGH-RATE TELEMETRY CHARACTERISTIC
     // =====================================================
 
     BLECharacteristic
-        m_encoderCharacteristic;
-
-    BLECharacteristic
-        m_loadCellCharacteristic;
-
-    BLECharacteristic
-        m_powerCharacteristic;
-
-	BLECharacteristic
-    	m_leftIntermediateTorqueCharacteristic;
-
-	BLECharacteristic
-    	m_rightIntermediateTorqueCharacteristic;
-
-    BLECharacteristic
-        m_leftControllerOutputTorqueCharacteristic;
-
-    BLECharacteristic
-        m_rightControllerOutputTorqueCharacteristic;
+        m_telemetryCharacteristic;
 
 
     // =====================================================
-    // LEFT MOTOR CHARACTERISTICS
+    // LEFT MOTOR EVENT-DRIVEN CHARACTERISTICS
     // =====================================================
-
-    BLECharacteristic
-        m_leftMotorReplyCharacteristic;
 
     BLECharacteristic
         m_leftMotorCommandCharacteristic;
@@ -1011,11 +1019,8 @@ private:
 
 
     // =====================================================
-    // RIGHT MOTOR CHARACTERISTICS
+    // RIGHT MOTOR EVENT-DRIVEN CHARACTERISTICS
     // =====================================================
-
-    BLECharacteristic
-        m_rightMotorReplyCharacteristic;
 
     BLECharacteristic
         m_rightMotorCommandCharacteristic;
@@ -1031,15 +1036,16 @@ private:
     BLECharacteristic
         m_loggingControlCharacteristic;
 
+
     // =====================================================
-    //TRANSPARENT MODE CONTROLLER CHARACTERISTIC
+    // TRANSPARENT MODE CONTROLLER CHARACTERISTICS
     // =====================================================
 
-	BLECharacteristic
-    	m_leftTransparentModeControllerCharacteristic;
+    BLECharacteristic
+        m_leftTransparentModeControllerCharacteristic;
 
-	BLECharacteristic
-    	m_rightTransparentModeControllerCharacteristic;
+    BLECharacteristic
+        m_rightTransparentModeControllerCharacteristic;
 };
 
 #endif

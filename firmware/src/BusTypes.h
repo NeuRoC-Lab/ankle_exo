@@ -38,8 +38,8 @@ struct MotorFeedback
 struct PowerReadings
 {
     float batteryVoltage;
-    float pcbCurrent;
-    float pcbPower;
+    //float pcbCurrent; //temporary disabled these to save BLE bandwidth, also we don't need that for higher level controller
+    //float pcbPower;
 };
 
 // Motor controllers

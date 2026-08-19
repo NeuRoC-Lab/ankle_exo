@@ -1,5 +1,5 @@
 params = {
-    "enabled": 1,
+    "enabled": 0,
 
     # Input torque filtering
     "input_hp_cutoff_hz": 3.7,       # high-pass cutoff for bias/drift removal
@@ -10,7 +10,7 @@ params = {
     "friction_lp_cutoff_hz": 5.0,    # low-pass cutoff for friction compensation
 
     # PD gains
-    "kp": 0.8,
+    "kp": 0.1,
     "kd": 0.0001,
 
     # Friction compensation

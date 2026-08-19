@@ -276,6 +276,7 @@ public:
 
         while (m_rxQueue.pop(message))
         {
+        //to fix : make a ring buffer or bounded queue because the while loop might spend a variable amount of time draining which could explain why the BLE connection hangs up randomly
             dispatchLocal(message);
         }
     }

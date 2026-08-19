@@ -16,6 +16,7 @@ from .peripherals import (
     Power,
     TransparentControlCommand,
     IntermediateTorque,
+    BLETelemetryPacket,
 )
 
 class Side(Enum):
@@ -31,12 +32,7 @@ class CanId(Enum):
 DEVICE_NAME = "AnkleExo"
 SERVICE_UUID = "CF45813E-4358-4903-B961-09996BB081FB"
 
-LOAD_CELL_UUID = "CA87289F-102B-4078-AD8C-8F53063547A6"
-ENCODER_UUID = "094A717B-0C7F-4A23-BFD1-A4924E6E7DAB"
-POWER_UUID = "4D92C3F7-848C-42C2-B26A-9D1D15CB361A"
-
-RIGHT_MOTOR_FEEDBACK_UUID = "2E38C871-902C-425F-8D3B-181CB21F0B67"
-LEFT_MOTOR_FEEDBACK_UUID = "81DC2896-1B27-4195-A391-99A637FA50A4"
+TELEMETRY_UUID = "348B92F4-EB75-476B-A124-5D8C97C35907"
 
 RIGHT_MOTOR_COMMAND_UUID = "09DC04D0-BFC0-4D7C-A88D-96D60857FE64"
 LEFT_MOTOR_COMMAND_UUID = "E0D883F6-705C-4A11-B117-E2B0909CC68E"
@@ -48,15 +44,6 @@ SD_LOGGER_UUID = "A06EE428-0AB6-4CD4-AA8A-91619F1AF577"
 
 LEFT_TRANSPARENT_CONTROLLER_UUID = "644CD587-A563-437E-8006-8B7F39559690"
 RIGHT_TRANSPARENT_CONTROLLER_UUID = "A8B58E7F-4B57-4C5F-85E4-55F38A6CE271"
-
-MOTOR_FEEDBACK_UUIDS = {
-    Side.LEFT:
-        LEFT_MOTOR_FEEDBACK_UUID,
-
-    Side.RIGHT:
-        RIGHT_MOTOR_FEEDBACK_UUID,
-}
-
 
 MOTOR_COMMAND_UUIDS = {
     Side.LEFT:
@@ -82,21 +69,7 @@ TRANSPARENT_CONTROLLER_UUIDS = {
         RIGHT_TRANSPARENT_CONTROLLER_UUID,
 }
 
-LEFT_INTERMEDIATE_TORQUE_UUID = (
-    "B50F6E44-AB02-4C7A-A801-74A85815B001"
-)
 
-RIGHT_INTERMEDIATE_TORQUE_UUID = (
-    "B50F6E44-AB02-4C7A-A801-74A85815B002"
-)
-
-LEFT_CONTROLLER_OUTPUT_TORQUE_UUID = (
-    "B50F6E44-AB02-4C7A-A801-74A85815B003"
-)
-
-RIGHT_CONTROLLER_OUTPUT_TORQUE_UUID = (
-    "B50F6E44-AB02-4C7A-A801-74A85815B004"
-)
 
 
 class BluetoothManager:
@@ -109,6 +82,7 @@ class BluetoothManager:
             left_motor: Motor,
             right_motor: Motor,
             intermediate_torque: IntermediateTorque,
+            controller_output_torque: IntermediateTorque,
             stop_event):
 
         self.encoders = encoders # two encoders
@@ -146,7 +120,10 @@ class BluetoothManager:
         self.ble_thread = None
 
         self.intermediate_torque = intermediate_torque
-        self.controller_output_torque = IntermediateTorque()
+        self.controller_output_torque = controller_output_torque
+
+        self.telemetry_packets_received = 0
+        self.telemetry_packets_malformed = 0
 
 
 
@@ -180,92 +157,73 @@ class BluetoothManager:
 
     def _has_pending_commands(self):
         return (
-            not self.command_queues[Side.LEFT].empty()
-            or not self.command_queues[Side.RIGHT].empty()
-            or not self.control_queues[Side.LEFT].empty()
-            or not self.control_queues[Side.RIGHT].empty()
-            or not self.sd_queue.empty()
-            or not self.transparent_queues.values()[Side.LEFT].empty()
-            or not self.transparent_queues.values()[Side.RIGHT].empty()
+                not self.command_queues[Side.LEFT].empty()
+                or not self.command_queues[Side.RIGHT].empty()
+                or not self.control_queues[Side.LEFT].empty()
+                or not self.control_queues[Side.RIGHT].empty()
+                or not self.sd_queue.empty()
+                or not self.transparent_queues.values()[Side.LEFT].empty()
+                or not self.transparent_queues.values()[Side.RIGHT].empty()
         )
 
-    def _fetch_motor(self, sender, data, side: Side):
-
-        values = struct.unpack("<fBBxx", data)
-
-        if self.motors[side] is None:
-            print("Motor is undefined")
+    def _fetch_telemetry(self, sender, data):
+        """Decode one aggregated Nano telemetry notification."""
+        try:
+            telemetry = BLETelemetryPacket.from_bytes(bytes(data))
+        except (ValueError, struct.error) as exc:
+            self.telemetry_packets_malformed += 1
+            print(
+                "Malformed BLE telemetry packet "
+                f"({len(data)} bytes): {exc}"
+            )
             return
 
-        self.motors[side]._update(*values)
+        self.telemetry_packets_received += 1
 
-    def _fetch_loadcells(self, sender, data):
-        values = struct.unpack("<2f", data)
+        if self.encoders is not None:
+            self.encoders._update(
+                telemetry.left_encoder,
+                telemetry.right_encoder,
+            )
+
         if self.loadcells is not None:
-            self.loadcells._update(*values)
+            self.loadcells._update(
+                telemetry.left_loadcell_torque,
+                telemetry.right_loadcell_torque,
+            )
 
-    def _fetch_left_intermediate_torque(self,sender,data):
+        if self.motors[Side.LEFT] is not None:
+            self.motors[Side.LEFT]._update(
+                telemetry.left_motor_torque,
+                telemetry.left_motor_temperature,
+                telemetry.left_motor_error,
+            )
 
-        value, = struct.unpack(
-            "<f",
-            data
-        )
+        if self.motors[Side.RIGHT] is not None:
+            self.motors[Side.RIGHT]._update(
+                telemetry.right_motor_torque,
+                telemetry.right_motor_temperature,
+                telemetry.right_motor_error,
+            )
+
+        if self.power is not None:
+            self.power._update(
+                telemetry.battery_voltage
+            )
 
         self.intermediate_torque._update_left(
-            value
-    )
-
-
-    def _fetch_right_intermediate_torque(
-            self,
-            sender,
-            data):
-
-        value, = struct.unpack(
-            "<f",
-            data
+            telemetry.left_intermediate_torque
         )
-
         self.intermediate_torque._update_right(
-            value
+            telemetry.right_intermediate_torque
         )
 
-    def _fetch_left_controller_output_torque(
-            self,
-            sender,
-            data,
-        ):
-            value, = struct.unpack("<f", data)
-
-            self.controller_output_torque._update_left(
-            value
+        self.controller_output_torque._update_left(
+            telemetry.left_controller_output_torque
         )
-
-
-    def _fetch_right_controller_output_torque(
-            self,
-            sender,
-            data,
-    ):
-        value, = struct.unpack("<f", data)
-
         self.controller_output_torque._update_right(
-            value
+            telemetry.right_controller_output_torque
         )
-
-    def _fetch_power(self, sender, data):
-        values = struct.unpack("<3f", data)
-        if self.power is None:
-            print("power is undefined")
-            return
-        self.power._update(*values)
-
-    def _fetch_encoders(self,sender,data):
-        values = struct.unpack("<2f",data)
-        if self.encoders is None:
-            print("power is undefined")
-            return
-        self.encoders._update(*values)
 
     def queue_motor_command(
             self,
@@ -337,20 +295,6 @@ class BluetoothManager:
             except queue.Empty:
                 break
 
-    def _make_motor_callback(self,side: Side):
-
-        def callback(
-                sender,
-                data,
-        ):
-            self._fetch_motor(
-                sender,
-                data,
-                side,
-            )
-
-        return callback
-
     async def _send_pending_motor_commands(
             self,
             client: BleakClient,
@@ -371,7 +315,8 @@ class BluetoothManager:
         }
 
         use_response = (
-            "write" in properties
+                "write-without-response" not in properties
+                and "write" in properties
         )
 
         command_queue = (self.command_queues[side])
@@ -422,7 +367,8 @@ class BluetoothManager:
         }
 
         use_response = (
-                "write" in properties
+                "write-without-response" not in properties
+                and "write" in properties
         )
 
 
@@ -457,47 +403,50 @@ class BluetoothManager:
 
 
     async def _send_pending_sd_commands(
-                self,
-                client: BleakClient,
-        ):
-            characteristic = (
-                client.services
-                .get_characteristic(
-                    SD_LOGGER_UUID
-                )
+            self,
+            client: BleakClient,
+    ):
+        characteristic = (
+            client.services
+            .get_characteristic(
+                SD_LOGGER_UUID
             )
+        )
 
-            properties = {
-                prop.lower()
-                for prop
-                in characteristic.properties
-            }
+        properties = {
+            prop.lower()
+            for prop
+            in characteristic.properties
+        }
 
-            use_response = ("write" in properties)
+        use_response = (
+                "write-without-response" not in properties
+                and "write" in properties
+        )
 
-            while True:
+        while True:
 
-                try:
-                    command = (self.sd_queue.get_nowait())
+            try:
+                command = (self.sd_queue.get_nowait())
 
-                except queue.Empty:
-                    break
-                try:
-                    packet = (command.to_bytes())
+            except queue.Empty:
+                break
+            try:
+                packet = (command.to_bytes())
 
-                    await client.write_gatt_char(
-                        characteristic,
-                        packet,
-                        response=use_response,
-                    )
+                await client.write_gatt_char(
+                    characteristic,
+                    packet,
+                    response=use_response,
+                )
 
-                except Exception as exc:
+            except Exception as exc:
 
-                    print(
-                        "Could not send "
-                        "SD logger control:",
-                        exc,
-                    )
+                print(
+                    "Could not send "
+                    "SD logger control:",
+                    exc,
+                )
 
     async def _send_pending_transparent_commands(
             self,
@@ -521,7 +470,8 @@ class BluetoothManager:
         }
 
         use_response = (
-                "write" in properties
+                "write-without-response" not in properties
+                and "write" in properties
         )
 
 
@@ -556,92 +506,70 @@ class BluetoothManager:
 
 
     async def _bluetooth_connection(self):
-            print("Searching for Bluetooth device...")
-            device = (
-                await
-                BleakScanner.find_device_by_name(
-                    DEVICE_NAME,
-                    timeout=15.0,
+        print("Searching for Bluetooth device...")
+        device = (
+            await
+            BleakScanner.find_device_by_name(
+                DEVICE_NAME,
+                timeout=15.0,
+            )
+        )
+        if device is None:
+            print("Bluetooth device not found")
+            self.stop_event.set()
+            return
+
+        async with BleakClient(device) as client:
+            print("Connected to Bluetooth")
+
+            telemetry_characteristic = (
+                client.services.get_characteristic(
+                    TELEMETRY_UUID
                 )
             )
-            if device is None:
-                print("Bluetooth device not found")
-                self.stop_event.set()
-                return
 
-            async with BleakClient(device) as client:
-                print("Connected to Bluetooth")
-
-                await client.start_notify(
-                    ENCODER_UUID,
-                    self._fetch_encoders,
+            if telemetry_characteristic is None:
+                raise RuntimeError(
+                    "Telemetry characteristic not found: "
+                    f"{TELEMETRY_UUID}"
                 )
 
-                await client.start_notify(
-                    LOAD_CELL_UUID,
-                    self._fetch_loadcells,
-                )
+            print(
+                "BLE telemetry packet size expected: "
+                f"{BLETelemetryPacket.size()} bytes"
+            )
 
-                await client.start_notify(
-                    POWER_UUID,
-                    self._fetch_power,
-                )
+            await client.start_notify(
+                telemetry_characteristic,
+                self._fetch_telemetry,
+            )
 
-                await client.start_notify(
-                    LEFT_INTERMEDIATE_TORQUE_UUID,
-                    self._fetch_left_intermediate_torque,
-                )
+            print("Receiving Bluetooth data...")
 
-                await client.start_notify(
-                    RIGHT_INTERMEDIATE_TORQUE_UUID,
-                    self._fetch_right_intermediate_torque,
-                )
 
-                await client.start_notify(
-                    LEFT_CONTROLLER_OUTPUT_TORQUE_UUID,
-                    self._fetch_left_controller_output_torque,
-                )
-
-                await client.start_notify(
-                    RIGHT_CONTROLLER_OUTPUT_TORQUE_UUID,
-                    self._fetch_right_controller_output_torque,
-                )
-
+            while not self.stop_event.is_set():
                 for side in Side:
-                    await client.start_notify(
-                        MOTOR_FEEDBACK_UUIDS[
-                            side
-                        ],
-                        self._make_motor_callback(
-                            side
-                        ),
+                    await self._send_pending_motor_commands(
+                        client,
+                        side,
                     )
-                print("Receiving Bluetooth data...")
 
 
-                while not self.stop_event.is_set():
-                    for side in Side:
-                        await self._send_pending_motor_commands(
+                    await  self._send_pending_motor_controls(
                         client,
                         side,
-                        )
+                    )
 
-
-                        await  self._send_pending_motor_controls(
+                    await  self._send_pending_transparent_commands(
                         client,
                         side,
-                        )
+                    )
 
-                        await  self._send_pending_transparent_commands(
-                            client,
-                            side,
-                        )
-
-                    await self._send_pending_sd_commands(
+                await self._send_pending_sd_commands(
                     client)
 
 
-                    await asyncio.sleep(0.01)
+                await asyncio.sleep(0.01)
 
 
     def _run_bluetooth(self):
